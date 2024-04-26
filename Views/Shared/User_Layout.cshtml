@@ -30,7 +30,7 @@
     
   <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
     <div class="container">
-      <a class="navbar-brand" href="index.html"><i class="flaticon-university"></i>Genius <br><small>University</small></a>
+      <a class="navbar-brand" href="/Page/Home"><i class="flaticon-university"></i>Genius <br><small>University</small></a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="oi oi-menu"></span> Menu
       </button>
@@ -38,21 +38,34 @@
       <div class="collapse navbar-collapse" id="ftco-nav">
         <ul class="navbar-nav ml-auto">
           <li class="nav-item active"><a href="/Page/Home" class="nav-link">Home</a></li>
-          <li class="nav-item"><a href="/Page/About" class="nav-link">About</a></li>
-          <li class="nav-item"><a href="/Page/Courses" class="nav-link">Courses</a></li>
+                    <li class="nav-item dropdown" onmouseleave="hideDropdown()">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownAbout" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Introduce
+                        </a>
+                        <div class="dropdown-menu" id="aboutDropdownMenu" aria-labelledby="navbarDropdownAbout">
+                            <a class="dropdown-item" href="/Page/About">About</a>
+                            <a class="dropdown-item" href="/Page/Facilities">Facilities</a>
+                            <a class="dropdown-item" href="/Page/Achievements">Achievements</a>
+                        </div>
+                    </li>
+
+                    <li class="nav-item"><a href="/Page/Courses" class="nav-link">Courses</a></li>
           <li class="nav-item"><a href="/Page/Teacher" class="nav-link">Teacher</a></li>
           <li class="nav-item"><a href="/Page/Blog" class="nav-link">Blog</a></li>
           <li class="nav-item"><a href="/Page/Events" class="nav-link">Events</a></li>
           <li class="nav-item"><a href="/Page/Contact" class="nav-link">Contact</a></li>
-          <li class="nav-item cta"><a href="contact.html" class="nav-link"><span>Apply Now!</span></a></li>
+          <li class="nav-item cta"><a href="/Page/Admission" class="nav-link"><span>Apply Now!</span></a></li>
         </ul>
       </div>
     </div>
   </nav>
     <!-- END nav -->
+   
+
     <div>
         @RenderBody()
     </div>
+
 
     <footer class="ftco-footer ftco-bg-dark ftco-section img" style="background-image: url(images/bg_2.jpg); background-attachment:fixed;">
     	<div class="overlay"></div>

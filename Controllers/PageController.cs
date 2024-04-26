@@ -12,6 +12,14 @@ namespace OnlineCollegeManagement.Controllers
         {
             return View();
         }
+        public async Task<IActionResult> Facilities()
+        {
+            return View();
+        }
+        public async Task<IActionResult> Achievements()
+        {
+            return View();
+        }
         public async Task<IActionResult> Courses()
         {
             return View();
@@ -37,6 +45,10 @@ namespace OnlineCollegeManagement.Controllers
             return View();
         }
         public async Task<IActionResult> Contact()
+        {
+            return View();
+        }
+        public async Task<IActionResult> Admission()
         {
             return View();
         }

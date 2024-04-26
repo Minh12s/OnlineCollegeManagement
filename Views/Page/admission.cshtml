@@ -1,0 +1,166 @@
+﻿@{
+    Layout = "~/Views/Shared/User_Layout.cshtml";
+    ViewData["Title"] = "Admission";
+}
+<div class="hero-wrap hero-wrap-2" style="background-image: url('/images/bg_2.jpg'); background-attachment:fixed;">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row no-gutters slider-text align-items-center justify-content-center" data-scrollax-parent="true">
+            <div class="col-md-8 ftco-animate text-center">
+                <p class="breadcrumbs">
+                    <span class="mr-2"><a href="index.html">Home</a></span> <span>
+                        Admission Procedure
+                    </span>
+                </p>
+                <h1 class="mb-3 bread">
+                    Admission Procedure
+                </h1>
+            </div>
+        </div>
+    </div>
+</div>
+<section class="ftco-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <div class="blog-entry align-self-stretch">
+                    <div class="text p-4 d-block">
+                        <h3 >Student Admission Form</h3>
+                        <form action="@Url.Action("SubmitAdmissionForm", "Admission")" method="post">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="name">Name:</label>
+                                        <input type="text" id="name" name="name" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="father_name">Father's Name:</label>
+                                        <input type="text" id="father_name" name="father_name" class="form-control" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="mother_name">Mother's Name:</label>
+                                        <input type="text" id="mother_name" name="mother_name" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="dob">Date of Birth:</label>
+                                        <input type="date" id="dob" name="dob" class="form-control" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="gender">Gender:</label>
+                                        <select id="gender" name="gender" class="form-control" required>
+                                            <option value="male">Male</option>
+                                            <option value="female">Female</option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="admission_for">Admission for:</label>
+                                        <select id="admission_for" name="admission_for" class="form-control" required>
+                                            <option value="science">Science</option>
+                                            <option value="arts">Arts</option>
+                                            <option value="commerce">Commerce</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="residential_address">Residential Address:</label>
+                                        <textarea id="residential_address" name="residential_address" class="form-control" required></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="permanent_address">Permanent Address:</label>
+                                        <textarea id="permanent_address" name="permanent_address" class="form-control" required></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <h3>Previous Exam Details</h3>
+                            <table>
+                                <tr>
+                                    <th>University</th>
+                                    <th>Enrollment Number</th>
+                                    <th>Center</th>
+                                    <th>Stream</th>
+                                </tr>
+                                <tr>
+                                    <td><input type="text" name="university[]" required></td>
+                                    <td><input type="text" name="enrollment_number[]" required></td>
+                                    <td><input type="text" name="center[]" required></td>
+                                    <td><input type="text" name="stream[]" required></td>
+                                </tr>
+                                <tr>
+                                    <th>Field</th>
+                                    <th>Marks Secured</th>
+                                    <th>Out of</th>
+                                    <th>Class Obtained</th>
+                                </tr>
+                                <tr>
+                                    <td><input type="text" name="field[]" required></td>
+                                    <td><input type="number" name="marks_secured[]" required></td>
+                                    <td><input type="number" name="out_of[]" required></td>
+                                    <td><input type="text" name="class_obtained[]" required></td>
+                                </tr>
+                            </table><br>
+
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="sports_details">Sports Details (if any):</label><br>
+                                        <textarea id="sports_details" name="sports_details" class="form-control" required></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <input type="submit" value="Submit" class="btn btn-primary">
+
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<style>
+    table {
+        border-collapse: collapse;
+        width: 100%;
+       
+
+    th, td {
+        padding: 8px;
+        text-align: left;
+    }
+
+    .btn-primary {
+        font-size: 18px; /* Đặt kích thước font */
+        padding: 12px 24px; /* Đặt kích thước padding */
+    }
+  
+</style>
