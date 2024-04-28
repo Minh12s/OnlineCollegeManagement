@@ -18,16 +18,7 @@ namespace OnlineCollegeManagement.Controllers
             return View("StudentManagement/EditStudent");
         }
 
-        public IActionResult Admissions()
-        {
-            return View("AdmissionsManagement/Admissions");
-        }
-
-        public IActionResult AdmissionsDetail()
-        {
-            return View("AdmissionsManagement/AdmissionsDetail");
-        }
-
+      
         public IActionResult Course()
         {
             return View("CourseManagement/Course");

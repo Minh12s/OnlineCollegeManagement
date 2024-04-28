@@ -121,5 +121,25 @@ namespace OnlineCollegeManagement.Controllers
         {
             return View();
         }
+        [HttpPost]
+        public async Task<IActionResult> SubmitAdmissionForm(StudentsInformation studentInfo)
+        {
+            if (true)
+            {
+                // Lưu thông tin sinh viên vào cơ sở dữ liệu
+                _context.StudentsInformation.Add(studentInfo);
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Đăng ký thành công!";
+
+                // Chuyển hướng trở lại trang Admission
+                return RedirectToAction("Admission", "Page");
+            }
+
+            // Nếu dữ liệu không hợp lệ, quay lại trang Admission để người dùng nhập lại
+            return View("Admission", studentInfo);
+        }
+
+
     }
 }
