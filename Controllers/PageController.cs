@@ -12,6 +12,7 @@ using System.Net.Mail;
 using System.Drawing.Printing;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Reflection.Metadata;
+using Azure;
 
 namespace OnlineCollegeManagement.Controllers
 {
@@ -89,10 +90,29 @@ namespace OnlineCollegeManagement.Controllers
         {
             return View();
         }
-        public async Task<IActionResult> Events()
+        public async Task<IActionResult> Events(int? page, int pageSize=9)
         {
-            return View();
+            int pageNumber = page ?? 1; // Trang hiện tại, mặc định là trang 1 nếu không có page được cung cấp
+
+            // Truy vấn dữ liệu sự kiện từ cơ sở dữ liệu
+            var eventsQuery = _context.Events.AsQueryable();
+            var paginatedEvent = await eventsQuery
+                                          .Skip((pageNumber - 1) * pageSize)
+                                          .Take(pageSize)
+                                          .ToListAsync();
+
+            // Lấy tổng số bài đăng sau khi áp dụng các tiêu chí lọc
+            int totalEvent = await eventsQuery.CountAsync();
+
+            // Chuyển thông tin phân trang vào ViewBag
+            ViewBag.CurrentPage = pageNumber;
+            ViewBag.TotalPages = (int)Math.Ceiling((double)totalEvent / pageSize);
+            ViewBag.TotalEvent = totalEvent;
+            ViewBag.PageSize = pageSize;
+            // Truyền danh sách sự kiện vào view để hiển thị
+            return View(paginatedEvent);
         }
+
         public async Task<IActionResult> Contact()
         {
             return View();
