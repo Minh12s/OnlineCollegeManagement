@@ -1,9 +1,33 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using OnlineCollegeManagement.Data;
+using OnlineCollegeManagement.Models;
+using BCrypt.Net;
+using System.Text;
+using System.Net.Mail;
+using System.Drawing.Printing;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Reflection.Metadata;
 
 namespace OnlineCollegeManagement.Controllers
 {
+
     public class PageController : Controller
     {
+        private readonly CollegeManagementContext _context;
+        private readonly IConfiguration _configuration;
+        private readonly IWebHostEnvironment _env;
+
+        public PageController(CollegeManagementContext context, IConfiguration configuration, IWebHostEnvironment env)
+        {
+            _context = context;
+            _configuration = configuration;
+            _env = env;
+        }
         public async Task<IActionResult> Home()
         {
             return View();
@@ -12,9 +36,34 @@ namespace OnlineCollegeManagement.Controllers
         {
             return View();
         }
-        public async Task<IActionResult> Facilities()
+        public async Task<IActionResult> Facilities(int? page)
         {
-            return View();
+            // Số lượng cơ sở vật lý trên mỗi trang
+            int pageSize = 3;
+
+            // Trang hiện tại (mặc định là trang 1 nếu không có giá trị được cung cấp)
+            int pageNumber = page ?? 1;
+
+            // Truy vấn dữ liệu từ bảng Facilities và sắp xếp theo ngày mới nhất
+            var facilities = await _context.Facilities
+                .OrderByDescending(f => f.FacilityDate) // Sắp xếp giảm dần theo ngày
+                .Skip((pageNumber - 1) * pageSize)     // Bỏ qua các cơ sở vật lý trên các trang trước
+                .Take(pageSize)                        // Lấy số lượng cơ sở vật lý trên trang hiện tại
+                .ToListAsync();
+
+            // Tổng số cơ sở vật lý
+            int totalFacilities = await _context.Facilities.CountAsync();
+
+            // Tính tổng số trang
+            int totalPages = (int)Math.Ceiling((double)totalFacilities / pageSize);
+
+            // Truyền các thông tin về phân trang vào ViewBag
+            ViewBag.CurrentPage = pageNumber;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.PageSize = pageSize;
+
+            // Trả về view và truyền dữ liệu facilities vào view
+            return View(facilities);
         }
         public async Task<IActionResult> Achievements()
         {

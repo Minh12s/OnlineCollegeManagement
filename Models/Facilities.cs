@@ -6,6 +6,7 @@ namespace OnlineCollegeManagement.Models
         public int FacilitiesId { get; set; }
         public string FacilityDescription { get; set; }
         public string FacilityImageUrl { get; set; }
+        public DateTime FacilityDate { get; set; }
         public string FacilityTitle { get; set; }
     }
 }

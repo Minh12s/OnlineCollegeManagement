@@ -481,7 +481,7 @@ namespace OnlineCollegeManagement.Data
 
 
                 // Seed data for Events
-                var thumbnailPaths = Enumerable.Range(1, 80).Select(i => $"/images/event-{i}.jpg").ToList();
+                var thumbnailPaths = Enumerable.Range(1, 6).Select(i => $"/images/event-{i}.jpg").ToList();
                 var eventDescriptions = new string[]
                 {
                 "Welcome Party",
@@ -515,7 +515,7 @@ namespace OnlineCollegeManagement.Data
 
 
                 // Seed data for Achievements
-                var thumbnailPaths1 = Enumerable.Range(1, 80).Select(i => $"/images/event-{i}.jpg").ToList();
+                var thumbnailPaths1 = Enumerable.Range(1, 6).Select(i => $"/images/event-{i}.jpg").ToList();
                 var achievementDescriptions = new string[]
  {
     "First Prize in Coding Competition",
@@ -538,6 +538,7 @@ namespace OnlineCollegeManagement.Data
                     {
                         AchievementDescription = achievementDescriptions[achievementIndex],
                         AchievementTitle = $"Achievement {i + 1}",
+                        AchievementDate = DateTime.Now.AddDays(random.Next(1, 30)),
                         AchievementImageUrl = thumbnailPaths1[random.Next(thumbnailPaths1.Count)],
                     };
 
@@ -548,7 +549,7 @@ namespace OnlineCollegeManagement.Data
 
 
                 // Seed data for Facilities
-                var thumbnailPaths3 = Enumerable.Range(1, 80).Select(i => $"/images/event-{i}.jpg").ToList();
+                var thumbnailPaths3 = Enumerable.Range(1, 6).Select(i => $"/images/event-{i}.jpg").ToList();
                 var facilityDescriptions = new string[]
                 {
     "State-of-the-art Computer Lab",
@@ -571,6 +572,7 @@ namespace OnlineCollegeManagement.Data
                     {
                         FacilityDescription = facilityDescriptions[facilityIndex],
                         FacilityTitle = $"Facility {i + 1}",
+                        FacilityDate = DateTime.Now.AddDays(random.Next(1, 30)),
                         FacilityImageUrl = thumbnailPaths3[random.Next(thumbnailPaths3.Count)]
                     };
 

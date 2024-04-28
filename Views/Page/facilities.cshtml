@@ -1,4 +1,5 @@
-﻿@{
+﻿@model List<OnlineCollegeManagement.Models.Facilities>
+@{
     Layout = "~/Views/Shared/User_Layout.cshtml";
     ViewData["Title"] = "Facilities";
 }
@@ -14,56 +15,44 @@
         </div>
     </div>
 </div>
-<section class="ftco-section">
-    <div class="container">
-        <h2 class="text-center mb-5">State-of-the-Art Facilities - Laboratories</h2>
-        <div class="row d-flex">
-            <div class="col-md-6 d-flex ftco-animate">
-                <div class="img img-about align-self-stretch" style="background-image: url(/images/bg_3.jpg); width: 100%;"></div>
-            </div>
-            <div class="col-md-6 pl-md-5 ftco-animate">
-                <p>Genius University takes pride in providing cutting-edge facilities to support the academic and extracurricular needs of our students. Our facilities are designed to foster creativity, innovation, and collaboration among students and faculty.</p>
-                <p>From modern laboratories equipped with the latest technology to expansive libraries stocked with a vast array of resources, our campus offers an environment conducive to learning and growth.</p>
-            </div>
-        </div>
-    </div>
-</section>
 
 <section class="ftco-section">
     <div class="container">
-        <h1 class="text-center mb-5">State-of-the-Art Facilities - Libraries</h1>
-        <div class="row d-flex">
-            <div class="col-md-6 d-flex ftco-animate">
-                <div class="img img-about align-self-stretch" style="background-image: url(/images/bg_3.jpg); width: 100%;"></div>
-            </div>
-
-            <div class="col-md-6 pl-md-5 ftco-animate">
-                <h2 class="text-center mb-5">State-of-the-Art Facilities - Libraries</h2>
-
-                <p>Genius University takes pride in providing cutting-edge facilities to support the academic and extracurricular needs of our students. Our facilities are designed to foster creativity, innovation, and collaboration among students and faculty.</p>
-                <p>From modern laboratories equipped with the latest technology to expansive libraries stocked with a vast array of resources, our campus offers an environment conducive to learning and growth.</p>
-            </div>
-        </div>
+        @if (Model != null)
+        {
+            @foreach (var facilities in Model)
+            {
+                <h2 style="margin-bottom: 10px;" class="text-center mb-5">@facilities.FacilityTitle</h2>
+                <div class="row d-flex">
+                    <div class="col-md-6 d-flex ftco-animate">
+                        <div class="img img-about align-self-stretch" style="background-image: url(@facilities.FacilityImageUrl); width: 100%; height:200px;"></div>
+                    </div>
+                    <div class="col-md-6 pl-md-5 ftco-animate">
+                        <p>@Html.Raw(facilities.FacilityDescription)</p>
+                  
+                    </div>
+                </div>
+            }
+        }
     </div>
 </section>
 
-<section class="ftco-section">
-    <div class="container">
-        <h2 class="text-center mb-5">State-of-the-Art Facilities - Sports Facilities</h2>
-        <div class="row d-flex">
-            <div class="col-md-6 d-flex ftco-animate">
-                <div class="img img-about align-self-stretch" style="background-image: url(/images/bg_3.jpg); width: 100%;"></div>
-            </div>
-            <div class="col-md-6 pl-md-5 ftco-animate">
-                <p>Genius University takes pride in providing cutting-edge facilities to support the academic and extracurricular needs of our students. Our facilities are designed to foster creativity, innovation, and collaboration among students and faculty.</p>
-                <p>In addition to academic facilities, our campus also boasts a wide range of recreational and sports amenities to promote a healthy and balanced lifestyle among students. Our sports facilities include state-of-the-art gyms, tennis courts, swimming pools, and athletic fields.</p>
-            </div>
+<div class="row mt-5">
+    <div class="col text-center">
+        <div style="margin-top: -60px; margin-bottom: 40px;" class="block-27">
+            <ul>
+                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                {
+                    <li class="@(ViewBag.CurrentPage == i ? "active" : "")"><a href="@Url.Action("Facilities", new { page = i })">@i</a></li>
+                }
+            </ul>
         </div>
     </div>
-</section>
+</div>
 
 
-<section class="ftco-section-3 img" >
+
+<section class="ftco-section-3 img">
     <div class="overlay"></div>
     <div class="container">
         <div class="row d-md-flex justify-content-center">
