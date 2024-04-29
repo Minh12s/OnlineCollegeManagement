@@ -12,7 +12,6 @@ using System.Net.Mail;
 using System.Drawing.Printing;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Reflection.Metadata;
-using Azure;
 
 namespace OnlineCollegeManagement.Controllers
 {
@@ -66,9 +65,34 @@ namespace OnlineCollegeManagement.Controllers
             // Trả về view và truyền dữ liệu facilities vào view
             return View(facilities);
         }
-        public async Task<IActionResult> Achievements()
+        public async Task<IActionResult> Achievements(int? page)
         {
-            return View();
+            // Số lượng cơ sở vật lý trên mỗi trang
+            int pageSize = 3;
+
+            // Trang hiện tại (mặc định là trang 1 nếu không có giá trị được cung cấp)
+            int pageNumber = page ?? 1;
+
+            // Truy vấn dữ liệu từ bảng Facilities và sắp xếp theo ngày mới nhất
+            var achievements = await _context.Achievements
+                .OrderByDescending(f => f.AchievementDate) // Sắp xếp giảm dần theo ngày
+                .Skip((pageNumber - 1) * pageSize)     // Bỏ qua các cơ sở vật lý trên các trang trước
+                .Take(pageSize)                        // Lấy số lượng cơ sở vật lý trên trang hiện tại
+                .ToListAsync();
+
+            // Tổng số cơ sở vật lý
+            int totalAchievements = await _context.Achievements.CountAsync();
+
+            // Tính tổng số trang
+            int totalPages = (int)Math.Ceiling((double)totalAchievements / pageSize);
+
+            // Truyền các thông tin về phân trang vào ViewBag
+            ViewBag.CurrentPage = pageNumber;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.PageSize = pageSize;
+
+            // Trả về view và truyền dữ liệu facilities vào view
+            return View(achievements);
         }
         public async Task<IActionResult> Courses()
         {
@@ -90,7 +114,7 @@ namespace OnlineCollegeManagement.Controllers
         {
             return View();
         }
-        public async Task<IActionResult> Events(int? page, int pageSize=9)
+        public async Task<IActionResult> Events(int? page, int pageSize = 9)
         {
             int pageNumber = page ?? 1; // Trang hiện tại, mặc định là trang 1 nếu không có page được cung cấp
 

@@ -37,7 +37,7 @@
         function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
         gtag('config', 'UA-130795909-1');</script>
- 
+
 </head>
 <body>
 
@@ -178,13 +178,20 @@
                             <span class="menu-item-label">Facilities Management</span>
                         </a>
                     </li>
-
+                    <li>
+                        <a href="/AchievementsManagement/Achievements">
+                            <span class="icon"><i class="mdi mdi-trophy"></i></span>
+                            <span class="menu-item-label">Achievements Management</span>
+                        </a>
+                    </li>
                     <li>
                         <a href="/Events/Event">
-                            <span class="icon"><i class="mdi mdi-pencil"></i></span>
+                            <span class="icon"><i class="mdi mdi-calendar-star"></i></span>
                             <span class="menu-item-label">Event Management</span>
                         </a>
                     </li>
+
+
 
                 </ul>
 
@@ -239,8 +246,7 @@
     <script type="text/javascript" src="~/admin/js/chart.sample.min.js"></script>
 
 
-    <script>
-        var myApp = new function () {
+    <script>var myApp = new function () {
             this.printTable = function () {
                 var tab = document.getElementById('sampleTable');
                 var win = window.open('', '', 'height=700,width=700');

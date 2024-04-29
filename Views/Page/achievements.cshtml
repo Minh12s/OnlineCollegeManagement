@@ -1,4 +1,5 @@
-﻿@{
+﻿@model List<OnlineCollegeManagement.Models.Achievements>
+@{
     Layout = "~/Views/Shared/User_Layout.cshtml";
     ViewData["Title"] = "Achievements";
 }
@@ -17,27 +18,48 @@
 
 <section class="ftco-section">
     <div class="container">
-        <div class="row d-flex">
-            <div class="col-md-6 d-flex ftco-animate">
-                <div class="img img-about align-self-stretch" style="background-image: url(/images/bg_3.jpg); width: 100%;"></div>
-            </div>
-            <div class="col-md-6 pl-md-5 ftco-animate">
-                <h2 class="mb-4">Our Outstanding Achievements</h2>
-                <p>Genius University is proud to have achieved numerous milestones and accolades throughout its illustrious history. Our commitment to excellence in education and innovation has earned us recognition on both national and international platforms.</p>
-                <p>From groundbreaking research projects to prestigious awards received by our faculty and students, we continue to set new standards of excellence in academia and beyond.</p>
-            </div>
-        </div>
+        @if (Model != null)
+        {
+            @foreach (var achievements in Model)
+            {
+                <h2 style="margin-bottom: 10px;" class="text-center mb-5">@achievements.AchievementTitle</h2>
+                <div class="row d-flex">
+                    <div class="col-md-6 d-flex ftco-animate">
+                        <div class="img img-about align-self-stretch" style="background-image: url(@achievements.AchievementImageUrl); width: 100%; height:200px;"></div>
+                    </div>
+                    <div class="col-md-6 pl-md-5 ftco-animate">
+                        <p>@Html.Raw(achievements.AchievementDescription)</p>
+
+                    </div>
+                </div>
+            }
+        }
     </div>
 </section>
 
-<section class="ftco-section-3 img" style="background-image: url(/images/bg_3.jpg);">
+<div class="row mt-5">
+    <div class="col text-center">
+        <div style="margin-top: -60px; margin-bottom: 40px;" class="block-27">
+            <ul>
+                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                {
+                    <li class="@(ViewBag.CurrentPage == i ? "active" : "")"><a href="@Url.Action("Achievements", new { page = i })">@i</a></li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+
+<section class="ftco-section-3 img">
     <div class="overlay"></div>
     <div class="container">
         <div class="row d-md-flex justify-content-center">
             <div class="col-md-9 about-video text-center">
-                <h2 class="ftco-animate">Celebrating Excellence</h2>
+                <h2 class="ftco-animate">Explore Our Campus Facilities</h2>
                 <div class="video d-flex justify-content-center">
-                    <a href="https://vimeo.com/45830194" class="button popup-vimeo d-flex justify-content-center align-items-center"><span class="ion-ios-play"></span></a>
+                    <a href="#" class="button d-flex justify-content-center align-items-center"><span class="ion-ios-play"></span></a>
                 </div>
             </div>
         </div>
@@ -52,32 +74,32 @@
                     <div class="col-md-3 d-flex justify-content-center counter-wrap ftco-animate">
                         <div class="block-18 text-center">
                             <div class="text">
-                                <strong class="number" data-number="50">0</strong>
-                                <span>Awards Received</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3 d-flex justify-content-center counter-wrap ftco-animate">
-                        <div class="block-18 text-center">
-                            <div class="text">
-                                <strong class="number" data-number="30">0</strong>
-                                <span>Research Projects</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3 d-flex justify-content-center counter-wrap ftco-animate">
-                        <div class="block-18 text-center">
-                            <div class="text">
-                                <strong class="number" data-number="100">0</strong>
-                                <span>Publications</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3 d-flex justify-content-center counter-wrap ftco-animate">
-                        <div class="block-18 text-center">
-                            <div class="text">
                                 <strong class="number" data-number="20">0</strong>
-                                <span>Patents Granted</span>
+                                <span>Modern Laboratories</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 d-flex justify-content-center counter-wrap ftco-animate">
+                        <div class="block-18 text-center">
+                            <div class="text">
+                                <strong class="number" data-number="10">0</strong>
+                                <span>Libraries</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 d-flex justify-content-center counter-wrap ftco-animate">
+                        <div class="block-18 text-center">
+                            <div class="text">
+                                <strong class="number" data-number="15">0</strong>
+                                <span>Sports Facilities</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 d-flex justify-content-center counter-wrap ftco-animate">
+                        <div class="block-18 text-center">
+                            <div class="text">
+                                <strong class="number" data-number="5">0</strong>
+                                <span>Student Centers</span>
                             </div>
                         </div>
                     </div>
@@ -91,7 +113,7 @@
     <div class="container">
         <div class="row justify-content-center mb-5 pb-3">
             <div class="col-md-7 heading-section ftco-animate text-center">
-                <h2 class="mb-4">Success Stories</h2>
+                <h2 class="mb-4">What Our Students Say</h2>
             </div>
         </div>
         <div class="row">
@@ -105,9 +127,9 @@
                                 </span>
                             </div>
                             <div class="text">
-                                <p class="mb-5">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean.</p>
-                                <p class="name">John Doe</p>
-                                <span class="position">Awarded Researcher</span>
+                                <p class="mb-5">"The facilities at Genius University are truly exceptional. The modern labs and libraries have been instrumental in enhancing my learning experience."</p>
+                                <p class="name">Emily Smith</p>
+                                <span class="position">Engineering Student</span>
                             </div>
                         </div>
                     </div>
@@ -119,9 +141,9 @@
                                 </span>
                             </div>
                             <div class="text">
-                                <p class="mb-5">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean.</p>
-                                <p class="name">Jane Smith</p>
-                                <span class="position">Published Author</span>
+                                <p class="mb-5">"I've had the opportunity to explore various sports facilities on campus. They are well-maintained and provide ample opportunities for students to stay active and healthy."</p>
+                                <p class="name">John Doe</p>
+                                <span class="position">Sports Science Student</span>
                             </div>
                         </div>
                     </div>
@@ -133,9 +155,9 @@
                                 </span>
                             </div>
                             <div class="text">
-                                <p class="mb-5">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean.</p>
-                                <p class="name">Emily Johnson</p>
-                                <span class="position">Innovative Inventor</span>
+                                <p class="mb-5">"The student centers at Genius University provide a welcoming and vibrant atmosphere for students to socialize and collaborate. They are truly the heart of campus life."</p>
+                                <p class="name">Sarah Johnson</p>
+                                <span class="position">Business Student</span>
                             </div>
                         </div>
                     </div>

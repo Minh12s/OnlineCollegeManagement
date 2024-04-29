@@ -19,34 +19,36 @@ namespace OnlineCollegeManagement.Controllers
             _env = env;
         }
 
-        public async Task<IActionResult> Event(int? page, string searchString, String EventDate, int pageSize = 5)
+        public async Task<IActionResult> Event(int? page, string EventTitle = null, DateTime? startDate = null, DateTime? endDate = null, string search = null, int pageSize = 10)
         {
             int pageNumber = page ?? 1; // Trang hiện tại, mặc định là trang 1 nếu không có page được cung cấp
 
             // Truy xuất dữ liệu sự kiện từ nguồn dữ liệu
             var eventsQuery = _context.Events.AsQueryable();
 
-            // Tìm kiếm theo EventDescription hoặc EventTitle nếu searchString không rỗng
-            if (!string.IsNullOrEmpty(searchString))
+            // Áp dụng các tiêu chí lọc nếu chúng được cung cấp
+            if (!string.IsNullOrEmpty(EventTitle))
             {
-                eventsQuery = eventsQuery.Where(e => e.EventDescription.Contains(searchString) || e.EventTitle.Contains(searchString));
+                eventsQuery = eventsQuery.Where(b => b.EventTitle.Contains(EventTitle));
+            }
+            if (startDate != null)
+            {
+                eventsQuery = eventsQuery.Where(b => b.EventDate >= startDate);
             }
 
-            if (!string.IsNullOrEmpty(EventDate))
+            if (endDate != null)
             {
-                // Chuyển đổi chuỗi EventDate thành kiểu DateTime
-                if (DateTime.TryParse(EventDate, out DateTime eventDateValue))
-                {
-                    // Lọc theo ngày sự kiện (EventDate)
-                    eventsQuery = eventsQuery.Where(e => e.EventDate.Date == eventDateValue.Date);
-                }
+                // Chú ý: Khi lọc theo ngày kết thúc, hãy thêm 1 ngày vào để bao gồm tất cả các bài đăng được đăng vào ngày kết thúc
+                eventsQuery = eventsQuery.Where(b => b.EventDate < endDate.Value.AddDays(1));
             }
 
 
+            if (!string.IsNullOrEmpty(search))
+            {
+                eventsQuery = eventsQuery.Where(b => b.EventTitle.Contains(search)
+                                        || b.EventDescription.Contains(search));
 
-
-            // Thực hiện truy vấn để lấy dữ liệu sự kiện
-            var events = await eventsQuery.ToListAsync();
+            }
 
             // Phân trang danh sách bài đăng và sắp xếp theo thời gian gần nhất
             var paginatedEvent = await eventsQuery

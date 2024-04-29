@@ -1,71 +1,11 @@
-﻿@model OnlineCollegeManagement.Models.Events
-
+﻿
+@model OnlineCollegeManagement.Models.Events
 @{
-    ViewData["Title"] = "EditEvent";
+    ViewData["Title"] = "Edit Facilities";
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
 
-<section class="is-title-bar">
-    <div class="flex flex-col md:flex-row items-center justify-between space-y-6 md:space-y-0">
-        <ul>
-            <li>List of products</li>
-            <li>Add Product</li>
-        </ul>
 
-    </div>
-</section>
-<section class="section main-section">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="tile">
-                <h3 class="tile-title">Add product</h3>
-                <div class="tile-body">
-                    <form class="edit-product-form" asp-controller="Events" asp-action="EditEvent" method="post" enctype="multipart/form-data">
-
-
-                        <div class="form-group col-md-3">
-                            <label class="control-label">Title</label>
-                            <input asp-for="EventTitle" class="form-control" name="EventTitle" placeholder="Title" />
-                        </div>
-
-                        <div class="form-group col-md-12">
-                            <label class="control-label">Event Image</label>
-                            <input type="file" name="EventImageUrl" class="form-control" asp-for="EventImageUrl" onchange="displayThumbnail(this);" />
-                                    <img id="thumbnailImage" alt="Thumbnail image" src="@Url.Content(Model.EventImageUrl)" style="max-width: 50%;" />
-                                
-                         
-                        </div>
-
-                        <div class="form-group col-md-6">
-                            <label class="control-label">Description</label>
-                            <textarea asp-for="EventDescription" class="form-control" name="EventDescription" placeholder="Content"></textarea>
-                        </div>
-
-                        <button class="btn btn-save" type="submit">Save</button>
-                        <a class="btn btn-cancel" href="/Events/Event">Cancel</a>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-<script src="https://cdn.tiny.cloud/1/6a4ufu188x8itoqtz2agsuahgg475yn7bxva9xzabribtvjm/tinymce/5/tinymce.min.js"></script>
-<script>
-    tinymce.init({
-        selector: 'textarea[name="EventDescription"]'
-    });</script>
-<script>
-    function displayThumbnail(input) {
-        var thumbnailImage = document.getElementById('thumbnailImage');
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
-            reader.onload = function (e) {
-                thumbnailImage.src = e.target.result;
-                thumbnailImage.style.display = 'block';
-            };
-            reader.readAsDataURL(input.files[0]);
-        }
-    }</script>
 <style>
     .row {
         display: -webkit-box;
@@ -108,10 +48,6 @@
         color: black;
     }
 
-    .main-section {
-        margin-left: 15px;
-    }
-
     .btn-save {
         background-color: rgb(166 236 171);
         color: rgb(1 123 10);
@@ -121,7 +57,8 @@
         border-color: none;
         border-radius: .357rem;
         border: none;
-        padding: 5px 20px; /* Điều chỉnh kích thước theo ý muốn */
+        padding: 5px 20px;
+        margin-top: 10px;
     }
 
     .btn-cancel {
@@ -133,6 +70,73 @@
         border-color: none;
         border-radius: .357rem;
         border: none;
-        padding: 5px 20px; /* Điều chỉnh kích thước theo ý muốn */
+        padding: 8px 20px;
+        margin-top: 10px;
+    }
+
+    .main-section {
+        margin-left: 15px;
     }
 </style>
+<section class="is-title-bar">
+    <div class="flex flex-col md:flex-row items-center justify-between space-y-6 md:space-y-0">
+        <ul>
+            <li style="margin-left:-50px;">Admin</li>
+            <li>Edit Facilities</li>
+        </ul>
+
+    </div>
+</section>
+<section class="section main-section">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="tile">
+
+                <div class="tile-body">
+                    <form class="edit-product-form" asp-controller="Events" asp-action="EditEvent" method="post" enctype="multipart/form-data">
+                        <!-- Trường ẩn để chứa FacilitiesId -->
+                        <input type="hidden" asp-for="EventsId" />
+
+                        <div class="form-group col-md-3">
+                            <label class="control-label">Title</label>
+                            <input asp-for="EventTitle" class="form-control" name="EventTitle" placeholder="Title" />
+                        </div>
+
+                        <div class="form-group col-md-12">
+                            <label class="control-label">Thumbnail</label>
+                            <div>
+                                <input asp-for="EventImageUrl" type="file" name="EventImageUrl" class="form-control" onchange="displayThumbnail(this);" />
+                                <img id="thumbnailImage" alt="Thumbnail image" src="@Url.Content(Model.EventImageUrl)" style="max-width: 50%;" />
+                            </div>
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <label class="control-label">Content</label>
+                            <textarea asp-for="EventDescription" class="form-control" name="EventDescription" placeholder="Content"></textarea>
+                        </div>
+
+                        <button class="btn btn-save" type="submit">Save</button>
+                        <a class="btn btn-cancel" href="/Events/Event">Cancel</a>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script src="https://cdn.tiny.cloud/1/6a4ufu188x8itoqtz2agsuahgg475yn7bxva9xzabribtvjm/tinymce/5/tinymce.min.js"></script>
+<script>tinymce.init({
+    selector: 'textarea[name="EventDescription"]'
+    });</script>
+<script>function displayThumbnail(input) {
+        var thumbnailImage = document.getElementById('thumbnailImage');
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                thumbnailImage.src = e.target.result;
+                thumbnailImage.style.display = 'block';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }</script>
+

@@ -1,12 +1,12 @@
 ﻿@{
-    ViewData["Title"] = "Facilities";
+    ViewData["Title"] = "Achievements";
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
 <section class="is-title-bar">
     <div class="flex flex-col md:flex-row items-center justify-between space-y-6 md:space-y-0">
         <ul>
             <li style="margin-left:-50px;">Admin</li>
-            <li>Facilities</li>
+            <li>Achievements</li>
         </ul>
 
     </div>
@@ -16,9 +16,9 @@
     <div class="flex flex-col md:flex-row items-center justify-start">
         <!-- Phần này để chứa nút "Add Blog" -->
         <div class="col-sm-2" style="margin-right: 5px;">
-            <a class="btn btn-add" asp-controller="FacilitiesManagement" asp-action="AddFacilities" title="Thêm">
+            <a class="btn btn-add" asp-controller="AchievementsManagement" asp-action="AddAchievements" title="Thêm">
                 <i class="fas fa-plus"></i>
-                Add Facilities
+                Add Achievements
             </a>
         </div>
 
@@ -48,11 +48,9 @@
     </div>
 </section>
 
-
-
-<form style="display: flex; align-items: center; border-radius: 5px; margin-top: 10px; flex-wrap: wrap;" asp-action="Facilities" asp-controller="FacilitiesManagement" method="get">
+<form style="display: flex; align-items: center; border-radius: 5px; margin-top: 10px; flex-wrap: wrap;" asp-action="Achievements" asp-controller="AchievementsManagement" method="get">
     <div class="input-group input-group-sm" style="margin-right: 5px; margin-bottom: 10px;">
-        <input value="" class="form-control" type="text" name="FacilityTitle" placeholder="Title" style="height: 45px; font-size: 0.765625rem; padding: 4px 8px; background-color: #F1F1F1; border-radius: 5px; width: 120px; margin-left: 28px;" />
+        <input value="" class="form-control" type="text" name="AchievementTitle" placeholder="Title" style="height: 45px; font-size: 0.765625rem; padding: 4px 8px; background-color: #F1F1F1; border-radius: 5px; width: 120px; margin-left: 28px;" />
     </div>
     <div class="input-group input-group-sm" style="margin-right: 5px; margin-bottom: 10px;">
         <input value="" class="form-control" type="date" name="StartDate" placeholder="Start Date" style="height: 45px; font-size: 0.765625rem; padding: 4px 8px; background-color: #F1F1F1; border-radius: 5px; width: 150px; margin-left: 10px;" />
@@ -73,10 +71,10 @@
         <header class="card-header">
             <p class="card-header-title">
                 @*<span class="icon"><i class="mdi mdi-shopping"></i></span>*@
-                Facilities
+                Achievement
             </p>
 
-            <form class="card-header-icon" asp-controller="FacilitiesManagement" asp-action="Facilities" method="get" onchange="this.submit()">
+            <form class="card-header-icon" asp-controller="AchievementsManagement" asp-action="Achievements" method="get" onchange="this.submit()">
 
                 <select style="margin-left:-10px; padding: 5px 10px;border:1px solid #F1F1F1 " name="PageSize">
                     <option value="10"
@@ -118,24 +116,24 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var facilities in Model)
+                    @foreach (var achievements in Model)
                     {
                         <tr>
 
                             <td width="10"><input type="checkbox" name="check1" value="1"></td>
-                            <td>@facilities.FacilitiesId</td>
-                            <td>@facilities.FacilityTitle</td>
-                            <td><img src="@facilities.FacilityImageUrl" alt="Thumbnail" width="100" height="100"></td>
-                            <td>@Html.Raw(facilities.FacilityDescription)</td>
-                            <td>@facilities.FacilityDate.ToString("yyyy-MM-dd")</td>
+                            <td>@achievements.AchievementsId</td>
+                            <td>@achievements.AchievementTitle</td>
+                            <td><img src="@achievements.AchievementImageUrl" alt="Thumbnail" width="100" height="100"></td>
+                            <td>@Html.Raw(achievements.AchievementDescription)</td>
+                            <td>@achievements.AchievementDate.ToString("yyyy-MM-dd")</td>
 
                             <td>
                                 <div class="button-group">
 
-                                    <a class="btn btn-primary" asp-controller="FacilitiesManagement" asp-action="EditFacilities" asp-route-id="@facilities.FacilitiesId">
+                                    <a class="btn btn-primary" asp-controller="AchievementsManagement" asp-action="EditAchievements" asp-route-id="@achievements.AchievementsId">
                                         <span class="icon"><i class="mdi mdi-pencil"></i></span>
                                     </a>
-                                    <form asp-controller="FacilitiesManagement" asp-action="DeleteFacilities" asp-route-id="@facilities.FacilitiesId" method="post" onsubmit="return confirm('Are you sure you want to delete this facilities?')">
+                                    <form asp-controller="AchievementsManagement" asp-action="DeleteAchievements" asp-route-id="@achievements.AchievementsId" method="post" onsubmit="return confirm('Are you sure you want to delete this achievement?')">
                                         <button class="btn btn-danger">
                                             <span class="icon"><i class="mdi mdi-delete"></i></span>
                                         </button>
@@ -153,7 +151,7 @@
                     <div class="buttons">
                         @for (int i = 1; i <= ViewBag.TotalPages; i++)
                         {
-                            <button type="button" class="button @(ViewBag.CurrentPage == i ? "active" : "")" onclick="location.href='@Url.Action("Facilities", "FacilitiesManagement", new { page = i, pageSize = ViewBag.PageSize })'">@i</button>
+                            <button type="button" class="button @(ViewBag.CurrentPage == i ? "active" : "")" onclick="location.href='@Url.Action("Achievements", "AchievementsManagement", new { page = i, pageSize = ViewBag.PageSize })'">@i</button>
                         }
                     </div>
                     <small>Page @ViewBag.CurrentPage of @ViewBag.TotalPages</small>
