@@ -169,12 +169,22 @@ namespace OnlineCollegeManagement.Data
                 var courseNames = new List<string> { "Web Development", "Database Management", "Machine Learning", "Software Testing", "Computer Graphics", "Network Security", "Digital Signal Processing", "Operating Systems", "Data Mining", "Artificial Intelligence" };
 
                 var courses = new List<Courses>();
-                foreach (var name in courseNames)
+
+                foreach (var major in majors1)
                 {
-                    var randomMajorId = majors1[random.Next(majors1.Count)].MajorsId;
-                    var randomTeacherId = teachers1[random.Next(teachers1.Count)].TeachersId;
-                    var course = new Courses { CourseName = name, Description = $"Course description for {name}", MajorsId = randomMajorId, TeachersId = randomTeacherId };
-                    courses.Add(course);
+                    for (int i = 0; i < 5; i++)
+                    {
+                        var randomTeacherId = teachers1[random.Next(teachers1.Count)].TeachersId;
+                        var randomCourseName = courseNames[random.Next(courseNames.Count)];
+                        var course = new Courses
+                        {
+                            CourseName = randomCourseName,
+                            Description = $"Course description for {randomCourseName}",
+                            MajorsId = major.MajorsId,
+                            TeachersId = randomTeacherId
+                        };
+                        courses.Add(course);
+                    }
                 }
 
                 foreach (var course in courses)
@@ -184,20 +194,19 @@ namespace OnlineCollegeManagement.Data
                 context.SaveChanges();
 
 
+
                 // Seed data for Classes
-                var courses1 = context.Courses.ToList();
-                var classNames = new List<string> { "CS", "Math", "Physics", "Chemistry", "Biology", "History", "English", "Art", "Music", "Geography" };
+                var classNames = new List<string> { "T2210A", "T2310A", "T2210A", "T1210A", "T2210A", "T1230A", "T2610A", "T72210A", "T3210A", "T1110A" };
 
                 var classes = new List<Classes>();
-                foreach (var course in courses1)
+                foreach (var className in classNames)
                 {
-                    // Randomly generate class names based on the course name
-                    var randomClassName = $"{classNames[random.Next(classNames.Count)]}{random.Next(101, 301)}";
+                    // Randomly generate class names based on the classNames list
+                    var randomClassName = $"{className}{random.Next(101, 301)}";
 
                     var classObj = new Classes
                     {
                         ClassName = randomClassName,
-                        CoursesId = course.CoursesId,
                         StartDate = DateTime.Now,
                         EndDate = DateTime.Now.AddMonths(3)
                     };
@@ -209,6 +218,7 @@ namespace OnlineCollegeManagement.Data
                     context.Classes.Add(classObj);
                 }
                 context.SaveChanges();
+
 
 
                 // Seed data for StudentsInformation
@@ -324,22 +334,33 @@ namespace OnlineCollegeManagement.Data
                 var studentsInformationIds = context.StudentsInformation.Select(s => s.StudentsInformationId).ToList();
                 var classes1 = context.Classes.Select(c => c.ClassesId).ToList();
                 var users1 = context.Users.Select(u => u.UsersId).ToList();
-                var officialStudents = new OfficialStudent[]
-                {
-                 new OfficialStudent {
-                     StudentCode = GenerateRandomStudentCode(),
-                     StudentsInformationId = studentsInformationIds[random.Next(studentsInformationIds.Count)],
-                     ClassesId = classes1[random.Next(classes1.Count)],
-                     UsersId = users1[random.Next(users1.Count)] },
-    new OfficialStudent { StudentCode = GenerateRandomStudentCode(), StudentsInformationId = studentsInformationIds[random.Next(studentsInformationIds.Count)], ClassesId = classes1[random.Next(classes1.Count)], UsersId = users1[random.Next(users1.Count)] },
-    new OfficialStudent { StudentCode = GenerateRandomStudentCode(), StudentsInformationId = studentsInformationIds[random.Next(studentsInformationIds.Count)], ClassesId = classes1[random.Next(classes1.Count)], UsersId = users1[random.Next(users1.Count)] },
-                    // Add more entries as needed
-                };
-                foreach (var student in officialStudents) // Đổi tên biến thành 'student'
+                var courses1 = context.Courses.Select(u => u.CoursesId).ToList();
+                var officialStudents = new OfficialStudent[]{
+                new OfficialStudent{
+                       StudentCode = GenerateRandomStudentCode(),
+                       StudentsInformationId =
+                       studentsInformationIds[random.Next(studentsInformationIds.Count)],
+                       ClassesId = classes1[random.Next(classes1.Count)],
+                       CoursesId = courses1[random.Next(courses1.Count)],
+                       UsersId = users1[random.Next(users1.Count)],
+                       Telephone = "1234567890"},
+                new OfficialStudent{
+                       StudentCode = GenerateRandomStudentCode(),
+                       StudentsInformationId =
+                       studentsInformationIds[random.Next(studentsInformationIds.Count)],
+                       ClassesId = classes1[random.Next(classes1.Count)],
+                       CoursesId = courses1[random.Next(courses1.Count)],
+                       UsersId = users1[random.Next(users1.Count)],
+                       Telephone = "0987654321"}
+
+                 };
+
+                foreach (var student in officialStudents)
                 {
                     context.OfficialStudents.Add(student);
                 }
                 context.SaveChanges();
+
 
                 // Function to generate random student code
                 string GenerateRandomStudentCode()
@@ -352,9 +373,7 @@ namespace OnlineCollegeManagement.Data
 
 
                 // Seed data for Subjects
-                // Lấy danh sách các CourseId từ cơ sở dữ liệu
                 var courseIds = context.Courses.Select(c => c.CoursesId).ToList();
-
                 // Duyệt qua mỗi CourseId
                 foreach (var courseId in courseIds)
                 {
