@@ -113,6 +113,19 @@ namespace OnlineCollegeManagement.Controllers
             return View(paginatedEvent);
         }
 
+        public async Task<IActionResult> EventsDetail(int id)
+        {
+            // Tìm kiếm sự kiện theo ID
+            var selectedEvent = await _context.Events.FindAsync(id);
+
+            if (selectedEvent == null)
+            {
+                return NotFound();
+            }
+
+            return View(selectedEvent);
+        }
+
         public async Task<IActionResult> Contact()
         {
             return View();

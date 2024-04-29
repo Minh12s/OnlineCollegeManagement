@@ -32,7 +32,7 @@
                             <div><a >Admin</a></div>
                             <div><a class="meta-chat"><span class="icon-chat"></span> 3</a></div>
                         </div>
-                        <h3 class="heading mb-4"><a href="#">@ev.EventTitle</a></h3>
+                            <h3 class="heading mb-4"><a asp-controller="Page" asp-action="EventsDetail" asp-route-id="@ev.EventsId">@ev.EventTitle</a></h3>
                         <p class="time-loc"><span class="mr-2"><i class="icon-clock-o"></i> 10:30AM-03:30PM</span> <span><i class="icon-map-o"></i> Venue Main Campus</span></p>
                         <p>@ev.EventDescription</p>
                         <p><a href="event.html">Join Event <i class="ion-ios-arrow-forward"></i></a></p>
