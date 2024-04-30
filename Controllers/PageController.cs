@@ -12,6 +12,7 @@ using System.Net.Mail;
 using System.Drawing.Printing;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Reflection.Metadata;
+using System.Net;
 
 namespace OnlineCollegeManagement.Controllers
 {
@@ -185,8 +186,10 @@ namespace OnlineCollegeManagement.Controllers
         {
             return View();
         }
-        public async Task<IActionResult> Admission()
+        public IActionResult Admission()
         {
+            var majors = _context.Majors.ToList();
+            ViewBag.Majors = majors;
             return View();
         }
         [HttpPost]
@@ -194,18 +197,94 @@ namespace OnlineCollegeManagement.Controllers
         {
             if (true)
             {
-                // Lưu thông tin sinh viên vào cơ sở dữ liệu
-                _context.StudentsInformation.Add(studentInfo);
-                await _context.SaveChangesAsync();
+                try
+                {
+                    // Lưu thông tin sinh viên vào cơ sở dữ liệu
+                    _context.StudentsInformation.Add(studentInfo);
+                    await _context.SaveChangesAsync();
 
-                TempData["SuccessMessage"] = "Đăng ký thành công!";
+                    // Tạo một đối tượng mới của model Registrations
+                    var registration = new Registrations
+                    {
+                        StudentsInformationId = studentInfo.StudentsInformationId,
+                        RegistrationStatus = "Pending",
+                        UniqueCode = GenerateUniqueCode()
+                    };
 
-                // Chuyển hướng trở lại trang Admission
-                return RedirectToAction("Admission", "Page");
+                    // Lưu thông tin đăng ký vào cơ sở dữ liệu
+                    _context.Registrations.Add(registration);
+                    await _context.SaveChangesAsync();
+
+                    // Gửi email thông báo đến địa chỉ email mà người dùng nhập vào trong form
+                    await SendAdmissionConfirmationEmail("", registration.UniqueCode);
+
+                    TempData["SuccessMessage"] = "Sign Up Success! The Code has been sent to your email address.";
+                    return RedirectToAction("Admission", "Page");
+                }
+                catch (Exception ex)
+                {
+                    // Xử lý nếu có lỗi xảy ra trong quá trình lưu dữ liệu
+                    TempData["ErrorMessage"] = "Đã xảy ra lỗi trong quá trình xử lý yêu cầu. Vui lòng thử lại sau.";
+                    // Log lỗi ex.Message
+                    return RedirectToAction("Admission", "Page");
+                }
             }
 
             // Nếu dữ liệu không hợp lệ, quay lại trang Admission để người dùng nhập lại
             return View("Admission", studentInfo);
+        }
+
+
+
+        // Phương thức tạo mã ngẫu nhiên duy nhất cho thuộc tính UniqueCode
+        private string GenerateUniqueCode()
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            Random random = new Random();
+            return new string(Enumerable.Repeat(chars, 8)
+              .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+        private async Task SendAdmissionConfirmationEmail(string recipientEmail, string uniqueCode)
+        {
+            try
+            {
+                // Đường dẫn tới mẫu email
+                string emailTemplatePath = Path.Combine(_env.ContentRootPath, "Views", "Email", "AdmissionConfirmation.cshtml");
+
+                // Đọc nội dung mẫu email từ file
+                string emailContent = await System.IO.File.ReadAllTextAsync(emailTemplatePath);
+
+                // Thay thế các thẻ placeholder trong mẫu email bằng thông tin thích hợp
+                emailContent = emailContent.Replace("{UniqueCode}", uniqueCode);
+
+                // Tạo đối tượng MailMessage
+                var message = new MailMessage();
+                message.To.Add(new MailAddress(recipientEmail)); // Địa chỉ email của sinh viên
+                message.From = new MailAddress(_configuration["EmailSettings:Username"]);
+                message.Subject = "Xác nhận đăng ký thành công!";
+                message.Body = emailContent;
+                message.IsBodyHtml = true;
+
+                // Tạo đối tượng SmtpClient để gửi email
+                using (var smtp = new SmtpClient(_configuration["EmailSettings:SmtpServer"], int.Parse(_configuration["EmailSettings:Port"])))
+                {
+                    var credentials = new NetworkCredential
+                    {
+                        UserName = _configuration["EmailSettings:Username"],
+                        Password = _configuration["EmailSettings:Password"]
+                    };
+                    smtp.Credentials = credentials;
+                    smtp.EnableSsl = true;
+
+                    // Gửi email
+                    await smtp.SendMailAsync(message);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Xử lý nếu có lỗi xảy ra khi gửi email
+                // Log lỗi ex.Message
+            }
         }
 
 

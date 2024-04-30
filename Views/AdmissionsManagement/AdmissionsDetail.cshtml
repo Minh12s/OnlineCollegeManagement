@@ -1,0 +1,110 @@
+﻿@model OnlineCollegeManagement.Models.StudentsInformation
+
+@{
+    ViewData["Title"] = "AdmissionsDetail";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<style>
+    .row {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        margin-right: 15px;
+        margin-left: 15px;
+    }
+
+    .col-lg-4 {
+        -webkit-box-flex: 0;
+        -ms-flex: 0 0 33.3333333333%;
+        flex: 0 0 33.3333333333%;
+        max-width: 33.3333333333%;
+</style>
+
+
+
+<section class="section main-section">
+
+    <div class="container">
+        <div class="row order_d_inner">
+            @if (Model != null)
+            {
+                <div class="col-lg-4">
+                    <div class="details_item">
+                        <h3>Previous Exam Details </h3>
+                        <ul class="list">
+                            <li><a href="#"><span>School Name</span>: @Model.SchoolName</a></li>
+                            <li><a href="#"><span>Registration Number</span>: @Model.RegistrationNumber</a></li>
+                            <li><a href="#"><span>Center</span>: $@Model.Center</a></li>
+                            <li><a href="#"><span>Academic Major </span>: @Model.AcademicMajor</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="details_item">
+                        <h3><br /></h3>
+                        <ul class="list">
+                            <li><a href="#"><span>Academic Major </span>: @Model.AcademicMajor</a></li>
+                            <li><a href="#"><span>Field</span>: @Model.FieldOfStudy</a></li>
+                            <li><a href="#"><span>MarksObtained</span>: @Model.MarksObtained</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="details_item">
+                        <h3><br /></h3>
+                        <ul class="list">
+                            <li><a href="#"><span>Total Marks </span>: @Model.TotalMarks</a></li>
+                            <li><a href="#"><span>Grade</span>: @Model.Grade</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="order_details_table">
+                    <h2>Admissions Details</h2>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th style="width:100px;" scope="col">ID</th>
+                                    <th style="width:200px;" scope="col">Student Name </th>
+                                    <th style="width:300px;" scope="col">Father's Name</th>
+                                    <th style="width:200px;" scope="col">Mother's Name</th>
+                                    <th style="width:200px;" scope="col">Date of Birth</th>
+                                    <th style="width:200px;" scope="col">Gender</th>
+                                    <th style="width:200px;" scope="col">Current Address</th>
+                                    <th style="width:200px;" scope="col">Permanent Address</th>
+                                    <th style="width:200px;" scope="col">Sports Details</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr>
+                                    <td>@Model.StudentsInformationId</td>
+                                    <td>@Model.StudentName</td>
+                                    <td>@Model.FatherName</td>
+                                    <td>@Model.MotherName</td>
+                                    <td>@Model.DateOfBirth</td>
+                                    <td>@Model.Gender</td>
+                                    <td>@Model.CurrentAddress</td>
+                                    <td>@Model.PermanentAddress</td>
+                                    <td>@Model.SportsInfo</td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <p>No admissions information available.</p>
+
+            }
+        </div>
+    </div>
+
+
+</section>

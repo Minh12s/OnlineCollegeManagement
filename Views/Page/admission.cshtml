@@ -76,15 +76,16 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="admission_for">Admission for:</label>
-                                        <select id="admission_for" name="AcademicMajor" class="form-control" required>
-                                            <option value="science">Science</option>
-                                            <option value="arts">Arts</option>
-                                            <option value="commerce">Commerce</option>
+                                        <label for="major">Major:</label>
+                                        <select id="major" name="MajorsId" class="form-control" required>
+                                            <option value="">Select Major</option>
+                                            @foreach (var major in ViewBag.Majors)
+                                            {
+                                                <option value="@major.MajorsId">@major.MajorName</option>
+                                            }
                                         </select>
                                     </div>
                                 </div>
-
                             </div>
 
                             <div class="row">
@@ -109,11 +110,16 @@
                                     <th>SchoolName</th>
                                     <th>Registration Number</th>
                                     <th>Center</th>
+                                    <th>Academic Major</th>
+
                                 </tr>
                                 <tr>
                                     <td><input type="text" name="SchoolName[]" required></td>
                                     <td><input type="text" name="RegistrationNumber[]" required></td>
                                     <td><input type="text" name="Center[]" required></td>
+                                    <td><input type="text" name="AcademicMajor[]" required></td>
+
+
                                 </tr>
                                 <tr>
                                     <th>Field</th>
