@@ -1,7 +1,7 @@
 ﻿
-@model OnlineCollegeManagement.Models.Achievements
+@model OnlineCollegeManagement.Models.Courses
 @{
-    ViewData["Title"] = "Add Achievements";
+    ViewData["Title"] = "Edit Courses";
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
 
@@ -82,7 +82,7 @@
     <div class="flex flex-col md:flex-row items-center justify-between space-y-6 md:space-y-0">
         <ul>
             <li style="margin-left:-50px;">Admin</li>
-            <li>Add Achievements</li>
+            <li>Edit Courses</li>
         </ul>
 
     </div>
@@ -91,33 +91,47 @@
     <div class="row">
         <div class="col-md-12">
             <div class="tile">
-                
-                <div class="tile-body">
-                    <form class="edit-product-form" asp-controller="AchievementsManagement" asp-action="AddAchievements" method="post" enctype="multipart/form-data">
-                        <!-- Thay thế Tag Helper asp-for bằng các giá trị cụ thể -->
 
+                <div class="tile-body">
+                    <form class="edit-product-form" asp-controller="Courses" asp-action="EditCourses" method="post" enctype="multipart/form-data">
+                        <!-- Trường ẩn để chứa FacilitiesId -->
+                        <input type="hidden" asp-for="CoursesId" />
 
                         <div class="form-group col-md-3">
                             <label class="control-label">Title</label>
-                            <input asp-for="AchievementTitle" class="form-control" name="AchievementTitle" placeholder="Title" />
+                            <input asp-for="CourseName" class="form-control" name="CourseName" placeholder="name" />
                         </div>
-
+                        <div class="form-group col-md-3">
+                            <label class="control-label">Majors</label>
+                            <select class="form-control" name="MajorsId" asp-for="MajorsId" asp-items="@ViewBag.Majors">
+                                <option value="">-- Select majors --</option>
+                                <!-- Thêm các tùy chọn danh mục tại đây -->
+                            </select>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label class="control-label">Teachers</label>
+                            <select class="form-control" name="TeachersId" asp-for="TeachersId" asp-items="@ViewBag.Teachers">
+                                <option value="">-- Select Teachers --</option>
+                                <!-- Thêm các tùy chọn danh mục tại đây -->
+                            </select>
+                        </div>
                         <div class="form-group col-md-12">
                             <label class="control-label">Thumbnail</label>
                             <div>
-                                <input asp-for="AchievementImageUrl" type="file" name="AchievementImageUrl" class="form-control" onchange="displayThumbnail(this);" />
-                                <img id="thumbnailImage" style="display: none; max-width: 50%;" alt="Thumbnail image" />
-
+                                <input asp-for="CoursesImageUrl" type="file" name="CoursesImageUrl" class="form-control" onchange="displayThumbnail(this);" />
+                                <img id="thumbnailImage" alt="Thumbnail image" src="@Url.Content(Model.CoursesImageUrl)" style="max-width: 50%;" />
                             </div>
                         </div>
+
                         <div class="form-group col-md-6">
                             <label class="control-label">Description</label>
-                            <textarea asp-for="AchievementDescription" class="form-control" name="AchievementDescription" placeholder="Description"></textarea>
+                            <textarea asp-for="Description" class="form-control" name="Description" placeholder="Description"></textarea>
                         </div>
 
                         <button class="btn btn-save" type="submit">Save</button>
-                        <a class="btn btn-cancel" href="/AchievementsManagement/Achievements">Cancel</a>
+                        <a class="btn btn-cancel" href="/Courses/Courses">Cancel</a>
                     </form>
+
                 </div>
             </div>
         </div>
@@ -125,7 +139,7 @@
 </section>
 <script src="https://cdn.tiny.cloud/1/6a4ufu188x8itoqtz2agsuahgg475yn7bxva9xzabribtvjm/tinymce/5/tinymce.min.js"></script>
 <script>tinymce.init({
-    selector: 'textarea[name="AchievementDescription"]'
+    selector: 'textarea[name="Description"]'
     });</script>
 <script>function displayThumbnail(input) {
         var thumbnailImage = document.getElementById('thumbnailImage');

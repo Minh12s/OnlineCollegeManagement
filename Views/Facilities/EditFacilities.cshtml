@@ -1,7 +1,7 @@
 ﻿
 @model OnlineCollegeManagement.Models.Facilities
 @{
-    ViewData["Title"] = "Add Facilities";
+    ViewData["Title"] = "Edit Facilities";
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
 
@@ -82,7 +82,7 @@
     <div class="flex flex-col md:flex-row items-center justify-between space-y-6 md:space-y-0">
         <ul>
             <li style="margin-left:-50px;">Admin</li>
-            <li>Add Facilities</li>
+            <li>Edit Facilities</li>
         </ul>
 
     </div>
@@ -91,33 +91,34 @@
     <div class="row">
         <div class="col-md-12">
             <div class="tile">
-              
+                
                 <div class="tile-body">
-                    <form class="edit-product-form" asp-controller="FacilitiesManagement" asp-action="AddFacilities" method="post" enctype="multipart/form-data">
-                        <!-- Thay thế Tag Helper asp-for bằng các giá trị cụ thể -->
-
+                    <form class="edit-product-form" asp-controller="Facilities" asp-action="EditFacilities" method="post" enctype="multipart/form-data">
+                        <!-- Trường ẩn để chứa FacilitiesId -->
+                        <input type="hidden" asp-for="FacilitiesId" />
 
                         <div class="form-group col-md-3">
                             <label class="control-label">Title</label>
                             <input asp-for="FacilityTitle" class="form-control" name="FacilityTitle" placeholder="Title" />
                         </div>
-                    
+
                         <div class="form-group col-md-12">
                             <label class="control-label">Thumbnail</label>
                             <div>
                                 <input asp-for="FacilityImageUrl" type="file" name="FacilityImageUrl" class="form-control" onchange="displayThumbnail(this);" />
-                                <img id="thumbnailImage" style="display: none; max-width: 50%;" alt="Thumbnail image" />
-
+                                <img id="thumbnailImage" alt="Thumbnail image" src="@Url.Content(Model.FacilityImageUrl)" style="max-width: 50%;" />
                             </div>
                         </div>
+
                         <div class="form-group col-md-6">
-                            <label class="control-label">Description</label>
-                            <textarea asp-for="FacilityDescription" class="form-control" name="FacilityDescription" placeholder="Description"></textarea>
+                            <label class="control-label">Content</label>
+                            <textarea asp-for="FacilityDescription" class="form-control" name="FacilityDescription" placeholder="Content"></textarea>
                         </div>
 
                         <button class="btn btn-save" type="submit">Save</button>
                         <a class="btn btn-cancel" href="/FacilitiesManagement/Facilities">Cancel</a>
                     </form>
+
                 </div>
             </div>
         </div>

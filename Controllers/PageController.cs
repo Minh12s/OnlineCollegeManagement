@@ -94,9 +94,40 @@ namespace OnlineCollegeManagement.Controllers
             // Trả về view và truyền dữ liệu facilities vào view
             return View(achievements);
         }
-        public async Task<IActionResult> Courses()
+        public async Task<IActionResult> Courses(int? page, int pageSize = 9)
         {
-            return View();
+            int pageNumber = page ?? 1; // Trang hiện tại, mặc định là trang 1 nếu không có page được cung cấp
+
+            // Truy vấn dữ liệu sự kiện từ cơ sở dữ liệu
+            var coursesQuery = _context.Courses.AsQueryable();
+            var paginatedCourses = await coursesQuery
+                                          .Skip((pageNumber - 1) * pageSize)
+                                          .Take(pageSize)
+                                          .ToListAsync();
+
+            // Lấy tổng số bài đăng sau khi áp dụng các tiêu chí lọc
+            int totalCourses = await coursesQuery.CountAsync();
+
+            // Chuyển thông tin phân trang vào ViewBag
+            ViewBag.CurrentPage = pageNumber;
+            ViewBag.TotalPages = (int)Math.Ceiling((double)totalCourses / pageSize);
+            ViewBag.totalCourses = totalCourses;
+            ViewBag.PageSize = pageSize;
+            // Truyền danh sách sự kiện vào view để hiển thị
+            return View(paginatedCourses);
+           
+        }
+        public async Task<IActionResult> coursesDetails(int id)
+        {
+            // Tìm kiếm sự kiện theo ID
+            var selectedcourses = await _context.Courses.FindAsync(id);
+
+            if (selectedcourses == null)
+            {
+                return NotFound();
+            }
+
+            return View(selectedcourses);
         }
         public async Task<IActionResult> Teacher()
         {

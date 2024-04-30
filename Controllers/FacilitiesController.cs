@@ -17,13 +17,13 @@ using System.Reflection.Metadata;
 
 namespace OnlineCollegeManagement.Controllers
 {
-    public class FacilitiesManagementController : Controller
+    public class FacilitiesController : Controller
     {
         private readonly CollegeManagementContext _context;
         private readonly IConfiguration _configuration;
         private readonly IWebHostEnvironment _env;
 
-        public FacilitiesManagementController(CollegeManagementContext context, IConfiguration configuration, IWebHostEnvironment env)
+        public FacilitiesController(CollegeManagementContext context, IConfiguration configuration, IWebHostEnvironment env)
         {
             _context = context;
             _configuration = configuration;
@@ -196,7 +196,7 @@ namespace OnlineCollegeManagement.Controllers
             await _context.SaveChangesAsync();
 
             // Chuyển hướng về trang BlogManagement/Blog
-            return RedirectToAction("Facilities", "FacilitiesManagement");
+            return RedirectToAction("Facilities", "Facilities");
         }
 
     }

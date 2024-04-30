@@ -5,7 +5,9 @@ namespace OnlineCollegeManagement.Models
     {
         public int CoursesId { get; set; }
         public string CourseName { get; set; }
+        public DateTime CourseDate { get; set; }
         public string Description { get; set; }
+        public string CoursesImageUrl { get; set; }
         public int MajorsId { get; set; }
         public int TeachersId { get; set; }
 

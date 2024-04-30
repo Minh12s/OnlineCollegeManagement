@@ -18,13 +18,13 @@ using System.IO;
 
 namespace OnlineCollegeManagement.Controllers
 {
-    public class AchievementsManagementController : Controller
+    public class AchievementsController : Controller
     {
         private readonly CollegeManagementContext _context;
         private readonly IConfiguration _configuration;
         private readonly IWebHostEnvironment _env;
 
-        public AchievementsManagementController(CollegeManagementContext context, IConfiguration configuration, IWebHostEnvironment env)
+        public AchievementsController(CollegeManagementContext context, IConfiguration configuration, IWebHostEnvironment env)
         {
             _context = context;
             _configuration = configuration;
@@ -194,7 +194,7 @@ namespace OnlineCollegeManagement.Controllers
             await _context.SaveChangesAsync();
 
             // Chuyển hướng về trang BlogManagement/Blog
-            return RedirectToAction("Achievements", "AchievementsManagement");
+            return RedirectToAction("Achievements", "Achievements");
         }
 
     }

@@ -1,7 +1,7 @@
 ﻿
 @model OnlineCollegeManagement.Models.Achievements
 @{
-    ViewData["Title"] = "Edit Achievements";
+    ViewData["Title"] = "Add Achievements";
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
 
@@ -82,7 +82,7 @@
     <div class="flex flex-col md:flex-row items-center justify-between space-y-6 md:space-y-0">
         <ul>
             <li style="margin-left:-50px;">Admin</li>
-            <li>Edit Achievements</li>
+            <li>Add Achievements</li>
         </ul>
 
     </div>
@@ -91,11 +91,11 @@
     <div class="row">
         <div class="col-md-12">
             <div class="tile">
-
+                
                 <div class="tile-body">
-                    <form class="edit-product-form" asp-controller="AchievementsManagement" asp-action="EditAchievements" method="post" enctype="multipart/form-data">
-                        <!-- Trường ẩn để chứa FacilitiesId -->
-                        <input type="hidden" asp-for="AchievementsId" />
+                    <form class="edit-product-form" asp-controller="Achievements" asp-action="AddAchievements" method="post" enctype="multipart/form-data">
+                        <!-- Thay thế Tag Helper asp-for bằng các giá trị cụ thể -->
+
 
                         <div class="form-group col-md-3">
                             <label class="control-label">Title</label>
@@ -106,19 +106,18 @@
                             <label class="control-label">Thumbnail</label>
                             <div>
                                 <input asp-for="AchievementImageUrl" type="file" name="AchievementImageUrl" class="form-control" onchange="displayThumbnail(this);" />
-                                <img id="thumbnailImage" alt="Thumbnail image" src="@Url.Content(Model.AchievementImageUrl)" style="max-width: 50%;" />
+                                <img id="thumbnailImage" style="display: none; max-width: 50%;" alt="Thumbnail image" />
+
                             </div>
                         </div>
-
                         <div class="form-group col-md-6">
-                            <label class="control-label">Content</label>
-                            <textarea asp-for="AchievementDescription" class="form-control" name="AchievementDescription" placeholder="Content"></textarea>
+                            <label class="control-label">Description</label>
+                            <textarea asp-for="AchievementDescription" class="form-control" name="AchievementDescription" placeholder="Description"></textarea>
                         </div>
 
                         <button class="btn btn-save" type="submit">Save</button>
                         <a class="btn btn-cancel" href="/AchievementsManagement/Achievements">Cancel</a>
                     </form>
-
                 </div>
             </div>
         </div>
