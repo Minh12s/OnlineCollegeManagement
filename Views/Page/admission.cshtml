@@ -21,10 +21,11 @@
 </div>
 @if (TempData["SuccessMessage"] != null)
 {
-    <div class="alert alert-success">
+    <div class="alert alert-success" style="text-align: center;">
         @TempData["SuccessMessage"]
     </div>
 }
+
 <section class="ftco-section">
     <div class="container">
         <div class="row justify-content-center">
@@ -108,27 +109,35 @@
                             <table>
                                 <tr>
                                     <th>SchoolName</th>
-                                    <th>Registration Number</th>
                                     <th>Center</th>
+
+                                </tr>
+                                <tr>
+                                    <td><input type="text" name="SchoolName[]" required style="width: 270px;"></td>
+                                    <td><input type="text" name="Center[]" required style="width: 270px;"></td>
+
+
+                                </tr>
+                                </table>
+                                <table>
+                                <tr>
+                                    <th>Registration Number</th>
                                     <th>Academic Major</th>
-
-                                </tr>
-                                <tr>
-                                    <td><input type="text" name="SchoolName[]" required></td>
-                                    <td><input type="text" name="RegistrationNumber[]" required></td>
-                                    <td><input type="text" name="Center[]" required></td>
-                                    <td><input type="text" name="AcademicMajor[]" required></td>
-
-
-                                </tr>
-                                <tr>
                                     <th>Field</th>
+                                </tr>
+                                <tr>
+                                    <td><input type="text" name="RegistrationNumber[]" required></td>
+                                    <td><input type="text" name="AcademicMajor[]" required></td>
+                                    <td><input type="text" name="FieldOfStudy[]" required></td>
+
+
+                                </tr>
+                                <tr>
                                     <th>Marks Obtained</th>
                                     <th>Total Marks</th>
                                     <th> Grade</th>
                                 </tr>
                                 <tr>
-                                    <td><input type="text" name="FieldOfStudy[]" required></td>
                                     <td><input type="number" name="MarksObtained[]" required></td>
                                     <td><input type="number" name="TotalMarks[]" required></td>
                                     <td><input type="text" name="Grade[]" required></td>
@@ -161,6 +170,7 @@
     table {
         border-collapse: collapse;
         width: 100%;
+        margin-left: 53px;
     }
 
     th, td {

@@ -224,7 +224,7 @@ namespace OnlineCollegeManagement.Controllers
                 catch (Exception ex)
                 {
                     // Xử lý nếu có lỗi xảy ra trong quá trình lưu dữ liệu
-                    TempData["ErrorMessage"] = "Đã xảy ra lỗi trong quá trình xử lý yêu cầu. Vui lòng thử lại sau.";
+                    TempData["ErrorMessage"] = "An error occurred while processing the request. Please try again later.";
                     // Log lỗi ex.Message
                     return RedirectToAction("Admission", "Page");
                 }
@@ -261,7 +261,7 @@ namespace OnlineCollegeManagement.Controllers
                 var message = new MailMessage();
                 message.To.Add(new MailAddress(recipientEmail)); // Địa chỉ email của sinh viên
                 message.From = new MailAddress(_configuration["EmailSettings:Username"]);
-                message.Subject = "Xác nhận đăng ký thành công!";
+                message.Subject = "Confirm successful registration!";
                 message.Body = emailContent;
                 message.IsBodyHtml = true;
 
