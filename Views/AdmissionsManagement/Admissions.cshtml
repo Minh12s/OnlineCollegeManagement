@@ -35,6 +35,18 @@
         .button-group > * {
             margin-right: 10px; /* Khoảng cách giữa các nút */
         }
+
+    .status-pending {
+        color: orange;
+    }
+
+    .status-not-admitted {
+        color: red;
+    }
+
+    .status-admitted {
+        color: green;
+    }
 </style>
 
 
@@ -49,25 +61,27 @@
 </section>
 
 <section class="is-hero-bar">
-    <div class="flex flex-col md:flex-row items-center justify-between space-y-6 md:space-y-0">
-        <!-- Phần này để chứa nút "Add Blog" -->
+    <div class="flex flex-col md:flex-row items-center justify-start">
+       
         <!-- Phần này để chứa nút "Print PDF" -->
-        <div class="flex items-center">
-            <!-- Thêm một phần tử div để căn chỉnh vị trí -->
-            <button onclick="myApp.printTable()" class="btn btn-add ml-2" style="margin-left:10px">
-                <!-- Thêm lớp ml-2 để tạo khoảng cách giữa nút -->
-                <i class="fas fa-file-pdf"></i> <!-- Thay thế icon print bằng icon pdf -->
-                Print PDF <!-- Đổi chữ "Print" thành "Print PDF" -->
+        <div class="col-sm-2" style="margin-right: 5px;">
+            <button onclick="myApp.printTable()" class="btn btn-add">
+                <i class="fas fa-file-pdf"></i>
+                Print PDF
             </button>
         </div>
-        <div class="flex items-center">
-            <button onclick="exportBlogToExcel()" class="btn btn-add ml-2" style="margin-right:700px">
+
+        <!-- Phần này để chứa nút "Export Excel" -->
+        <div class="col-sm-2" style="margin-right: 5px;">
+            <button onclick="exportBlogToExcel()" class="btn btn-add">
                 <i class="fas fa-file-excel"></i>
                 Export Excel
             </button>
         </div>
-        <div class="flex items-center">
-            <button onclick="exportExcel()" class="btn btn-add" style="margin-left:-700px;">
+
+        <!-- Phần này để chứa nút "Excel Filtered" -->
+        <div class="col-sm-2">
+            <button onclick="exportExcel()" class="btn btn-add">
                 <i class="fas fa-file-excel"></i>
                 Excel Filtered
             </button>
@@ -75,8 +89,20 @@
     </div>
 </section>
 <form style="display: flex; align-items: center; border-radius: 5px; margin-top: 10px; flex-wrap: wrap;" asp-action="Admissions" asp-controller="AdmissionsManagement" method="get">
+    <div class="input-group input-group-sm" style="margin-left: 21px; margin-bottom: 10px;">
+        <select style="height: 45px; font-size: 0.765625rem; padding: 4px 8px; background-color: #F1F1F1; border-radius: 5px; width: 150px;" name="RegistrationStatus" class="form-control">
+            <option value="">Filter by registrations</option>
+            <option value="Pending">Pending</option>
+            <option value="Not Admitted">Not Admitted</option>
+            <option value="Admitted">Admitted</option>
+        </select>
+    </div>
     <div class="input-group input-group-sm" style="margin-right: 5px; margin-bottom: 10px;">
-        <input value="" class="form-control" type="text" name="searchString" placeholder="Status" style="height: 45px; font-size: 0.765625rem; padding: 4px 8px; background-color: #F1F1F1; border-radius: 5px; width: 120px; margin-left: 28px;" />
+        <input value="" class="form-control" type="date" name="StartDate" placeholder="Start Date" style="height: 45px; font-size: 0.765625rem; padding: 4px 8px; background-color: #F1F1F1; border-radius: 5px; width: 150px; margin-left: 10px;" />
+        <input value="" class="form-control" type="date" name="EndDate" placeholder="End Date" style="height: 45px; font-size: 0.765625rem; padding: 4px 8px; background-color: #F1F1F1; border-radius: 5px; width: 150px; margin-left: 10px;" />
+    </div>
+    <div class="input-group input-group-sm" style="margin-right: 5px; margin-bottom: 10px;">
+        <input value="" class="form-control" type="text" name="UniqueCode" placeholder="Code" style="height: 45px; font-size: 0.765625rem; padding: 4px 8px; background-color: #F1F1F1; border-radius: 5px; width: 120px; margin-left: 28px;" />
     </div>
 
     <div class="input-group input-group-sm" style="margin-bottom: 10px; margin-left: -5px;">
@@ -101,19 +127,36 @@
                         <th>ID</th>
                         <th>Status</th>
                         <th>Code</th>
+                        <th>Registration Date</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var registration in Model)
                     {
-
-
                         <tr>
                             <td>@registration.StudentsInformationId</td>
-                            <td>@registration.RegistrationStatus</td>
+                            <td>
+                                @{
+                                    // Tạo class dựa trên giá trị của RegistrationStatus
+                                    string statusClass = "";
+                                    if (registration.RegistrationStatus == "Pending")
+                                    {
+                                        statusClass = "status-pending";
+                                    }
+                                    else if (registration.RegistrationStatus == "Not Admitted")
+                                    {
+                                        statusClass = "status-not-admitted";
+                                    }
+                                    else if (registration.RegistrationStatus == "Admitted")
+                                    {
+                                        statusClass = "status-admitted";
+                                    }
+                                }
+                                <span class="@statusClass">@registration.RegistrationStatus</span>
+                            </td>
                             <td>@registration.UniqueCode</td>
-
+                            <td>@registration.RegistrationDate</td>
                             <td>
                                 <div class="button-group">
                                     <a style="background-color:green; color:white;" class="btn btn-primary"
@@ -123,7 +166,6 @@
                                     </a>
                                 </div>
                             </td>
-
                         </tr>
                     }
 

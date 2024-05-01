@@ -473,7 +473,9 @@ namespace OnlineCollegeManagement.Data
                     {
                         StudentsInformationId = student.StudentsInformationId,
                         RegistrationStatus = GetRandomRegistrationStatus(),
-                        UniqueCode = GenerateUniqueCode()
+                        UniqueCode = GenerateUniqueCode(),
+                        RegistrationDate = DateTime.Now.AddDays(random.Next(1, 30)),
+
                     };
 
                     registrations.Add(registration);
