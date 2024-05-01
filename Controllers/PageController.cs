@@ -13,6 +13,7 @@ using System.Drawing.Printing;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Reflection.Metadata;
 using System.Net;
+using System.IO;
 
 namespace OnlineCollegeManagement.Controllers
 {
@@ -32,6 +33,36 @@ namespace OnlineCollegeManagement.Controllers
         public async Task<IActionResult> Home()
         {
             return View();
+        }
+        public async Task<IActionResult> Search(string searchTerm)
+        {
+            // Thực hiện tìm kiếm dựa trên UniqueCode
+            var registrations = await _context.Registrations
+                .Include(r => r.StudentInformation)
+                    .ThenInclude(si => si.Major) 
+                .Where(r => r.UniqueCode.Contains(searchTerm))
+                .ToListAsync();
+
+            // Trả về kết quả tìm kiếm
+            return View(registrations);
+        }
+        public async Task<IActionResult> DetailsSearch(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var studentInfo = await _context.StudentsInformation
+                .Include(si => si.Major)
+                .FirstOrDefaultAsync(si => si.StudentsInformationId == id);
+
+            if (studentInfo == null)
+            {
+                return NotFound();
+            }
+
+            return View(studentInfo);
         }
         public async Task<IActionResult> About()
         {
@@ -116,7 +147,7 @@ namespace OnlineCollegeManagement.Controllers
             ViewBag.PageSize = pageSize;
             // Truyền danh sách sự kiện vào view để hiển thị
             return View(paginatedCourses);
-           
+
         }
         public async Task<IActionResult> coursesDetails(int id)
         {

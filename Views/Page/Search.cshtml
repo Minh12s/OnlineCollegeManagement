@@ -1,0 +1,83 @@
+﻿@model List<OnlineCollegeManagement.Models.Registrations>
+@{
+    Layout = "~/Views/Shared/User_Layout.cshtml";
+    ViewData["Title"] = "About";
+}
+<div class="hero-wrap hero-wrap-2" style="background-image: url('/images/bg_2.jpg'); background-attachment:fixed;">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row no-gutters slider-text align-items-center justify-content-center" data-scrollax-parent="true">
+            <div class="col-md-8 ftco-animate text-center">
+                <p class="breadcrumbs"><span class="mr-2"><a href="/Page/Home">Home</a></span> <span>Admission profile</span></p>
+                <h1 class="mb-3 bread">Admission profile</h1>
+            </div>
+        </div>
+    </div>
+</div>
+<h2 style="text-align: center; margin-top: 20px; ">Results found</h2>
+<div class="table-container">
+    @if (Model.Count > 0)
+    {
+        <table class="table table-bordered" style="margin-bottom: 400px;">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Status</th>
+                    <th>Unique Code</th>
+                    <th>Student Name</th>
+                    <th>Date Of Birth</th>
+                    <th>Gender</th>
+                    <th>Current Address</th>
+                    <th>Majors</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var registration in Model)
+                {
+                    <tr>
+                        <td>@registration.RegistrationsId</td>
+                        <td>@registration.RegistrationStatus</td>
+                        <td>@registration.UniqueCode</td>
+                        <td>@registration.StudentInformation.StudentName</td>
+                        <td>@registration.StudentInformation.DateOfBirth.ToString("dd/MM/yyyy")</td>
+                        <td>@registration.StudentInformation.Gender</td>
+                        <td>@registration.StudentInformation.CurrentAddress</td>
+                        <td>@registration.StudentInformation.Major.MajorName</td>
+                        <td>
+                            <div class="button-group">
+                                <a style="background-color:#167CE9;" class="btn btn-primary1" href="@Url.Action("DetailsSearch", "Page", new { id = registration.StudentInformation.StudentsInformationId })">
+                                    <span class="icon" style="color: #FFFFFF;"><i class="oi oi-eye"></i></span>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div style="font-size: 17px;" class="text-center">
+            <p>No registrations found.</p>
+        </div>
+    }
+</div>
+
+
+<style>
+    .table-container {
+        margin-top: 50px; /* Điều chỉnh giá trị này để điều chỉnh vị trí của bảng */
+    }
+
+    .button-group > * {
+        margin-right: 10px;
+    }
+
+    .btn-primary1 {
+        border-radius: .357rem;
+        border: none;
+        font-weight: 600;
+        padding: 5px 20px;
+    }
+</style>
