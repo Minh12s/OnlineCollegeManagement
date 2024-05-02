@@ -161,13 +161,37 @@ namespace OnlineCollegeManagement.Controllers
 
             return View(selectedcourses);
         }
-        public async Task<IActionResult> Teacher()
+        public async Task<IActionResult> Teacher(int? page, int pageSize = 9)
         {
-            return View();
+            int pageNumber = page ?? 1; // Trang hiện tại, mặc định là trang 1 nếu không có page được cung cấp
+
+            var lecturersQuery = _context.Teachers.Include(t => t.Department).AsQueryable();
+            var paginatedLecturer = await lecturersQuery
+                                        .Skip((pageNumber - 1) * pageSize)
+                                        .Take(pageSize)
+                                        .ToListAsync();
+
+            // Lấy tổng số bài đăng sau khi áp dụng các tiêu chí lọc
+            int totalLecturer = await lecturersQuery.CountAsync();
+
+            // Chuyển thông tin phân trang vào ViewBag
+            ViewBag.CurrentPage = pageNumber;
+            ViewBag.TotalPages = (int)Math.Ceiling((double)totalLecturer / pageSize);
+            ViewBag.TotalEvent = totalLecturer;
+            ViewBag.PageSize = pageSize;
+            return View(paginatedLecturer);
         }
-        public async Task<IActionResult> TeacherDetails()
+        public async Task<IActionResult> TeacherDetails(int id)
         {
-            return View();
+            // Tìm kiếm giáo viên theo ID, bao gồm thông tin về phòng ban
+            var selectedTeacher = await _context.Teachers.Include(t => t.Department).FirstOrDefaultAsync(t => t.TeachersId == id);
+
+            if (selectedTeacher == null)
+            {
+                return NotFound();
+            }
+
+            return View(selectedTeacher);
         }
         public async Task<IActionResult> Blog()
         {
