@@ -5,13 +5,13 @@ using OnlineCollegeManagement.Models;
 
 namespace OnlineCollegeManagement.Controllers
 {
-    public class AdmissionsManagement : Controller
+    public class AdmissionsController : Controller
     {
         private readonly CollegeManagementContext _context;
         private readonly IConfiguration _configuration;
         private readonly IWebHostEnvironment _env;
 
-        public AdmissionsManagement(CollegeManagementContext context, IConfiguration configuration, IWebHostEnvironment env)
+        public AdmissionsController(CollegeManagementContext context, IConfiguration configuration, IWebHostEnvironment env)
         {
             _context = context;
             _configuration = configuration;
