@@ -16,11 +16,11 @@ namespace OnlineCollegeManagement.Data
         public DbSet<Departments> Departments { get; set; }
         public DbSet<Majors> Majors { get; set; }
         public DbSet<Teachers> Teachers { get; set; }
+        public DbSet<Subjects> Subjects { get; set; }
         public DbSet<Courses> Courses { get; set; }
         public DbSet<Classes> Classes { get; set; }
         public DbSet<StudentsInformation> StudentsInformation { get; set; }
         public DbSet<OfficialStudent> OfficialStudents { get; set; }
-        public DbSet<Subjects> Subjects { get; set; }
         public DbSet<ClassSchedules> ClassSchedules { get; set; }
         public DbSet<ExamScores> ExamScores { get; set; }
         public DbSet<Registrations> Registrations { get; set; }
@@ -28,8 +28,12 @@ namespace OnlineCollegeManagement.Data
         public DbSet<Achievements> Achievements { get; set; }
         public DbSet<Facilities> Facilities { get; set; }
         public DbSet<ContactInfo> ContactInfo { get; set; }
+        public DbSet<CoursesSubjects> CoursesSubjects { get; set; }
 
-   
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<CoursesSubjects>().HasKey(cs => new { cs.CoursesId, cs.SubjectsId });
+        }
     }
 }
 

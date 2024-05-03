@@ -25,7 +25,7 @@ namespace OnlineCollegeManagement.Data
                     context.StudentsInformation.Any() || context.OfficialStudents.Any() ||
                     context.Subjects.Any() || context.ClassSchedules.Any() || context.ExamScores.Any() ||
                     context.Registrations.Any() || context.Events.Any() || context.Achievements.Any() ||
-                    context.Facilities.Any() || context.ContactInfo.Any())
+                    context.Facilities.Any() || context.ContactInfo.Any() || context.CoursesSubjects.Any())
                 {
                     return; // Database has been seeded
                 }
@@ -162,9 +162,48 @@ namespace OnlineCollegeManagement.Data
                 context.Teachers.AddRange(teachers);
                 context.SaveChanges();
 
+                // Seed data for Subjects
+                for (int i = 0; i < 10; i++)
+                {
+                    var subject = new Subjects
+                    {
+                        SubjectCode = GenerateRandomSubjectCode(),
+                        SubjectName = GenerateRandomSubjectName(),
+                    };
 
+                    // Thêm môn học vào danh sách
+                    context.Subjects.Add(subject);
+                }
+
+                // Lưu thay đổi vào cơ sở dữ liệu
+                context.SaveChanges();
+
+
+                // Hàm sinh mã ngẫu nhiên cho môn học
+                string GenerateRandomSubjectCode()
+                {
+                    // Tạo một chuỗi ngẫu nhiên cho mã môn học
+                    const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+                    var random = new Random();
+                    var subjectCode = new string(Enumerable.Repeat(chars, 6)
+                        .Select(s => s[random.Next(s.Length)]).ToArray());
+                    return subjectCode;
+                }
+
+                // Hàm sinh tên ngẫu nhiên cho môn học
+                string GenerateRandomSubjectName()
+                {
+                    // Danh sách các tên môn học có thể chọn
+                    string[] subjectNames = { "Introduction to Programming", "Calculus", "Newtonian Mechanics", "Data Structures", "Organic Chemistry", "Artificial Intelligence", "World History", "English Literature", "Statistics", "Economics" };
+
+                    // Lấy ngẫu nhiên một tên môn học từ danh sách
+                    var random = new Random();
+                    var subjectName = subjectNames[random.Next(subjectNames.Length)];
+                    return subjectName;
+                }
                 // Seed data for Courses
                 var majors1 = context.Majors.ToList();
+                var subjects3 = context.Subjects.ToList();
                 var teachers1 = context.Teachers.ToList();
                 var thumbnailPaths4 = Enumerable.Range(1, 6).Select(i => $"/images/course-{i}.jpg").ToList();
                 var courseNames = new List<string> { "Web Development", "Database Management", "Machine Learning", "Software Testing", "Computer Graphics", "Network Security", "Digital Signal Processing", "Operating Systems", "Data Mining", "Artificial Intelligence" };
@@ -175,6 +214,7 @@ namespace OnlineCollegeManagement.Data
                 {
                     for (int i = 0; i < 5; i++)
                     {
+                        var randomSubjectsId = subjects3[random.Next(subjects3.Count)].SubjectsId;
                         var randomTeacherId = teachers1[random.Next(teachers1.Count)].TeachersId;
                         var randomCourseName = courseNames[random.Next(courseNames.Count)];
                         var course = new Courses
@@ -184,7 +224,8 @@ namespace OnlineCollegeManagement.Data
                             MajorsId = major.MajorsId,
                             CourseDate = DateTime.Now,
                             CoursesImageUrl = thumbnailPaths4[random.Next(thumbnailPaths4.Count)],
-                            TeachersId = randomTeacherId
+                            TeachersId = randomTeacherId,
+                            SubjectsId = randomSubjectsId
                         };
                         courses.Add(course);
                     }
@@ -375,53 +416,6 @@ namespace OnlineCollegeManagement.Data
                 }
 
 
-                // Seed data for Subjects
-                var courseIds = context.Courses.Select(c => c.CoursesId).ToList();
-                // Duyệt qua mỗi CourseId
-                foreach (var courseId in courseIds)
-                {
-                    // Tạo danh sách gồm khoảng 10 môn học ngẫu nhiên cho mỗi CourseId
-                    for (int i = 0; i < 10; i++)
-                    {
-                        var subject = new Subjects
-                        {
-                            SubjectCode = GenerateRandomSubjectCode(),
-                            SubjectName = GenerateRandomSubjectName(),
-                            CoursesId = courseId
-                        };
-
-                        // Thêm môn học vào danh sách
-                        context.Subjects.Add(subject);
-                    }
-                }
-
-                // Lưu thay đổi vào cơ sở dữ liệu
-                context.SaveChanges();
-
-                // Hàm sinh mã ngẫu nhiên cho môn học
-                string GenerateRandomSubjectCode()
-                {
-                    // Tạo một chuỗi ngẫu nhiên cho mã môn học
-                    const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-                    var random = new Random();
-                    var subjectCode = new string(Enumerable.Repeat(chars, 6)
-                        .Select(s => s[random.Next(s.Length)]).ToArray());
-                    return subjectCode;
-                }
-
-                // Hàm sinh tên ngẫu nhiên cho môn học
-                string GenerateRandomSubjectName()
-                {
-                    // Danh sách các tên môn học có thể chọn
-                    string[] subjectNames = { "Introduction to Programming", "Calculus", "Newtonian Mechanics", "Data Structures", "Organic Chemistry", "Artificial Intelligence", "World History", "English Literature", "Statistics", "Economics" };
-
-                    // Lấy ngẫu nhiên một tên môn học từ danh sách
-                    var random = new Random();
-                    var subjectName = subjectNames[random.Next(subjectNames.Length)];
-                    return subjectName;
-                }
-
-
                 // Seed data for ClassSchedules
                 var classes2 = context.Classes.ToList();
                 var subjects = context.Subjects.ToList();
@@ -605,7 +599,26 @@ namespace OnlineCollegeManagement.Data
 
                 context.SaveChanges();
 
+                // Seed data for CoursesSubjects
+                var Courses1 = context.Courses.ToList();
+                var subjects1 = context.Subjects.ToList();
 
+                for (int i = 0; i < 10; i++)
+                {
+                    var randomCoursesId = Courses1[random.Next(Courses1.Count)].CoursesId;
+                    var randomSubjectId = subjects[random.Next(subjects1.Count)].SubjectsId;
+
+                    var newCoursesSubjects = new CoursesSubjects
+                    {
+                        CoursesId = randomCoursesId,
+                        SubjectsId = randomSubjectId,
+
+                    };
+
+                    context.CoursesSubjects.Add(newCoursesSubjects);
+                }
+
+                context.SaveChanges();
                 // Seed data for ContactInfo
                 var contactInfos = new ContactInfo[]
                 {
@@ -618,6 +631,7 @@ namespace OnlineCollegeManagement.Data
                 }
                 context.SaveChanges();
             }
+
         }
     }
 }

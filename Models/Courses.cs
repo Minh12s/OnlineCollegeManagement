@@ -10,9 +10,11 @@ namespace OnlineCollegeManagement.Models
         public string CoursesImageUrl { get; set; }
         public int MajorsId { get; set; }
         public int TeachersId { get; set; }
+        public int SubjectsId { get; set; }
 
         public Majors Major { get; set; }
         public Teachers Teacher { get; set; }
+        public Subjects Subjects { get; set; }
+
     }
 }
-
