@@ -127,9 +127,19 @@ namespace OnlineCollegeManagement.Controllers
                 return NotFound();
             }
 
-            // Kiểm tra tính hợp lệ của model
-            if (true)
+            // Kiểm tra xem dữ liệu đầu vào có hợp lệ không (ví dụ: các trường bắt buộc)
+            if (!string.IsNullOrEmpty(department.DepartmentName))
             {
+                // Chuyển đổi DepartmentName sang chữ thường để so sánh
+                string departmentNameLower = department.DepartmentName.ToLower();
+
+                // Kiểm tra xem có bất kỳ bộ phận nào có trùng tên (không phân biệt chữ hoa/chữ thường) ngoại trừ phòng ban hiện tại không
+                if (_context.Departments.Any(d => d.DepartmentName.ToLower() == departmentNameLower && d.DepartmentsId != id))
+                {
+                    ModelState.AddModelError("DepartmentName", "Department name already exists.");
+                    return View(department);
+                }
+
                 try
                 {
                     // Cập nhật thông tin của phòng ban trong cơ sở dữ liệu
@@ -151,9 +161,11 @@ namespace OnlineCollegeManagement.Controllers
                 // Chuyển hướng đến action hiển thị danh sách phòng ban sau khi chỉnh sửa thành công
                 return RedirectToAction(nameof(Departments));
             }
-            // Trả về view với model và hiển thị lại form chỉnh sửa nếu dữ liệu không hợp lệ
+            // Nếu dữ liệu không hợp lệ, hiển thị thông báo lỗi và trả về view để người dùng nhập lại
+            ModelState.AddModelError(string.Empty, "Please provide a department name.");
             return View(department);
         }
+
         private bool DepartmentExists(int id)
         {
             return _context.Departments.Any(e => e.DepartmentsId == id);

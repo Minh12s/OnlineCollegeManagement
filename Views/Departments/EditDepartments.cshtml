@@ -77,6 +77,14 @@
     .main-section {
         margin-left: 15px;
     }
+    .main-section {
+        margin-left: 15px;
+    }
+
+    .error-message {
+        color: red;
+        font-size: 15px;
+    }
 </style>
 <section class="is-title-bar">
     <div class="flex flex-col md:flex-row items-center justify-between space-y-6 md:space-y-0">
@@ -100,6 +108,7 @@
                         <div class="form-group col-md-3">
                             <label class="control-label">Title</label>
                             <input asp-for="DepartmentName" class="form-control" name="DepartmentName" placeholder="Name" />
+                            <span asp-validation-for="DepartmentName" class="error-message"></span>
                         </div>
 
 
