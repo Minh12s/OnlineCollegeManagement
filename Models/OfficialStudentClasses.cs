@@ -3,15 +3,14 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace OnlineCollegeManagement.Models
 {
-    public class Classes
-    {
-        public int ClassesId { get; set; }
-        public string ClassName { get; set; }
+	public class OfficialStudentClasses
+	{
+        public int Id { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
- 
-        public virtual ICollection<OfficialStudentClasses> OfficialStudent { get; set; }
-
+        public string StudentStatus { get; set; }
+        public Classes Classes { get; set; }
+        public OfficialStudent OfficialStudent { get; set; }
     }
 }
 

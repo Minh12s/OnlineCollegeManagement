@@ -25,7 +25,7 @@ namespace OnlineCollegeManagement.Data
                     context.StudentsInformation.Any() || context.OfficialStudents.Any() ||
                     context.Subjects.Any() || context.ClassSchedules.Any() || context.ExamScores.Any() ||
                     context.Registrations.Any() || context.Events.Any() || context.Achievements.Any() ||
-                    context.Facilities.Any() || context.ContactInfo.Any() || context.CoursesSubjects.Any())
+                    context.Facilities.Any() || context.ContactInfo.Any())
                 {
                     return; // Database has been seeded
                 }
@@ -203,7 +203,7 @@ namespace OnlineCollegeManagement.Data
                 }
                 // Seed data for Courses
                 var majors1 = context.Majors.ToList();
-                var subjects3 = context.Subjects.ToList();
+               
                 var teachers1 = context.Teachers.ToList();
                 var thumbnailPaths4 = Enumerable.Range(1, 6).Select(i => $"/images/course-{i}.jpg").ToList();
                 var courseNames = new List<string> { "Web Development", "Database Management", "Machine Learning", "Software Testing", "Computer Graphics", "Network Security", "Digital Signal Processing", "Operating Systems", "Data Mining", "Artificial Intelligence" };
@@ -214,7 +214,7 @@ namespace OnlineCollegeManagement.Data
                 {
                     for (int i = 0; i < 5; i++)
                     {
-                        var randomSubjectsId = subjects3[random.Next(subjects3.Count)].SubjectsId;
+                        
                         var randomTeacherId = teachers1[random.Next(teachers1.Count)].TeachersId;
                         var randomCourseName = courseNames[random.Next(courseNames.Count)];
                         var course = new Courses
@@ -225,7 +225,7 @@ namespace OnlineCollegeManagement.Data
                             CourseDate = DateTime.Now,
                             CoursesImageUrl = thumbnailPaths4[random.Next(thumbnailPaths4.Count)],
                             TeachersId = randomTeacherId,
-                            SubjectsId = randomSubjectsId
+                           
                         };
                         courses.Add(course);
                     }
@@ -599,26 +599,7 @@ namespace OnlineCollegeManagement.Data
 
                 context.SaveChanges();
 
-                // Seed data for CoursesSubjects
-                var Courses1 = context.Courses.ToList();
-                var subjects1 = context.Subjects.ToList();
-
-                for (int i = 0; i < 10; i++)
-                {
-                    var randomCoursesId = Courses1[random.Next(Courses1.Count)].CoursesId;
-                    var randomSubjectId = subjects[random.Next(subjects1.Count)].SubjectsId;
-
-                    var newCoursesSubjects = new CoursesSubjects
-                    {
-                        CoursesId = randomCoursesId,
-                        SubjectsId = randomSubjectId,
-
-                    };
-
-                    context.CoursesSubjects.Add(newCoursesSubjects);
-                }
-
-                context.SaveChanges();
+        
                 // Seed data for ContactInfo
                 var contactInfos = new ContactInfo[]
                 {

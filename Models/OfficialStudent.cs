@@ -1,4 +1,5 @@
 ﻿using System;
+
 namespace OnlineCollegeManagement.Models
 {
     public class OfficialStudent
@@ -15,6 +16,8 @@ namespace OnlineCollegeManagement.Models
         public StudentsInformation StudentInformation { get; set; }
         public Users User { get; set; }
         public Courses Course { get; set; }
+        public virtual ICollection<OfficialStudentClasses> Classes { get; set; }
+
     }
 }
 
