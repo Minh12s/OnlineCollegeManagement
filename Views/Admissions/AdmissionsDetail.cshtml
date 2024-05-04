@@ -22,6 +22,32 @@
         flex: 0 0 33.3333333333%;
         max-width: 33.3333333333%;
 </style>
+<style>
+    .btn-primary {
+        color: rgb(245 157 57);
+        background-color: rgb(251 226 197);
+        border-color: none;
+        /* border-top-left-radius: 10px !important; */
+        /* border-bottom-right-radius: 10px !important; */
+        border-radius: .357rem;
+        border: none;
+        font-weight: 600;
+        padding: 5px 20px; /* Điều chỉnh kích thước theo ý muốn */
+    }
+
+    .page-link {
+        padding: 5px 10px; /* Có thể điều chỉnh kích thước của nút */
+        border: 1px solid #ccc; /* Thêm đường viền */
+        border-radius: 3px; /* Bo tròn góc */
+        margin-right: 5px; /* Khoảng cách giữa các nút */
+        text-decoration: none; /* Loại bỏ gạch chân mặc định */
+        color: #333; /* Màu chữ */
+    }
+
+        .page-link:hover {
+            background-color: #f0f0f0; /* Màu nền khi hover */
+        }
+</style>
 
 
 
@@ -108,3 +134,42 @@
 
 
 </section>
+<div>
+    <!-- Thêm input hidden để chứa giá trị returnUrl -->
+    <input type="hidden" id="returnUrl" name="returnUrl" value="@Url.Action("Admissions", "Admissions")" />
+
+    <div style="float:right; margin-top: 10px; display: flex; gap: 10px;">
+        @if (Model.Registration.RegistrationStatus == "Pending")
+        {
+            <!-- Hiển thị nút "Not Admitted" và "Admitted" -->
+            <div style="float:right; margin-top: 10px; display: flex; gap: 10px;">
+                <div>
+                    <form method="post" action="@Url.Action("UpdateStatus", "Admissions", new { StudentsInformationId = Model.StudentsInformationId, status = "Not Admitted" })">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="returnUrl" value="@Url.Action("Admissions", "Admissions", new { StudentsInformationId = Model.StudentsInformationId })" />
+                        <button onclick="return confirm('Surely you want to update the status to:  Not Admitted')" type="submit" class="btn btn-danger" style="padding: 5px 10px; border-radius: 5px; margin-right: 10px; background-color: red; color: white;">
+                            Not Admitted
+                        </button>
+                    </form>
+                </div>
+                <div>
+                    <form method="post" action="@Url.Action("UpdateStatus", "Admissions", new { StudentsInformationId = Model.StudentsInformationId, status = "Admitted" })">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="returnUrl" value="@Url.Action("Admissions", "Admissions", new { StudentsInformationId = Model.StudentsInformationId })" />
+                        <button onclick="return confirm('Surely you want to update the status to: Admitted')" type="submit" class="btn btn-success" style="padding: 5px 10px; border-radius: 5px; margin-right: 10px; background-color: green; color:white;">
+                            Admitted
+                        </button>
+                    </form>
+                </div>
+            </div>
+        }
+        else
+        {
+            <!-- Hiển thị nút "Back" -->
+            <div style="float:right; margin-top: 10px;">
+                <a style="padding: 5px 10px; border-radius: 5px; margin-right: 10px; background-color: red; color: white; " href="@Url.Action("Admissions", "Admissions")" class="btn btn-warning">Back</a>
+            </div>
+        }
+
+    </div>
+</div>

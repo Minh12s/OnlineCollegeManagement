@@ -387,7 +387,11 @@ namespace OnlineCollegeManagement.Data
                        ClassesId = classes1[random.Next(classes1.Count)],
                        CoursesId = courses1[random.Next(courses1.Count)],
                        UsersId = users1[random.Next(users1.Count)],
-                       Telephone = "1234567890"},
+                       Telephone = "1234567890",
+                        EnrollmentStartDate = DateTime.UtcNow, // Set the enrollment start date
+                        EnrollmentEndDate = DateTime.UtcNow.AddDays(30) // Set the enrollment end date, for example, 30 days from now
+                },
+
                 new OfficialStudent{
                        StudentCode = GenerateRandomStudentCode(),
                        StudentsInformationId =
@@ -395,7 +399,10 @@ namespace OnlineCollegeManagement.Data
                        ClassesId = classes1[random.Next(classes1.Count)],
                        CoursesId = courses1[random.Next(courses1.Count)],
                        UsersId = users1[random.Next(users1.Count)],
-                       Telephone = "0987654321"}
+                       Telephone = "0987654321",
+                       EnrollmentStartDate = DateTime.UtcNow.AddDays(10), // Set the enrollment start date, for example, 10 days from now
+                       EnrollmentEndDate = DateTime.UtcNow.AddDays(40) // Set the enrollment end date, for example, 40 days from now
+                }
 
                  };
 

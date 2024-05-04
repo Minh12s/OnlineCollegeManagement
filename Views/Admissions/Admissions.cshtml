@@ -62,7 +62,7 @@
 
 <section class="is-hero-bar">
     <div class="flex flex-col md:flex-row items-center justify-start">
-       
+
         <!-- Phần này để chứa nút "Print PDF" -->
         <div class="col-sm-2" style="margin-right: 5px;">
             <button onclick="myApp.printTable()" class="btn btn-add">
@@ -90,7 +90,7 @@
 </section>
 <form style="display: flex; align-items: center; border-radius: 5px; margin-top: 10px; flex-wrap: wrap;" asp-action="Admissions" asp-controller="AdmissionsManagement" method="get">
     <div class="input-group input-group-sm" style="margin-left: 21px; margin-bottom: 10px;">
-        <select style="height: 45px; font-size: 0.765625rem; padding: 4px 8px; background-color: #F1F1F1; border-radius: 5px; width: 160px;" name="RegistrationStatus" class="form-control">
+        <select style="height: 45px; font-size: 0.765625rem; padding: 4px 8px; background-color: #F1F1F1; border-radius: 5px; width: 150px;" name="RegistrationStatus" class="form-control">
             <option value="">Filter by registrations</option>
             <option value="Pending">Pending</option>
             <option value="Not Admitted">Not Admitted</option>
@@ -102,7 +102,7 @@
         <input value="" class="form-control" type="date" name="EndDate" placeholder="End Date" style="height: 45px; font-size: 0.765625rem; padding: 4px 8px; background-color: #F1F1F1; border-radius: 5px; width: 150px; margin-left: 10px;" />
     </div>
     <div class="input-group input-group-sm" style="margin-right: 5px; margin-bottom: 10px;">
-        <input value="" class="form-control" type="text" name="UniqueCode" placeholder="Code" style="height: 45px; font-size: 0.765625rem; padding: 4px 8px; background-color: #F1F1F1; border-radius: 5px; width: 120px; margin-left: 5px;" />
+        <input value="" class="form-control" type="text" name="UniqueCode" placeholder="Code" style="height: 45px; font-size: 0.765625rem; padding: 4px 8px; background-color: #F1F1F1; border-radius: 5px; width: 120px; margin-left: 28px;" />
     </div>
 
     <div class="input-group input-group-sm" style="margin-bottom: 10px; margin-left: -5px;">
@@ -118,38 +118,14 @@
                 <span class="icon"><i class="mdi mdi-account-multiple"></i></span>
                 Admissions
             </p>
-            <form class="card-header-icon" asp-controller="Admissions" asp-action="Admissions" method="get" onchange="this.submit()">
 
-                <select style="margin-left:-10px; padding: 5px 10px;border:1px solid #F1F1F1 " name="PageSize">
-                    <option value="10"
-                            selected="@(ViewBag.PageSize == 10)">
-                        10
-                    </option>
-                    <option value="20"
-                            selected="@(ViewBag.PageSize == 20)">
-                        20
-                    </option>
-                    <option value="50"
-                            selected="@(ViewBag.PageSize == 50)">
-                        50
-                    </option>
-                    <option value="100"
-                            selected="@(ViewBag.PageSize == 100)">
-                        100
-                    </option>
-                </select>
-
-                <input type="hidden" name="page" value="@ViewBag.CurrentPage">
-
-                @*<button style="border:1px solid white ;background-color:#FFA45C; color: white;" type="submit">filter</button>*@
-
-            </form>
         </header>
         <div class="card-content">
             <table>
                 <thead>
                     <tr>
                         <th>ID</th>
+                        <th>Name </th>
                         <th>Status</th>
                         <th>Code</th>
                         <th>Registration Date</th>
@@ -161,6 +137,8 @@
                     {
                         <tr>
                             <td>@registration.StudentsInformationId</td>
+                            <td>@registration.StudentInformation.StudentName</td>
+
                             <td>
                                 @{
                                     // Tạo class dựa trên giá trị của RegistrationStatus
@@ -181,7 +159,7 @@
                                 <span class="@statusClass">@registration.RegistrationStatus</span>
                             </td>
                             <td>@registration.UniqueCode</td>
-                            <td>@registration.RegistrationDate.ToString("yyyy-MM-dd")</td>
+                            <td>@registration.RegistrationDate</td>
                             <td>
                                 <div class="button-group">
                                     <a style="background-color:green; color:white;" class="btn btn-primary"

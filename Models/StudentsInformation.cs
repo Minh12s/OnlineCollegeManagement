@@ -23,5 +23,7 @@ namespace OnlineCollegeManagement.Models
         public string? Grade { get; set; }
         public string? SportsInfo { get; set; }
         public Majors Major { get; set; }
+        public Registrations Registration { get; set; }
+
     }
 }

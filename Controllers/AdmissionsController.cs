@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using OnlineCollegeManagement.Data;
 using OnlineCollegeManagement.Models;
+using System.Net.Mail;
+using System.Net;
 
 namespace OnlineCollegeManagement.Controllers
 {
@@ -22,7 +24,8 @@ namespace OnlineCollegeManagement.Controllers
             int pageNumber = page ?? 1;
 
             // Truy vấn dữ liệu sinh viên từ cơ sở dữ liệu
-            var registrations = _context.Registrations.AsQueryable();
+            var registrations = _context.Registrations.Include(r => r.StudentInformation).AsQueryable();
+
 
             // Lọc theo trạng thái mong muốn
             if (!string.IsNullOrEmpty(RegistrationStatus))
@@ -71,17 +74,140 @@ namespace OnlineCollegeManagement.Controllers
                 return NotFound();
             }
 
-            var admission = await _context.StudentsInformation
-                .FirstOrDefaultAsync(s => s.StudentsInformationId == StudentsInformationId);
+            var student = await _context.StudentsInformation
+        .Include(s => s.Registration) // Load thông tin đăng ký
+        .FirstOrDefaultAsync(s => s.StudentsInformationId == StudentsInformationId);
 
-            if (admission == null)
+            if (student == null)
             {
                 return NotFound();
             }
 
-            return View("AdmissionsDetail", admission); // Chỉ định tên view là "AdmissionsDetail"
+            return View("AdmissionsDetail", student); // Chỉ định tên view là "AdmissionsDetail"
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateStatus(int StudentsInformationId, string status)
+        {
+            // Tìm thông tin đăng ký của sinh viên
+            var registration = await _context.Registrations.FirstOrDefaultAsync(r => r.StudentsInformationId == StudentsInformationId);
+
+            if (registration == null)
+            {
+                return NotFound();
+            }
+
+            // Cập nhật trạng thái đăng ký
+            registration.RegistrationStatus = status;
+            _context.Update(registration);
+            await _context.SaveChangesAsync();
+
+            // Kiểm tra nếu trạng thái là "Admitted"
+            if (status == "Admitted")
+            {
+                // Lấy thông tin sinh viên từ cơ sở dữ liệu
+                var student = await _context.StudentsInformation.FirstOrDefaultAsync(s => s.StudentsInformationId == StudentsInformationId);
+
+                // Tạo dữ liệu mới cho bảng Users
+                var newUser = new Users
+                {
+                    Username = student.StudentName,
+                    Email = $"{student.StudentName}{new Random().Next(10000)}@gmail.com",
+                    Password = GenerateRandomPassword(),
+                    Role = "User"
+                };
+
+                // Thêm dữ liệu mới vào bảng Users
+                _context.Users.Add(newUser);
+                await _context.SaveChangesAsync();
+
+                // Tạo dữ liệu mới cho bảng OfficialStudent
+                var officialStudent = new OfficialStudent
+                {
+                    StudentsInformationId = student.StudentsInformationId,
+                    UsersId = newUser.UsersId,
+                    StudentCode = GenerateRandomCode(),
+                    Telephone = "N/A" // Giá trị mặc định hoặc có thể là null tùy theo yêu cầu của ứng dụng
+                };
+
+                // Thêm dữ liệu mới vào bảng OfficialStudent
+                _context.OfficialStudents.Add(officialStudent);
+                await _context.SaveChangesAsync();
+                await SendAdmittedConfirmationEmail("minhtnth2209037@fpt.edu.vn", newUser.Username, newUser.Email, newUser.Password);
+
+            }
+
+            // Chuyển hướng đến trang chi tiết đăng ký với StudentsInformationId tương ứng
+            return RedirectToAction("Admissions", "Admissions", new { StudentsInformationId = StudentsInformationId });
         }
 
+        // Phương thức để tạo mật khẩu ngẫu nhiên
+        private string GenerateRandomPassword()
+        {
+            // Các ký tự được chấp nhận cho mật khẩu
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            var random = new Random();
+            // Tạo mật khẩu ngẫu nhiên có độ dài 8 ký tự
+            return new string(Enumerable.Repeat(chars, 8)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
 
+        // Phương thức để tạo mã sinh viên ngẫu nhiên
+        private string GenerateRandomCode()
+        {
+            // Các ký tự được chấp nhận cho mã sinh viên
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            var random = new Random();
+            // Tạo mã sinh viên ngẫu nhiên có độ dài 8 ký tự
+            return new string(Enumerable.Repeat(chars, 8)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+        private async Task SendAdmittedConfirmationEmail(string recipientEmail, string username, string email, string password)
+        {
+            try
+            {
+                // Đường dẫn tới mẫu email
+                string emailTemplatePath = Path.Combine(_env.ContentRootPath, "Views", "Email", "AdmittedConfirmation.cshtml");
+
+                // Đọc nội dung mẫu email từ file
+                string emailContent = await System.IO.File.ReadAllTextAsync(emailTemplatePath);
+
+                // Thay thế các thẻ placeholder trong mẫu email bằng thông tin thích hợp
+                emailContent = emailContent.Replace("{Username}", username);
+                emailContent = emailContent.Replace("{Email}", email);
+                emailContent = emailContent.Replace("{Password}", password);
+
+
+
+                // Tạo đối tượng MailMessage
+                var message = new MailMessage();
+                message.To.Add(new MailAddress(recipientEmail)); // Địa chỉ email của sinh viên
+                message.From = new MailAddress(_configuration["EmailSettings:Username"]);
+                message.Subject = "Confirmed successful admission!";
+                message.Body = emailContent;
+                message.IsBodyHtml = true;
+
+                // Tạo đối tượng SmtpClient để gửi email
+                using (var smtp = new SmtpClient(_configuration["EmailSettings:SmtpServer"], int.Parse(_configuration["EmailSettings:Port"])))
+                {
+                    var credentials = new NetworkCredential
+                    {
+                        UserName = _configuration["EmailSettings:Username"],
+                        Password = _configuration["EmailSettings:Password"]
+                    };
+                    smtp.Credentials = credentials;
+                    smtp.EnableSsl = true;
+
+                    // Gửi email
+                    await smtp.SendMailAsync(message);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Xử lý nếu có lỗi xảy ra khi gửi email
+                // Log lỗi ex.Message
+            }
+
+        }
     }
 }
