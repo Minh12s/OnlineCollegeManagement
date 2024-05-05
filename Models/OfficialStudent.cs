@@ -10,7 +10,7 @@ namespace OnlineCollegeManagement.Models
         public int? ClassesId { get; set; }
         public int UsersId { get; set; }
         public string StudentCode { get; set; }
-        public string Telephone { get; set; }
+        public string? Telephone { get; set; }
         public DateTime? EnrollmentStartDate { get; set; }
         public DateTime? EnrollmentEndDate { get; set; }
 

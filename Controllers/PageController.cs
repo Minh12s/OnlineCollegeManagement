@@ -263,7 +263,9 @@ namespace OnlineCollegeManagement.Controllers
                     {
                         StudentsInformationId = studentInfo.StudentsInformationId,
                         RegistrationStatus = "Pending",
-                        UniqueCode = GenerateUniqueCode()
+                        UniqueCode = GenerateUniqueCode(),
+                        RegistrationDate = DateTime.UtcNow // Gán ngày đăng ký là thời gian hiện tại
+
                     };
 
                     // Lưu thông tin đăng ký vào cơ sở dữ liệu

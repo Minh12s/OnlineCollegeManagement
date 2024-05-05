@@ -4,6 +4,8 @@ using OnlineCollegeManagement.Data;
 using OnlineCollegeManagement.Models;
 using System.Net.Mail;
 using System.Net;
+using BCrypt.Net;
+
 
 namespace OnlineCollegeManagement.Controllers
 {
@@ -74,16 +76,29 @@ namespace OnlineCollegeManagement.Controllers
                 return NotFound();
             }
 
+            // Truy vấn RegistrationStatus dựa trên StudentsInformationId
+            var registrationStatus = await _context.Registrations
+                .Where(r => r.StudentsInformationId == StudentsInformationId)
+                .Select(r => r.RegistrationStatus)
+                .FirstOrDefaultAsync();
+
+            if (registrationStatus == null)
+            {
+                return NotFound();
+            }
+
+            // Lấy thông tin sinh viên
             var student = await _context.StudentsInformation
-        .Include(s => s.Registration) // Load thông tin đăng ký
-        .FirstOrDefaultAsync(s => s.StudentsInformationId == StudentsInformationId);
+                .FirstOrDefaultAsync(s => s.StudentsInformationId == StudentsInformationId);
 
             if (student == null)
             {
                 return NotFound();
             }
 
-            return View("AdmissionsDetail", student); // Chỉ định tên view là "AdmissionsDetail"
+            // Truyền dữ liệu RegistrationStatus và Student vào view
+            ViewBag.RegistrationStatus = registrationStatus;
+            return View(student); // Trả về view "AdmissionsDetail" với dữ liệu sinh viên
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -107,13 +122,21 @@ namespace OnlineCollegeManagement.Controllers
             {
                 // Lấy thông tin sinh viên từ cơ sở dữ liệu
                 var student = await _context.StudentsInformation.FirstOrDefaultAsync(s => s.StudentsInformationId == StudentsInformationId);
+                // Tạo địa chỉ email từ StudentName và loại bỏ dấu cách
+                string cleanedEmail = $"{student.StudentName.Replace(" ", "")}{new Random().Next(10000)}@gmail.com";
+
+                // Tạo mật khẩu ngẫu nhiên cho sinh viên
+                string originalPassword = GenerateRandomPassword();
+
+                // Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu
+                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(originalPassword);
 
                 // Tạo dữ liệu mới cho bảng Users
                 var newUser = new Users
                 {
                     Username = student.StudentName,
-                    Email = $"{student.StudentName}{new Random().Next(10000)}@gmail.com",
-                    Password = GenerateRandomPassword(),
+                    Email = cleanedEmail,
+                    Password = hashedPassword,
                     Role = "User"
                 };
 
@@ -127,14 +150,14 @@ namespace OnlineCollegeManagement.Controllers
                     StudentsInformationId = student.StudentsInformationId,
                     UsersId = newUser.UsersId,
                     StudentCode = GenerateRandomCode(),
-                    Telephone = "N/A" // Giá trị mặc định hoặc có thể là null tùy theo yêu cầu của ứng dụng
                 };
 
                 // Thêm dữ liệu mới vào bảng OfficialStudent
                 _context.OfficialStudents.Add(officialStudent);
                 await _context.SaveChangesAsync();
-                await SendAdmittedConfirmationEmail("minhtnth2209037@fpt.edu.vn", newUser.Username, newUser.Email, newUser.Password);
 
+                // Gửi email với mật khẩu nguyên thủy (không mã hóa)
+                await SendAdmittedConfirmationEmail("minhtnth2209037@fpt.edu.vn", newUser.Username, newUser.Email, originalPassword);
             }
 
             // Chuyển hướng đến trang chi tiết đăng ký với StudentsInformationId tương ứng
@@ -175,9 +198,7 @@ namespace OnlineCollegeManagement.Controllers
                 // Thay thế các thẻ placeholder trong mẫu email bằng thông tin thích hợp
                 emailContent = emailContent.Replace("{Username}", username);
                 emailContent = emailContent.Replace("{Email}", email);
-                emailContent = emailContent.Replace("{Password}", password);
-
-
+                emailContent = emailContent.Replace("{Password}", password); // Sử dụng mật khẩu không mã hóa
 
                 // Tạo đối tượng MailMessage
                 var message = new MailMessage();
@@ -207,7 +228,6 @@ namespace OnlineCollegeManagement.Controllers
                 // Xử lý nếu có lỗi xảy ra khi gửi email
                 // Log lỗi ex.Message
             }
-
         }
     }
 }

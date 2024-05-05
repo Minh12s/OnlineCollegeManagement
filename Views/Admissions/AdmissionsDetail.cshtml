@@ -139,7 +139,7 @@
     <input type="hidden" id="returnUrl" name="returnUrl" value="@Url.Action("Admissions", "Admissions")" />
 
     <div style="float:right; margin-top: 10px; display: flex; gap: 10px;">
-        @if (Model.Registration.RegistrationStatus == "Pending")
+        @if (ViewBag.RegistrationStatus == "Pending")
         {
             <!-- Hiển thị nút "Not Admitted" và "Admitted" -->
             <div style="float:right; margin-top: 10px; display: flex; gap: 10px;">
