@@ -273,7 +273,7 @@ namespace OnlineCollegeManagement.Controllers
                     await _context.SaveChangesAsync();
 
                     // Gửi email thông báo đến địa chỉ email mà người dùng nhập vào trong form
-                    await SendAdmissionConfirmationEmail("", registration.UniqueCode);
+                    await SendAdmissionConfirmationEmail("dungprohn1409@gmail.com", registration.UniqueCode);
 
                     TempData["SuccessMessage"] = "Sign Up Success! The Code has been sent to your email address.";
                     return RedirectToAction("Admission", "Page");

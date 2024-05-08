@@ -9,6 +9,8 @@ namespace OnlineCollegeManagement.Models
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public string StudentStatus { get; set; }
+        public int OfficialStudentId { get; set; }
+        public int ClassesId { get; set; }
         public Classes Classes { get; set; }
         public OfficialStudent OfficialStudent { get; set; }
     }

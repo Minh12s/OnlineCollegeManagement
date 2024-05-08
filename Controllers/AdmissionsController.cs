@@ -157,7 +157,7 @@ namespace OnlineCollegeManagement.Controllers
                 await _context.SaveChangesAsync();
 
                 // Gửi email với mật khẩu nguyên thủy (không mã hóa)
-                await SendAdmittedConfirmationEmail("minhtnth2209037@fpt.edu.vn", newUser.Username, newUser.Email, originalPassword);
+                await SendAdmittedConfirmationEmail("", newUser.Username, newUser.Email, originalPassword);
             }
 
             // Chuyển hướng đến trang chi tiết đăng ký với StudentsInformationId tương ứng

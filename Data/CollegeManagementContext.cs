@@ -28,11 +28,12 @@ namespace OnlineCollegeManagement.Data
         public DbSet<Achievements> Achievements { get; set; }
         public DbSet<Facilities> Facilities { get; set; }
         public DbSet<ContactInfo> ContactInfo { get; set; }
-  
+        public DbSet<OfficialStudentClasses> OfficialStudentClasses { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-       
+
             modelBuilder.Entity<Courses>()
                 .HasMany(c => c.Subjects)
                 .WithMany(s => s.Courses)

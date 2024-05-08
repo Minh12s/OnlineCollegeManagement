@@ -83,15 +83,29 @@ namespace OnlineCollegeManagement.Controllers
         {
             var majors = _context.Majors.OrderBy(c => c.MajorName).ToList();
             var teachers = _context.Teachers.OrderBy(c => c.TeacherName).ToList();
+            var subjects = _context.Subjects.OrderBy(s => s.SubjectName).ToList();
+
+            if (subjects != null)
+            {
+                ViewBag.Subjects = subjects;
+            }
+            else
+            {
+                // Xử lý trường hợp khi không có dữ liệu môn học
+                // Ví dụ: ViewBag.Subjects = new List<Subject>();
+            }
+
             ViewBag.Majors = new SelectList(majors, "MajorsId", "MajorName");
             ViewBag.Teachers = new SelectList(teachers, "TeachersId", "TeacherName");
-           
+
             return View();
         }
 
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddCourses(Courses model, IFormFile CoursesImageUrl)
+        public async Task<IActionResult> AddCourses(Courses model, IFormFile CoursesImageUrl, List<int> SelectedSubjects)
         {
             if (true)
             {
@@ -109,19 +123,33 @@ namespace OnlineCollegeManagement.Controllers
                         await CoursesImageUrl.CopyToAsync(stream);
                     }
                     model.CoursesImageUrl = "/images/Courses/" + Path.GetFileName(imagePath);
-
                 }
 
                 model.CourseDate = DateTime.Now;
 
-
                 _context.Add(model);
                 await _context.SaveChangesAsync();
+
+                // Lấy CoursesId vừa tạo
+                int coursesId = model.CoursesId;
+
+                // Thêm các môn học vào bảng CourseSubject
+                if (SelectedSubjects != null && SelectedSubjects.Any())
+                {
+                    foreach (var subjectId in SelectedSubjects)
+                    {
+                        await _context.Database.ExecuteSqlInterpolatedAsync($"INSERT INTO CourseSubject (CoursesId, SubjectsId) VALUES ({coursesId}, {subjectId})");
+                    }
+                }
+
                 return RedirectToAction(nameof(Courses));
             }
 
             return View(model);
         }
+
+
+
 
         [HttpGet]
         public async Task<IActionResult> EditCourses(int id)
@@ -209,6 +237,7 @@ namespace OnlineCollegeManagement.Controllers
 
             // Chuyển hướng về trang BlogManagement/Blog
             return RedirectToAction("Courses", "Courses");
+
         }
     }
 }

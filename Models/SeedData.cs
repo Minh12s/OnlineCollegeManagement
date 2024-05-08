@@ -376,7 +376,7 @@ namespace OnlineCollegeManagement.Data
 
                 // Seed data for OfficialStudents
                 var studentsInformationIds = context.StudentsInformation.Select(s => s.StudentsInformationId).ToList();
-                var classes1 = context.Classes.Select(c => c.ClassesId).ToList();
+               
                 var users1 = context.Users.Select(u => u.UsersId).ToList();
                 var courses1 = context.Courses.Select(u => u.CoursesId).ToList();
                 var officialStudents = new OfficialStudent[]{
@@ -384,7 +384,7 @@ namespace OnlineCollegeManagement.Data
                        StudentCode = GenerateRandomStudentCode(),
                        StudentsInformationId =
                        studentsInformationIds[random.Next(studentsInformationIds.Count)],
-                       ClassesId = classes1[random.Next(classes1.Count)],
+                     
                        CoursesId = courses1[random.Next(courses1.Count)],
                        UsersId = users1[random.Next(users1.Count)],
                        Telephone = "1234567890",
@@ -396,7 +396,7 @@ namespace OnlineCollegeManagement.Data
                        StudentCode = GenerateRandomStudentCode(),
                        StudentsInformationId =
                        studentsInformationIds[random.Next(studentsInformationIds.Count)],
-                       ClassesId = classes1[random.Next(classes1.Count)],
+                      
                        CoursesId = courses1[random.Next(courses1.Count)],
                        UsersId = users1[random.Next(users1.Count)],
                        Telephone = "0987654321",
