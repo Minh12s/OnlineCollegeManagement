@@ -165,7 +165,7 @@ namespace OnlineCollegeManagement.Controllers
                 if (student != null)
                 {
                     // Gửi email từ chối
-                    await SendNotAdmittedConfirmationEmail("", student.StudentName);
+                    await SendNotAdmittedConfirmationEmail("dungprohn1409@gmail.com", student.StudentName);
                 }
 
             }

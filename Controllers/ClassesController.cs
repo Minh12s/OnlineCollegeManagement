@@ -228,7 +228,7 @@ namespace OnlineCollegeManagement.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> AddStudentToClass(int classesId, int page = 1, int pageSize = 10)
+        public async Task<IActionResult> AddStudentToClass(int classesId, int page = 1, int pageSize = 1)
         {
             // Lấy thông tin lớp học từ ID
             var classes = await _context.Classes.FindAsync(classesId);
@@ -263,7 +263,7 @@ namespace OnlineCollegeManagement.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> AddStudentToClass(int classesId, List<int> selectedStudents)
+        public async Task<IActionResult> AddStudentToClass(int classesId, List<int> selectedStudents, int page = 1, int pageSize = 1)
         {
             // Lấy thông tin lớp học từ ID
             var classes = await _context.Classes.FindAsync(classesId);
@@ -319,11 +319,14 @@ namespace OnlineCollegeManagement.Controllers
                     // Nếu có sinh viên trùng lặp, thêm thông báo lỗi vào ModelState
                     ModelState.AddModelError("", $"Students with ID {string.Join(", ", duplicateStudentIds)} already exist in this class.");
 
-                    // Lấy lại dữ liệu sinh viên và hiển thị lại trang
-                    var students = await _context.OfficialStudents.ToListAsync();
-                    ViewBag.ClassesId = classesId;
-                    ViewBag.ClassesStartDate = classes.StartDate;
-                    ViewBag.ClassesEndDate = classes.EndDate;
+                    // Lấy lại dữ liệu sinh viên với phân trang và hiển thị lại trang
+                    var students = await _context.OfficialStudents
+                                                .Include(s => s.Course)
+                                                .Skip((page - 1) * pageSize)
+                                                .Take(pageSize)
+                                                .ToListAsync();
+                    ViewBag.PageNumber = page;
+                    ViewBag.TotalPages = (int)Math.Ceiling(await _context.OfficialStudents.CountAsync() / (double)pageSize);
                     return View(students);
                 }
 
@@ -335,9 +338,11 @@ namespace OnlineCollegeManagement.Controllers
             }
             else
             {
-                return View(classes); // Trả về view với thông tin lớp học nếu không có sinh viên được chọn
+                // Trả về view với thông tin lớp học nếu không có sinh viên được chọn
+                return View(classes);
             }
         }
+
 
         [HttpPost]
         public async Task<IActionResult> RemoveStudentFromClass(int classesId, int officialStudentId)
