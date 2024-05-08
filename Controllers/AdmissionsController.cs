@@ -159,6 +159,17 @@ namespace OnlineCollegeManagement.Controllers
                 // Gửi email với mật khẩu nguyên thủy (không mã hóa)
                 await SendAdmittedConfirmationEmail("", newUser.Username, newUser.Email, originalPassword);
             }
+            if (status == "Not Admitted")
+            {
+                var student = await _context.StudentsInformation.FirstOrDefaultAsync(s => s.StudentsInformationId == StudentsInformationId);
+                if (student != null)
+                {
+                    // Gửi email từ chối
+                    await SendNotAdmittedConfirmationEmail("", student.StudentName);
+                }
+
+            }
+
 
             // Chuyển hướng đến trang chi tiết đăng ký với StudentsInformationId tương ứng
             return RedirectToAction("Admissions", "Admissions", new { StudentsInformationId = StudentsInformationId });
@@ -229,5 +240,48 @@ namespace OnlineCollegeManagement.Controllers
                 // Log lỗi ex.Message
             }
         }
+        private async Task SendNotAdmittedConfirmationEmail(string recipientEmail, string studentName)
+        {
+            try
+            {
+                // Đường dẫn tới mẫu email
+                string emailTemplatePath = Path.Combine(_env.ContentRootPath, "Views", "Email", "NotAdmittedConfirmation.cshtml");
+
+                // Đọc nội dung mẫu email từ file
+                string emailContent = await System.IO.File.ReadAllTextAsync(emailTemplatePath);
+
+                // Thay thế các thẻ placeholder trong mẫu email bằng thông tin thích hợp
+                emailContent = emailContent.Replace("{StudentName}", studentName);
+
+                // Tạo đối tượng MailMessage
+                var message = new MailMessage();
+                message.To.Add(new MailAddress(recipientEmail)); // Địa chỉ email của sinh viên
+                message.From = new MailAddress(_configuration["EmailSettings:Username"]);
+                message.Subject = "Admission application denied";
+                message.Body = emailContent;
+                message.IsBodyHtml = true;
+
+                // Tạo đối tượng SmtpClient để gửi email
+                using (var smtp = new SmtpClient(_configuration["EmailSettings:SmtpServer"], int.Parse(_configuration["EmailSettings:Port"])))
+                {
+                    var credentials = new NetworkCredential
+                    {
+                        UserName = _configuration["EmailSettings:Username"],
+                        Password = _configuration["EmailSettings:Password"]
+                    };
+                    smtp.Credentials = credentials;
+                    smtp.EnableSsl = true;
+
+                    // Gửi email
+                    await smtp.SendMailAsync(message);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Xử lý nếu có lỗi xảy ra khi gửi email
+                // Log lỗi ex.Message
+            }
+        }
+
     }
 }
