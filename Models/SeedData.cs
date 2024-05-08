@@ -25,7 +25,7 @@ namespace OnlineCollegeManagement.Data
                     context.StudentsInformation.Any() || context.OfficialStudents.Any() ||
                     context.Subjects.Any() || context.ClassSchedules.Any() || context.ExamScores.Any() ||
                     context.Registrations.Any() || context.Events.Any() || context.Achievements.Any() ||
-                    context.Facilities.Any() || context.ContactInfo.Any())
+                    context.Facilities.Any() || context.ContactInfo.Any() || context.CoursesSubjects.Any())
                 {
                     return; // Database has been seeded
                 }
@@ -606,7 +606,28 @@ namespace OnlineCollegeManagement.Data
 
                 context.SaveChanges();
 
-        
+                // Seed data for CoursesSubjects
+                var Courses1 = context.Courses.ToList();
+                var subjects1 = context.Subjects.ToList();
+
+                for (int i = 0; i < 10; i++)
+                {
+                    var randomCoursesId = Courses1[random.Next(Courses1.Count)].CoursesId;
+                    var randomSubjectId = subjects[random.Next(subjects1.Count)].SubjectsId;
+
+                    var newCoursesSubjects = new CoursesSubjects
+                    {
+                        CoursesId = randomCoursesId,
+                        SubjectsId = randomSubjectId,
+
+                    };
+
+                    context.CoursesSubjects.Add(newCoursesSubjects);
+                }
+
+                context.SaveChanges();
+
+
                 // Seed data for ContactInfo
                 var contactInfos = new ContactInfo[]
                 {

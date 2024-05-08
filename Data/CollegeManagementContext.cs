@@ -31,13 +31,12 @@ namespace OnlineCollegeManagement.Data
         public DbSet<OfficialStudentClasses> OfficialStudentClasses { get; set; }
 
 
+        public DbSet<CoursesSubjects> CoursesSubjects { get; set; }
+
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
-            modelBuilder.Entity<Courses>()
-                .HasMany(c => c.Subjects)
-                .WithMany(s => s.Courses)
-                .UsingEntity(j => j.ToTable("CourseSubject"));
+            modelBuilder.Entity<CoursesSubjects>().HasKey(cs => new { cs.CoursesId, cs.SubjectsId });
         }
 
     }

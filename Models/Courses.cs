@@ -13,7 +13,6 @@ namespace OnlineCollegeManagement.Models
 
         public Majors Major { get; set; }
         public Teachers Teacher { get; set; }
-        public virtual ICollection<Subjects> Subjects { get; set; }
 
     }
 }
