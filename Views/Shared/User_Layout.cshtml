@@ -24,6 +24,8 @@
     <link rel="stylesheet" href="~/css/flaticon.css">
     <link rel="stylesheet" href="~/css/icomoon.css">
     <link rel="stylesheet" href="~/css/style.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <style>
     .cart-dropdown-content {
@@ -98,11 +100,11 @@
           <li class="nav-item cta"><a href="/Page/Admission" class="nav-link"><span>Apply Now!</span></a></li>
                     <li class="nav-item">
                         <a href="#" class="nav-link" onclick="showCartDropdown()">
-                            <span class="icon-user" style="font-size:11px; color: #333; margin-top: 10px;"></span>
+                            <span class="icon-user" style=" color: #333; margin-top: 10px;"></span>
                             <span style=" color: #55688b">Guest</span>
                         </a>
                         <div class="cart-dropdown-content" id="cartDropdownContent">
-                            <a href=""><i class="fas fa-file-alt text-dark"></i> MyTranscript</a>
+                            <a href="/Page/MyTranscript"><i class="fas fa-file-alt text-dark"></i> MyTranscript</a>
                             <a asp-controller="Page" asp-action="logout"><i class="fas fa-sign-out-alt text-dark"></i> Logout</a>
                         </div>
 
