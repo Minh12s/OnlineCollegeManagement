@@ -257,7 +257,7 @@ namespace OnlineCollegeManagement.Controllers
                 var message = new MailMessage();
                 message.To.Add(new MailAddress(recipientEmail)); // Địa chỉ email của sinh viên
                 message.From = new MailAddress(_configuration["EmailSettings:Username"]);
-                message.Subject = "Admission application denied";
+                message.Subject = "Admission Unsuccessful Notification";
                 message.Body = emailContent;
                 message.IsBodyHtml = true;
 
