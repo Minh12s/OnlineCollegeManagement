@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using OnlineCollegeManagement.Data;
 using OnlineCollegeManagement.Models;
+using OnlineCollegeManagement.Models.Authentication;
 
 namespace OnlineCollegeManagement.Controllers
 {
+    [Authentication]
     public class SubjectsController : Controller
     {
         private readonly CollegeManagementContext _context;

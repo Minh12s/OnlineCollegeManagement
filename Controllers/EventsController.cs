@@ -2,9 +2,12 @@
 using Microsoft.EntityFrameworkCore;
 using OnlineCollegeManagement.Data;
 using OnlineCollegeManagement.Models;
+using OnlineCollegeManagement.Heplers;
+using OnlineCollegeManagement.Models.Authentication;
 
 namespace OnlineCollegeManagement.Controllers
 {
+    [Authentication]
     public class EventsController : Controller
     {
 

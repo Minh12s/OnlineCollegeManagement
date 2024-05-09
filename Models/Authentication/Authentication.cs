@@ -1,0 +1,49 @@
+﻿using System;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+
+namespace OnlineCollegeManagement.Models.Authentication
+{
+    public class Authentication : ActionFilterAttribute
+    {
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            if (context.HttpContext.Session.GetString("Username") == null)
+            {
+                context.Result = new RedirectToRouteResult(
+                    new RouteValueDictionary
+                    {
+                        {"Controller","Page"},
+                        {"Action","login" }
+                    });
+            }
+            else
+            {
+                string userRole = context.HttpContext.Session.GetString("Role");
+
+                // Kiểm tra nếu đang cố gắng chuyển hướng từ trang Admin
+                bool isRedirectedFromAdmin = context.HttpContext.Request.Headers["Referer"].ToString().Contains("Admin/dashboard");
+
+                // Lấy danh sách các controller mà cần kiểm tra quyền
+                string[] adminControllers = {
+                    "Admin", "Courses", "Classes" , "Admissions", "Achievements",
+                    "Departments", "Events", "Facilities" , "Majors" ,"Subjects","Teachers"
+                };
+
+                // Kiểm tra xem controller hiện tại có trong danh sách các controller admin hay không
+                bool isAdminController = Array.Exists(adminControllers, controller => controller.Equals(context.RouteData.Values["Controller"].ToString()));
+
+                if (userRole == "Admin" && isRedirectedFromAdmin && !isAdminController)
+                {
+                    // Nếu có cố gắng truy cập trái phép vào trang Admin, trả về mã lỗi 404
+                    context.Result = new NotFoundResult();
+                }
+                else if (userRole == "User" && isAdminController)
+                {
+                    // Nếu người dùng có vai trò là "User" cố gắng truy cập phần "Admin", trả về mã lỗi 404
+                    context.Result = new NotFoundResult();
+                }
+            }
+        }
+    }
+}

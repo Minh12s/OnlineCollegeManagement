@@ -1,54 +1,108 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using OnlineCollegeManagement.Data;
+using OnlineCollegeManagement.Models;
+using BCrypt.Net;
+using System.Text;
+using System.Net.Mail;
+using System.Drawing.Printing;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Reflection.Metadata;
+using System.Net;
+using System.IO;
+using OnlineCollegeManagement.Heplers;
+using OnlineCollegeManagement.Models.Authentication;
 
 namespace OnlineCollegeManagement.Controllers
 {
+
     public class AdminController : Controller
     {
+        private readonly CollegeManagementContext _context;
+        private readonly IConfiguration _configuration;
+        private readonly IWebHostEnvironment _env;
+
+        public AdminController(CollegeManagementContext context, IConfiguration configuration, IWebHostEnvironment env)
+        {
+            _context = context;
+            _configuration = configuration;
+            _env = env;
+        }
+        [Authentication]
         public IActionResult Dashboard()
         {
-            return View("DashboardAdmin/Dashboard");
-        }
-        public IActionResult Student()
-        {
-            return View("StudentManagement/Student");
-        }
-      
-        public IActionResult EditStudent()
-        {
-            return View("StudentManagement/EditStudent");
+            return View();
         }
 
-      
-        public IActionResult Course()
+        [HttpGet]
+        public IActionResult Login()
         {
-            return View("CourseManagement/Course");
+            if (HttpContext.Session.GetString("Username") == null)
+            {
+                return View();
+            }
+            else
+            {
+                string userRole = HttpContext.Session.GetString("Role");
+                if (userRole == "Admin")
+                {
+                    return RedirectToAction("Dashboard", "Admin");
+                }
+                else if (userRole == "User")
+                {
+                    // Nếu là Admin, hiển thị thông báo lỗi "Email or password is incorrect"
+                    ModelState.AddModelError(string.Empty, "Email or password is incorrect");
+                    return View();
+                }
+            }
+            // Trường hợp còn lại, chuyển hướng đến trang Home của User
+            return RedirectToAction("Dashboard", "Admin");
         }
 
-
-        public IActionResult AddCourse()
+        [HttpPost]
+        public IActionResult Login(Users user)
         {
-            return View("CourseManagement/AddCourse");
+            if (HttpContext.Session.GetString("Username") == null)
+            {
+                Users u = _context.Users.FirstOrDefault(x => x.Email.Equals(user.Email));
+
+                if (u != null && BCrypt.Net.BCrypt.Verify(user.Password, u.Password))
+                {
+                    if (u.Role == "User")
+                    {
+                        // Trường hợp đăng nhập thành công nhưng là Admin, hiển thị thông báo lỗi "Email or password is incorrect"
+                        ModelState.AddModelError(string.Empty, "Email or password is incorrect");
+                        return View();
+                    }
+                    else if (u.Role == "Admin")
+                    {
+                        // Chỉ đặt Session khi thông tin đăng nhập hợp lệ
+                        HttpContext.Session.SetString("Username", u.Username.ToString());
+                        HttpContext.Session.SetString("Role", u.Role);
+                        HttpContext.Session.SetString("UserId", u.UsersId.ToString());
+
+                        return RedirectToAction("Dashboard", "Admin"); // Chuyển hướng đến "Home", "Page" nếu là User
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Email or password is incorrect");
+                    return View();
+                }
+            }
+
+            return RedirectToAction("Dashboard", "Admin");
         }
 
-        public IActionResult EditCourse()
+        public IActionResult Logout()
         {
-            return View("CourseManagement/EditCourse");
-        }
-
-
-        public IActionResult Lecturer()
-        {
-            return View("LecturerManagement/Lecturer");
-        }
-
-        public IActionResult AddLecturer()
-        {
-            return View("LecturerManagement/AddLecturer");
-        }
-
-        public IActionResult EditLecturer()
-        {
-            return View("LecturerManagement/EditLecturer");
+            HttpContext.Session.Clear();
+            HttpContext.Session.Remove("Username");
+            return RedirectToAction("Login", "Admin");
         }
 
     }

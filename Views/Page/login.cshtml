@@ -1,0 +1,84 @@
+﻿@{
+    Layout = "~/Views/Shared/login_Layout.cshtml";
+    ViewData["Title"] = "login";
+}
+@model Users
+<!-- LOGIN FORM CREATION -->
+<div class="background"></div>
+<div class="container">
+    <div class="item">
+        <h2 class="logo"></h2>
+        <div class="text-item">
+            <h2>
+                Welcome! <br><span>
+                    To Genius University
+                </span>
+            </h2>
+            <p>School uniforms are not only beautiful features but also memories of school days</p>
+            <div class="social-icon">
+                <a href="#"><i class='bx bxl-facebook'></i></a>
+                <a href="#"><i class='bx bxl-twitter'></i></a>
+                <a href="#"><i class='bx bxl-youtube'></i></a>
+                <a href="#"><i class='bx bxl-instagram'></i></a>
+                <a href="#"><i class='bx bxl-linkedin'></i></a>
+            </div>
+        </div>
+    </div>
+    <div class="login-section">
+        <div class="form-box login">
+            @using (Html.BeginForm("Login", "Page", FormMethod.Post))
+                {
+                <div style="margin-left:45px;color: red;">
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                </div>
+                <h2 style="color: blue;">Sign In</h2>
+                <div class="input-box">
+                    <span class="icon"><i class='bx bxs-envelope'></i></span>
+                    @Html.TextBoxFor(x => x.Email, new
+                     {
+
+                         type = "text",
+                         id = "email",
+                         name = "email",
+                         required = "required",
+                         autofocus = "autofocus"
+                      })
+                    <label>Email</label>
+                </div>
+                <div class="input-box">
+                    <span class="icon"><i class='bx bxs-lock-alt'></i></span>
+                    @Html.TextBoxFor(x => x.Password, new
+                     {
+
+                       type = "password",
+                       id = "password",
+                       name = "password",
+                       required = "required",
+                       autofocus = "autofocus"
+                     })
+                    <label>Password</label>
+                </div>
+                <div class="remember-password">
+                    <label for=""><input type="checkbox">Remember Me</label>
+                    <a href="#">Forget Password</a>
+                </div>
+                <button class="btn">Log in</button>
+                @*<div class="create-account">
+                <p>Create A New Account? <a style="color: blue;" href="#" class="register-link">Sign Up</a></p>
+            </div>*@
+                }
+            </div>
+
+    </div>
+</div>
+<!-- SIGN UP FORM CREATION -->
+
+<script>const loginsec = document.querySelector('.login-section')
+    const loginlink = document.querySelector('.login-link')
+    const registerlink = document.querySelector('.register-link')
+    registerlink.addEventListener('click', () => {
+        loginsec.classList.add('active')
+    })
+    loginlink.addEventListener('click', () => {
+        loginsec.classList.remove('active')
+    })</script>

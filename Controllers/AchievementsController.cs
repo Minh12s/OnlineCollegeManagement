@@ -13,11 +13,14 @@ using System.Drawing.Printing;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Reflection.Metadata;
 using System.IO;
+using OnlineCollegeManagement.Heplers;
+using OnlineCollegeManagement.Models.Authentication;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace OnlineCollegeManagement.Controllers
 {
+    [Authentication]
     public class AchievementsController : Controller
     {
         private readonly CollegeManagementContext _context;

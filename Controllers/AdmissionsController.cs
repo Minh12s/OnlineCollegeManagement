@@ -5,10 +5,13 @@ using OnlineCollegeManagement.Models;
 using System.Net.Mail;
 using System.Net;
 using BCrypt.Net;
+using OnlineCollegeManagement.Heplers;
+using OnlineCollegeManagement.Models.Authentication;
 
 
 namespace OnlineCollegeManagement.Controllers
 {
+    [Authentication]
     public class AdmissionsController : Controller
     {
         private readonly CollegeManagementContext _context;

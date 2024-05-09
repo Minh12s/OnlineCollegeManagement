@@ -7,11 +7,14 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using OnlineCollegeManagement.Data;
 using OnlineCollegeManagement.Models;
+using OnlineCollegeManagement.Heplers;
+using OnlineCollegeManagement.Models.Authentication;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace OnlineCollegeManagement.Controllers
 {
+    [Authentication]
     public class CoursesController : Controller
     {
         private readonly CollegeManagementContext _context;
@@ -24,6 +27,7 @@ namespace OnlineCollegeManagement.Controllers
             _configuration = configuration;
             _env = env;
         }
+       
         public async Task<IActionResult> Courses(int? page, string courseName = null, DateTime? startDate = null, DateTime? endDate = null, string search = null, int? majorsId = null, int? teachersId = null, int pageSize = 10)
         {
             int pageNumber = page ?? 1;
