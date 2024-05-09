@@ -130,17 +130,7 @@ namespace OnlineCollegeManagement.Controllers
                 _context.Add(model);
                 await _context.SaveChangesAsync();
 
-                // Lấy CoursesId vừa tạo
-                int coursesId = model.CoursesId;
-
-                // Thêm các môn học vào bảng CourseSubject
-                if (SelectedSubjects != null && SelectedSubjects.Any())
-                {
-                    foreach (var subjectId in SelectedSubjects)
-                    {
-                        await _context.Database.ExecuteSqlInterpolatedAsync($"INSERT INTO CourseSubject (CoursesId, SubjectsId) VALUES ({coursesId}, {subjectId})");
-                    }
-                }
+               
 
                 return RedirectToAction(nameof(Courses));
             }
@@ -239,6 +229,183 @@ namespace OnlineCollegeManagement.Controllers
             return RedirectToAction("Courses", "Courses");
 
         }
+
+        public IActionResult CoursesDetail(int courseId)
+        {
+            // Truy vấn dữ liệu từ bảng CoursesSubjects chỉ lấy những dòng có CoursesId trùng với courseId được truyền vào,
+            // và nạp dữ liệu từ bảng Courses và Subjects tương ứng
+            var coursesSubjects = _context.CoursesSubjects
+                                      .Include(cs => cs.Course)
+                                      .Include(cs => cs.Subject)
+                                      .Where(cs => cs.CoursesId == courseId)
+                                      .ToList();
+            ViewBag.CourseId = courseId;
+            // Trả về view và truyền dữ liệu đã lọc qua view
+            return View(coursesSubjects);
+        }
+
+        public async Task<IActionResult> AddSubject(int courseId, int? page, int pageSize = 5)
+        {
+            int pageNumber = page ?? 1;
+
+            // Sắp xếp danh sách môn học theo tên môn học
+            var subjects = _context.Subjects.OrderBy(s => s.SubjectName);
+
+            // Tính toán số lượng trang và số lượng môn học
+            int totalSubjects = await subjects.CountAsync();
+            int totalPages = (int)Math.Ceiling((double)totalSubjects / pageSize);
+
+            // Kiểm tra nếu pageNumber vượt quá số trang tối đa hoặc nhỏ hơn 1
+            pageNumber = Math.Max(1, Math.Min(pageNumber, totalPages));
+
+            // Lấy danh sách các môn học trên trang hiện tại
+            var paginatedSubjects = await subjects
+                                              .Skip((pageNumber - 1) * pageSize)
+                                              .Take(pageSize)
+                                              .ToListAsync();
+            // Lấy tên khóa học từ cơ sở dữ liệu dựa trên courseId
+            var course = await _context.Courses.FindAsync(courseId);
+            if (course == null)
+            {
+                // Xử lý khi không tìm thấy khóa học
+                return NotFound();
+            }
+            ViewBag.CourseId = courseId;
+            ViewBag.CourseName = course.CourseName;
+
+            // Lấy danh sách các môn học từ cơ sở dữ liệu
+            ViewBag.Subjects = paginatedSubjects;
+            ViewBag.CurrentPage = pageNumber;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.TotalSubjects = totalSubjects;
+            ViewBag.PageSize = pageSize;
+
+            // Trả về view và truyền danh sách môn học và tên khóa học đã lấy từ cơ sở dữ liệu
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddSubject(int courseId, List<int> selectedSubjects)
+        {
+            if (selectedSubjects != null && selectedSubjects.Any())
+            {
+                foreach (var subjectId in selectedSubjects)
+                {
+                    // Kiểm tra xem môn học đã tồn tại trong khóa học chưa
+                    if (!_context.CoursesSubjects.Any(cs => cs.CoursesId == courseId && cs.SubjectsId == subjectId))
+                    {
+                        var coursesSubjectsToAdd = new CoursesSubjects
+                        {
+                            CoursesId = courseId,
+                            SubjectsId = subjectId
+                        };
+
+                        _context.CoursesSubjects.Add(coursesSubjectsToAdd);
+                    }
+                    else
+                    {
+                        // Nếu môn đã tồn tại trong khóa học, hiển thị thông báo lỗi
+                        var duplicateSubject = await _context.Subjects.FindAsync(subjectId);
+                        var subjects = _context.Subjects.OrderBy(s => s.SubjectName);
+
+                        var duplicateSubjectsIds = await _context.CoursesSubjects
+                            .Where(cs => cs.CoursesId == courseId)
+                            .Select(cs => cs.SubjectsId)
+                            .ToListAsync();
+
+                        var duplicateSubjectCodes = subjects
+                            .Where(s => duplicateSubjectsIds.Contains(s.SubjectsId))
+                            .Select(s => s.SubjectCode);
+
+
+                        ViewBag.ErrorMessage = $"Subjects : {string.Join(", ", duplicateSubjectCodes)} already exist in the course";
+
+                        ViewBag.CourseId = courseId; // Giữ lại courseId
+                        var course = await _context.Courses.FindAsync(courseId);
+                        @ViewBag.CourseName = course.CourseName;
+
+                        // Cập nhật lại thông tin phân trang
+
+                        int pageNumber = 1; // Trang đầu tiên
+                        int pageSize = 5; // Số lượng mục trên mỗi trang
+                        var totalSubjects = await _context.Subjects.CountAsync();
+                        var totalPages = (int)Math.Ceiling((double)totalSubjects / pageSize);
+
+                        var paginatedSubjects = await subjects
+                            .Skip((pageNumber - 1) * pageSize)
+                            .Take(pageSize)
+                            .ToListAsync();
+
+
+                        ViewBag.CurrentPage = pageNumber;
+                        ViewBag.TotalPages = totalPages;
+                        ViewBag.PageSize = pageSize;
+
+                        // Trả về cùng một view với danh sách môn học phân trang
+                        ViewBag.subjects = paginatedSubjects;
+                        return View();
+                    }
+
+
+                }
+
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction("CoursesDetail", "Courses", new { courseId = courseId });
+            }
+            else
+            {
+                // Nếu không có môn nào được chọn
+                var subjects = _context.Subjects.OrderBy(s => s.SubjectName);
+                ViewBag.ErrorMessages = "Please select at least one subject.";
+
+                ViewBag.CourseId = courseId; // Giữ lại courseId
+                var course = await _context.Courses.FindAsync(courseId);
+                @ViewBag.CourseName = course.CourseName;
+
+
+
+                int pageNumber = 1; // Trang đầu tiên
+                int pageSize = 5; // Số lượng mục trên mỗi trang
+                var totalSubjects = await _context.Subjects.CountAsync();
+                var totalPages = (int)Math.Ceiling((double)totalSubjects / pageSize);
+
+                var paginatedSubjects = await subjects
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+
+
+                ViewBag.CurrentPage = pageNumber;
+                ViewBag.TotalPages = totalPages;
+                ViewBag.PageSize = pageSize;
+
+                // Trả về cùng một view với danh sách môn học phân trang
+                ViewBag.subjects = paginatedSubjects;
+                return View();
+            }
+        }
+
+
+
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteSubject(int courseId, int subjectId)
+        {
+            var courseSubjectToDelete = await _context.CoursesSubjects.FindAsync(courseId, subjectId);
+            if (courseSubjectToDelete == null)
+            {
+                return NotFound();
+            }
+
+            _context.CoursesSubjects.Remove(courseSubjectToDelete);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("CoursesDetail", "Courses", new { courseId = courseId });
+        }
+
     }
 }
 

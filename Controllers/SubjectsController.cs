@@ -53,7 +53,7 @@ namespace OnlineCollegeManagement.Controllers
         }
 
 
-       
+
         // GET: Subjects/Create
         public IActionResult Create()
         {
@@ -67,17 +67,30 @@ namespace OnlineCollegeManagement.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Subjects model)
         {
-            // Kiểm tra xem SubjectCode đã tồn tại trong cơ sở dữ liệu chưa
-            var existingSubject = await _context.Subjects.FirstOrDefaultAsync(s => s.SubjectCode == model.SubjectCode);
+
+            // Loại bỏ dấu cách ở đầu và cuối của SubjectCode và SubjectName
+            model.SubjectCode = model.SubjectCode.Trim();
+            model.SubjectName = model.SubjectName.Trim();
+
+            // Kiểm tra xem SubjectCode hoặc SubjectName đã tồn tại trong cơ sở dữ liệu chưa
+            var existingSubject = await _context.Subjects.FirstOrDefaultAsync(s => s.SubjectCode.Trim() == model.SubjectCode || s.SubjectName.Trim() == model.SubjectName);
+            // Kiểm tra xem trường SubjectCode có được điền không
 
             if (existingSubject != null)
             {
-                // Nếu đã tồn tại môn học với SubjectCode tương tự trong cơ sở dữ liệu, hiển thị thông báo lỗi
-                ModelState.AddModelError("SubjectCode", "This subject already exists");
+                // Nếu đã tồn tại môn học với SubjectCode hoặc SubjectName tương tự trong cơ sở dữ liệu, hiển thị thông báo lỗi
+                if (existingSubject.SubjectCode.Trim() == model.SubjectCode)
+                {
+                    ModelState.AddModelError("SubjectCode", "This subject code already exists");
+                }
+                if (existingSubject.SubjectName.Trim() == model.SubjectName)
+                {
+                    ModelState.AddModelError("SubjectName", "This subject name already exists");
+                }
                 return View(model);
             }
 
-            // Nếu không có môn học nào có cùng SubjectCode, thêm môn học mới vào cơ sở dữ liệu
+            // Nếu không có môn học nào có cùng SubjectCode hoặc SubjectName, thêm môn học mới vào cơ sở dữ liệu
             if (true)
             {
                 _context.Add(model);
@@ -87,6 +100,7 @@ namespace OnlineCollegeManagement.Controllers
 
             return View(model);
         }
+
 
 
         // GET: Subjects/Edit/5
@@ -113,36 +127,63 @@ namespace OnlineCollegeManagement.Controllers
         public async Task<IActionResult> Edit(int id, Subjects model)
         {
             // Kiểm tra xem id có tồn tại trong cơ sở dữ liệu hay không
-            var existingEvent = await _context.Subjects.FirstOrDefaultAsync(e => e.SubjectsId == id);
+            var existingSubject = await _context.Subjects.FirstOrDefaultAsync(e => e.SubjectsId == id);
 
-            if (existingEvent == null)
+            if (existingSubject == null)
             {
                 return NotFound(); // Trả về lỗi 404 nếu không tìm thấy môn học cần chỉnh sửa
             }
 
-            // Kiểm tra xem có môn học khác trong cơ sở dữ liệu đã có cùng SubjectCode nhưng khác với môn học đang được chỉnh sửa hay không
-            var otherSubjectWithSameCode = await _context.Subjects.FirstOrDefaultAsync(e => e.SubjectCode == model.SubjectCode && e.SubjectsId != id);
-
-            if (otherSubjectWithSameCode != null)
+            // Kiểm tra xem trường SubjectCode có được điền không
+            if (string.IsNullOrWhiteSpace(model.SubjectCode))
             {
-                // Nếu đã tồn tại môn học khác có cùng SubjectCode, hiển thị thông báo lỗi
-                ModelState.AddModelError("SubjectCode", "This subject already exists");
-                return View(model);
+                ModelState.AddModelError("SubjectCode", "Subject code is required");
             }
 
-            // Cập nhật thông tin môn học chỉnh sửa
+            // Kiểm tra xem trường SubjectName có được điền không
+            if (string.IsNullOrWhiteSpace(model.SubjectName))
+            {
+                ModelState.AddModelError("SubjectName", "Subject name is required");
+            }
+
+
+
+            // Loại bỏ dấu cách và chuyển đổi thành chữ thường để so sánh
+            var subjectCodeWithoutSpace = model.SubjectCode?.Replace(" ", "")?.ToLower();
+            var subjectNameWithoutSpace = model.SubjectName?.Replace(" ", "")?.ToLower();
+
+            // Kiểm tra xem có môn học khác trong cơ sở dữ liệu đã có cùng SubjectCode và SubjectName (bỏ qua dấu cách) nhưng khác với môn học đang được chỉnh sửa hay không
+            var otherSubjectWithSameCodeOrName = await _context.Subjects.FirstOrDefaultAsync(e => (e.SubjectCode.Replace(" ", "").ToLower() == subjectCodeWithoutSpace || e.SubjectName.Replace(" ", "").ToLower() == subjectNameWithoutSpace) && e.SubjectsId != id);
+
+            if (otherSubjectWithSameCodeOrName != null)
+            {
+                // Nếu đã tồn tại môn học khác có cùng SubjectCode hoặc SubjectName, hiển thị thông báo lỗi
+                if (subjectCodeWithoutSpace != null && otherSubjectWithSameCodeOrName.SubjectCode.Replace(" ", "").ToLower() == subjectCodeWithoutSpace)
+                {
+                    ModelState.AddModelError("SubjectCode", "This subject code already exists");
+                }
+
+                if (subjectNameWithoutSpace != null && otherSubjectWithSameCodeOrName.SubjectName.Replace(" ", "").ToLower() == subjectNameWithoutSpace)
+                {
+                    ModelState.AddModelError("SubjectName", "This subject name already exists");
+                }
+            }
+
+            // Kiểm tra tính hợp lệ của mô hình
             if (ModelState.IsValid)
             {
-                existingEvent.SubjectCode = model.SubjectCode;
-                existingEvent.SubjectName = model.SubjectName;
+                existingSubject.SubjectCode = model.SubjectCode;
+                existingSubject.SubjectName = model.SubjectName;
 
-                _context.Update(existingEvent);
+                _context.Update(existingSubject);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
 
             return View(model); // Trả về view với dữ liệu không hợp lệ nếu ModelState không hợp lệ
         }
+
+
 
 
         [HttpPost]
@@ -157,7 +198,7 @@ namespace OnlineCollegeManagement.Controllers
             }
 
             // Xóa ảnh đại diện của blog khỏi thư mục
-           
+
 
             _context.Subjects.Remove(Subject);
             await _context.SaveChangesAsync();
@@ -166,6 +207,6 @@ namespace OnlineCollegeManagement.Controllers
             return RedirectToAction("Index", "Subjects");
         }
 
-      
+
     }
 }

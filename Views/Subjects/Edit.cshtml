@@ -14,11 +14,11 @@
 
     </div>
 </section>
-<<section class="section main-section">
+<section class="section main-section">
     <div class="row">
         <div class="col-md-12">
             <div class="tile">
-                <h3 class="tile-title">Edit Majors</h3>
+                <h3 class="tile-title">Edit Subjects</h3>
                 <div class="tile-body">
                     <form class="edit-product-form" asp-controller="Subjects" asp-action="Edit" method="post" enctype="multipart/form-data">
                         <div class="form-group col-md-3">
@@ -31,7 +31,7 @@
                             <input asp-for="SubjectName" class="form-control" name="SubjectName" placeholder="SubjectName" />
                             <span style="color:red" asp-validation-for="SubjectName" class="text-danger"></span> <!-- Error message -->
                         </div>
-                       
+
                         <button class="btn btn-save" type="submit">Save</button>
                         <a class="btn btn-cancel" href="/Subjects/Index">Cancel</a>
                     </form>

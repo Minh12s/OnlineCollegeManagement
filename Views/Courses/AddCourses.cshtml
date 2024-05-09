@@ -126,16 +126,7 @@
                             <textarea asp-for="Description" class="form-control" name="Description" placeholder="Description"></textarea>
                         </div>
 
-                        <div class="form-group col-md-6">
-                            <label class="control-label">Subjects</label>
-                            @foreach (var subject in ViewBag.Subjects)
-                            {
-                                <div>
-                                    <input type="checkbox" name="SelectedSubjects" value="@subject.SubjectsId">
-                                    @subject.SubjectName
-                                </div>
-                            }
-                        </div>
+                       
 
                         <button class="btn btn-save" type="submit">Save</button>
                         <a class="btn btn-cancel" href="/Courses/Courses">Cancel</a>

@@ -1,158 +1,90 @@
 ﻿@{
-    ViewData["Title"] = "Subjects";
+    ViewData["Title"] = "List   Subjects";
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
 <section class="is-title-bar">
     <div class="flex flex-col md:flex-row items-center justify-between space-y-6 md:space-y-0">
         <ul>
-            <li>Admin</li>
-            <li>Tables</li>
+            <li style="margin-left:-50px;">Admin</li>
+            <li>List  Subjects</li>
         </ul>
-        <a href="https://justboil.me/" onclick="alert('Coming soon'); return false" target="_blank" class="button blue">
-            <span class="icon"><i class="mdi mdi-credit-card-outline"></i></span>
-            <span>Premium Demo</span>
-        </a>
-    </div>
-</section>
 
+    </div>
+
+</section>
 <section class="is-hero-bar">
-    <div class="flex flex-col md:flex-row items-center">
-        <div class="col-sm-2 flex items-center">
-            <!-- Nút "Add Product" -->
-            <a href="/Subjects/Create" class="btn btn-add" title="Thêm">
-                <i class="fas fa-plus"></i>
-                Add Subjects
-            </a>
-        </div>
-
-        <!-- Phần này để chứa nút "Print PDF" -->
-        <div class="  flex items-center">
-            <!-- Thêm một phần tử div để căn chỉnh vị trí -->
-            <button onclick="myApp.printTable()" class="btn btn-add ml-2" style="margin-left:10px">
-                <!-- Thêm lớp ml-2 để tạo khoảng cách giữa nút -->
-                <i class="fas fa-file-pdf"></i> <!-- Thay thế icon print bằng icon pdf -->
-                Print PDF <!-- Đổi chữ "Print" thành "Print PDF" -->
-            </button>
-        </div>
-        <div class=" flex items-center">
-            <button onclick="exportBlogToExcel()" class="btn btn-add ml-2" style="margin-left:10px">
-                <i class="fas fa-file-excel"></i>
-                Export Excel
-            </button>
-        </div>
-        <div class=" flex items-center">
-            <button onclick="exportExcel()" class="btn btn-add" style="margin-left:10px">
-                <i class="fas fa-file-excel"></i>
-                Excel Filtered
-            </button>
+    <div class="flex flex-col md:flex-row items-center justify-start">
+        <div class="col-sm-2" style="margin-right: 5px;">
+            <a class="btn btn-add" asp-controller="Courses" asp-action="AddSubject" asp-route-courseId="@ViewBag.CourseId" asp-route-clearSessionStorage="true" title="Thêm">
+            <i class="fas fa-plus"></i>
+            Add Subject
+        </a>
         </div>
 
 
     </div>
 </section>
-
-<form style="display: flex; align-items: center; border-radius: 5px; margin-top: 10px; flex-wrap: wrap;" asp-action="Index" asp-controller="Subjects" method="get">
-    <div class="input-group input-group-sm" style="margin-right: 5px; margin-bottom: 10px;">
-        <input value="@ViewBag.SearchString" class="form-control" type="text" name="searchString" placeholder="Search " style="height: 45px; font-size: 0.765625rem; padding: 4px 8px; background-color: #F1F1F1; border-radius: 5px; width: 200px; margin-left: 10px;" />
-    </div>
-    <div class="input-group input-group-sm" style="margin-bottom: 10px; margin-left: -5px;">
-        <button style="margin-left:10px; height: 45px; background-color: #F1F1F1; border: none; border-radius: 5px;" type="submit" class="btn btn-default">
-            <i class="mdi mdi-magnify" style="padding: 10px;"></i>
-        </button>
-    </div>
-</form>
-
-
 
 <section class="section main-section">
-
     <div class="card has-table">
         <header class="card-header">
             <p class="card-header-title">
                 @*<span class="icon"><i class="mdi mdi-shopping"></i></span>*@
-                Facilities
+                List   Subjects
             </p>
 
-            <form class="card-header-icon" asp-controller="Subjects" asp-action="Index" method="get" onchange="this.submit()">
 
-                <select style="margin-left:-10px; padding: 5px 10px;border:1px solid #F1F1F1 " name="PageSize">
-                    <option value="10"
-                            selected="@(ViewBag.PageSize == 10)">
-                        10
-                    </option>
-                    <option value="20"
-                            selected="@(ViewBag.PageSize == 20)">
-                        20
-                    </option>
-                    <option value="50"
-                            selected="@(ViewBag.PageSize == 50)">
-                        50
-                    </option>
-                    <option value="100"
-                            selected="@(ViewBag.PageSize == 100)">
-                        100
-                    </option>
-                </select>
-
-                <input type="hidden" name="page" value="@ViewBag.CurrentPage">
-
-                @*<button style="border:1px solid white ;background-color:#FFA45C; color: white;" type="submit">filter</button>*@
-
-            </form>
         </header>
+
         <div class="card-content">
+
+
             <table>
                 <thead>
                     <tr>
-                        <th>SubjectsId</th>
-                        <th>SubjectCode</th>
+                        <th>Subjectscode</th>
                         <th>SubjectName</th>
                         <th></th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var sub in Model)
+                    @foreach (var courseSubject in Model)
                     {
                         <tr>
-                            <td>@sub.SubjectsId</td>
-
-                            <td>@sub.SubjectCode</td>
-                            <td>@sub.SubjectName</td>
-
-
+                            <td>
+                                <p> @courseSubject.Subject.SubjectCode</p>
+                            </td>
+                            <td>
+                                @courseSubject.Subject.SubjectName
+                            </td>
                             <td>
                                 <div class="button-group">
-                                    <a class="btn btn-primary" asp-controller="Subjects" asp-action="Edit" asp-route-id="@sub.SubjectsId">
-                                        <span class="icon"><i class="mdi mdi-pencil"></i></span>
-                                    </a>
-                                    <form asp-controller="Subjects" asp-action="Delete" asp-route-id="@sub.SubjectsId" method="post" onsubmit="return confirm('Bạn có chắc muốn xóa sản phẩm này không?')">
-                                        <button class="btn btn-danger">
+
+
+                                    <form asp-controller="Courses" asp-action="DeleteSubject" method="post" onsubmit="return confirm('Are you sure you want to delete this course?')">
+                                        <input type="hidden" name="courseId" value="@courseSubject.CoursesId" />
+                                        <input type="hidden" name="subjectId" value="@courseSubject.SubjectsId" />
+                                        <button class="btn btn-danger" type="submit">
                                             <span class="icon"><i class="mdi mdi-delete"></i></span>
                                         </button>
                                     </form>
+
+
                                 </div>
+
                             </td>
                         </tr>
                     }
                 </tbody>
             </table>
-            <div class="table-pagination">
-                <div class="flex items-center justify-between">
-                    <div class="buttons">
-                        @for (int i = 1; i <= ViewBag.TotalPages; i++)
-                        {
-                            <button type="button" class="button @(ViewBag.CurrentPage == i ? "active" : "")" onclick="location.href='@Url.Action("Index", "Subjects", new { page = i, pageSize = ViewBag.PageSize })'">@i</button>
-                        }
-                    </div>
-                    <small>Page @ViewBag.CurrentPage of @ViewBag.TotalPages</small>
-                </div>
-            </div>
+
+
+
+
         </div>
     </div>
 
-
 </section>
-
 <style>
 
     .btn-primary {
