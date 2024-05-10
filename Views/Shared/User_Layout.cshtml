@@ -117,7 +117,7 @@
                   <div class="cart-dropdown-content" id="cartDropdownContent">
                       @if (@Context.Session.GetString("Username") != null)
                       {
-                          <a href="/MyOrder/MyOrder"><i class="fas fa-file-alt text-dark"></i> MyOrder</a>
+                                <a href="/MyTranscript/MyTranscript"><i class="fas fa-file-alt text-dark"></i> MyTranscript</a>
                           <a asp-controller="Page" asp-action="logout"><i class="fas fa-sign-out-alt text-dark"></i> Logout</a>
                       }
                       else

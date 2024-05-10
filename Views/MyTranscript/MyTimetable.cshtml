@@ -1,0 +1,300 @@
+﻿@{
+    Layout = "~/Views/Shared/User_Layout.cshtml";
+    ViewData["Title"] = "MyTimetable";
+}
+<div class="contain1">
+    <div class="title-top">
+        <p>Home / Account</p>
+    </div>
+    <div class="sidebar">
+
+        <div class="username">
+            Account of
+            <strong>@Context.Session.GetString("Username")</strong>
+        </div>
+
+
+        <ul>
+            <li>
+                <div class="menu">
+                    <i class="fas fa-shopping-cart" ></i>
+                    <a href="/MyTranscript/MyTranscript" >My Transcript</a>
+                </div>
+            </li>
+
+            <li>
+                <div class="menu">
+                    <i class="fas fa-key"></i>
+                    <a href="/MyTranscript/ChangePassword">Change password</a>
+                </div>
+            </li>
+
+            <li>
+                <div class="menu">
+                    <i class="fas fa-user-circle" style="color: #167ce9;"></i>
+                    <a href="/MyTranscript/MyTimetable" style="color: #167ce9;" class="li1">My Timetable</a>
+                </div>
+            </li>
+
+        </ul>
+    </div>
+    <div class="content">
+        <div class="content-top">
+            <div class="content-top-title">
+                <p style="color: black">My Timetable </p>
+            </div>
+
+        </div>
+
+
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th style="width:10%">Time</th>
+                    <th style="width:15%">Monday</th>
+                    <th style="width:15%">Tuesday</th>
+                    <th style="width:15%">Wednesday</th>
+                    <th style="width:15%">Thursday</th>
+                    <th style="width:15%">Friday</th>
+                    <th style="width:15%">Saturday</th>
+                    <th style="width:15%">Sunday</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>8:00 AM - 9:00 AM</td>
+                    <td>Mathematics</td>
+                    <td>Physics</td>
+                    <td>English</td>
+                    <td>Chemistry</td>
+                    <td>Physical Education</td>
+                    <td>History</td>
+                    <td>Music</td>
+                </tr>
+                <tr>
+                    <td>9:00 AM - 10:00 AM</td>
+                    <td>Chemistry</td>
+                    <td>History</td>
+                    <td>Computer Science</td>
+                    <td>Mathematics</td>
+                    <td>Physics</td>
+                    <td>Geography</td>
+                    <td>Art</td>
+                </tr>
+                <tr>
+                    <td>10:00 AM - 11:00 AM</td>
+                    <td>Physical Education</td>
+                    <td>Geography</td>
+                    <td>Art</td>
+                    <td>Biology</td>
+                    <td>Chemistry</td>
+                    <td>Physical Education</td>
+                    <td>Geography</td>
+                </tr>
+                <tr>
+                    <td>11:00 AM - 12:00 PM</td>
+                    <td>Biology</td>
+                    <td>Music</td>
+                    <td>Mathematics</td>
+                    <td>Physics</td>
+                    <td>History</td>
+                    <td>Computer Science</td>
+                    <td>Mathematics</td>
+                </tr>
+                <tr>
+                    <td>12:00 PM - 1:00 PM</td>
+                    <td>Lunch Break</td>
+                    <td>Lunch Break</td>
+                    <td>Lunch Break</td>
+                    <td>Lunch Break</td>
+                    <td>Lunch Break</td>
+                    <td>Lunch Break</td>
+                    <td>Lunch Break</td>
+                </tr>
+                <tr>
+                    <td>1:00 PM - 2:00 PM</td>
+                    <td>Physics</td>
+                    <td>Chemistry</td>
+                    <td>Physical Education</td>
+                    <td>Geography</td>
+                    <td>Art</td>
+                    <td>Biology</td>
+                    <td>Physics</td>
+                </tr>
+                <tr>
+                    <td>2:00 PM - 3:00 PM</td>
+                    <td>History</td>
+                    <td>Geography</td>
+                    <td>Biology</td>
+                    <td>Computer Science</td>
+                    <td>Music</td>
+                    <td>Mathematics</td>
+                    <td>Chemistry</td>
+                </tr>
+                <tr>
+                    <td>3:00 PM - 4:00 PM</td>
+                    <td>Computer Science</td>
+                    <td>Art</td>
+                    <td>Music</td>
+                    <td>Physical Education</td>
+                    <td>Geography</td>
+                    <td>Physics</td>
+                    <td>History</td>
+                </tr>
+            </tbody>
+        </table>
+        <div>
+        </div>
+
+    </div>
+
+
+    <style>
+        .content-top1 {
+            border-top: 1px solid #167ce9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            padding: 3px; /* Điều chỉnh khoảng cách nếu cần thiết */
+        }
+
+        .btn {
+            font-weight: bold;
+            text-align: center;
+            margin: 5px; /* Điều chỉnh khoảng cách giữa các nút */
+            padding: 10px; /* Điều chỉnh padding của nút */
+            border: 1px solid transparent;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .site-btn {
+            font-size: 13px;
+            background: #167ce9;
+            border: 2px solid #167ce9;
+            border-radius: 5px;
+            display: inline-block;
+            padding: 3px 3px;
+        }
+
+        .contain1 {
+            margin-top: 0px;
+            background-color: #f8f8f8;
+            padding: 50px;
+            font-family: "Roboto", sans-serif;
+        }
+
+        .title {
+            text-align: center;
+            padding: 0 0 20px 0;
+        }
+
+        .title-bottom {
+        }
+        /* CSS cho phần bên trái (sidebar) */
+        .sidebar {
+            width: 250px;
+            background-color: #fff;
+            padding: 0 20px;
+            float: left;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 80vh;
+        }
+
+        .profile-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-top: 20px;
+            text-align: center;
+            align-items: center;
+        }
+
+        .username {
+            font-size: 18px;
+            margin-top: 9px;
+        }
+
+        .logout-button {
+            background-color: #7fad39;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 20px;
+            cursor: pointer;
+            border-radius: 50px;
+            width: 200px;
+            align-items: center;
+            text-align: center;
+        }
+
+        .menu {
+            display: flex;
+            cursor: pointer;
+        }
+
+            .menu i {
+                margin-right: 10px;
+                padding: 5px 0 0 0;
+            }
+
+            .menu a {
+                color: black;
+            }
+
+        .sidebar ul {
+            list-style-type: none;
+            padding: 30px 0 0 0;
+        }
+
+            .sidebar ul a li {
+                padding: 0 0 40px 0;
+                margin-right: 40px;
+                height: 2px;
+                font-size: 17px;
+            }
+
+        .content {
+            margin-left: 280px;
+            /* Để tạo khoảng cách với phần sidebar */
+            min-height: 80vh;
+            background-color: #fff;
+            /* Đổ bóng sang trái và sang phải */
+        }
+
+        .content-top {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 20px 0 20px;
+        }
+
+        .table-bordered {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+            .table-bordered th,
+            .table-bordered td {
+                padding: 8px;
+                color: black;
+            }
+
+            .table-bordered th {
+                background-color: #f8f8f8;
+                height: 30px;
+                border-bottom: 1px solid #DDE1EF;
+                border-top: 1px solid #DDE1EF;
+                font-weight: 1000;
+                color: #167ce9;
+            }
+
+        .label-success {
+            background-color: #28a745;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 3px;
+        }
+    </style>
