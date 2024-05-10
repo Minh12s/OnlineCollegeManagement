@@ -164,24 +164,26 @@
                             <table class="table">
                                 <thead>
                                     <tr>
+                                        <th width="10"><input type="checkbox" id="selectAll"></th>
                                         <th>Subjects Code</th>
                                         <th>Subject Name</th>
-                                        <th>Select</th>
+
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach (var subject in ViewBag.Subjects)
                                     {
                                         <tr>
-                                            <td>@subject.SubjectCode</td>
-                                            <td>
-                                                @subject.SubjectName
-                                               
-                                            </td>
-
                                             <td>
                                                 <input type="checkbox" name="selectedSubjects" value="@subject.SubjectsId">
                                             </td>
+                                            <td>@subject.SubjectCode</td>
+                                            <td>
+                                                @subject.SubjectName
+
+                                            </td>
+
+
                                         </tr>
                                     }
 

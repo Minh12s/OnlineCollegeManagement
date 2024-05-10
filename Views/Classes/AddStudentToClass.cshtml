@@ -233,68 +233,66 @@
 </form>
 
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>// Kiểm tra xem tham số clearSessionStorage có tồn tại trong URL không
+    const urlParams = new URLSearchParams(window.location.search);
+    const clearSessionStorage = urlParams.has('clearSessionStorage');
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.2/xlsx.full.min.js"></script>
-<script>function exportBlogToExcel() {
-        $.ajax({
-            url: '/Excel/ExportBlogToExcel',
-            type: 'GET',
-            success: function (data) {
-                var wb = XLSX.utils.book_new();
-                var ws = XLSX.utils.json_to_sheet(data);
-                XLSX.utils.book_append_sheet(wb, ws, "Blogs");
-                var wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
-                var blob = new Blob([s2ab(wbout)], { type: 'application/octet-stream' });
-                var link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = 'blogs.xlsx';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            },
-            error: function (error) {
-                console.log(error);
-            }
-        });
-    }
-
-    function s2ab(s) {
-        var buf = new ArrayBuffer(s.length);
-        var view = new Uint8Array(buf);
-        for (var i = 0; i != s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
-        return buf;
+    // Nếu có, xóa dữ liệu sessionStorage và localStorage
+    if (clearSessionStorage) {
+        sessionStorage.clear();
+        localStorage.clear();
     }</script>
-<script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
 
-<script>this.exportExcel = function () {
-        // Lấy bảng cần xuất
-        var tab = document.getElementById('sampleTable');
-        // Tạo một đối tượng Excel
-        var excel = new ExcelJS.Workbook();
-        // Thêm một trang tính mới
-        var sheet = excel.addWorksheet('Sheet 1');
-        // Lặp qua các hàng và cột của bảng để đổ dữ liệu vào trang tính Excel
-        for (var i = 0; i < tab.rows.length; i++) {
-            var row = sheet.getRow(i + 1);
-            for (var j = 0; j < tab.rows[i].cells.length; j++) {
-                row.getCell(j + 1).value = tab.rows[i].cells[j].innerText;
-            }
+
+
+
+
+<script>document.addEventListener("DOMContentLoaded", function () {
+        // Khởi tạo mảng để lưu trữ các mục đã chọn
+        var selectedStudents = [];
+
+        // Load dữ liệu từ localStorage nếu có
+        var storedStudent = localStorage.getItem("selectedStudents");
+        if (storedStudent) {
+            selectedStudents = JSON.parse(storedStudent);
+            // Hiển thị các mục đã chọn khi trang được tải lại
+            displaySelectedStudents();
         }
-        // Tạo một blob từ file Excel
-        excel.xlsx.writeBuffer().then(function (buffer) {
-            var blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-            // Tạo một URL từ blob và mở cửa sổ mới để tải xuống file Excel
-            var url = window.URL.createObjectURL(blob);
-            var a = document.createElement("a");
-            document.body.appendChild(a);
-            a.style = "display: none";
-            a.href = url;
-            a.download = "blogfiltered.xlsx";
-            a.click();
-            window.URL.revokeObjectURL(url);
+
+        // Function để hiển thị các mục đã chọn
+        function displaySelectedStudents() {
+            selectedStudents.forEach(function (officialStudentId) {
+                // Tìm checkbox tương ứng với subjectId và đánh dấu là đã chọn
+                var checkbox = document.querySelector('input[name="selectedStudents"][value="' + officialStudentId + '"]');
+                if (checkbox) {
+                    checkbox.checked = true;
+                }
+            });
+        }
+
+        // Lưu trữ dữ liệu vào localStorage khi checkbox được chọn hoặc bỏ chọn
+        var checkboxes = document.querySelectorAll('input[name="selectedStudents"]');
+        checkboxes.forEach(function (checkbox) {
+            checkbox.addEventListener("change", function () {
+                var officialStudentId = this.value;
+                if (this.checked) {
+                    // Nếu checkbox được chọn, thêm subjectId vào mảng selectedSubjects
+                    selectedStudents.push(officialStudentId);
+                } else {
+                    // Nếu checkbox bị bỏ chọn, loại bỏ subjectId khỏi mảng selectedSubjects
+                    var index = selectedStudents.indexOf(officialStudentId);
+                    if (index !== -1) {
+                        selectedStudents.splice(index, 1);
+                    }
+                }
+                // Lưu mảng selectedSubjects vào localStorage
+                localStorage.setItem("selectedStudents", JSON.stringify(selectedStudents));
+            });
         });
-    }</script>
 
-
-
+        // Xóa dữ liệu đã chọn khi form được submit
+        var form = document.querySelector('.edit-product-form');
+        form.addEventListener('submit', function () {
+            localStorage.removeItem('selectedStudents');
+        });
+    });</script>
