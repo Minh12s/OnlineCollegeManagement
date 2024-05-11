@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace OnlineCollegeManagement.Models.Authentication
@@ -30,12 +29,26 @@ namespace OnlineCollegeManagement.Models.Authentication
                     "Departments", "Events", "Facilities" , "Majors" ,"Subjects","Teachers"
                 };
 
+                // Lấy danh sách các controller mà admin không được phép truy cập
+                string[] adminRestrictedControllers = {
+                    // Danh sách các controller mà admin không được phép truy cập
+                    "MyTranscript"
+                };
+
                 // Kiểm tra xem controller hiện tại có trong danh sách các controller admin hay không
                 bool isAdminController = Array.Exists(adminControllers, controller => controller.Equals(context.RouteData.Values["Controller"].ToString()));
+
+                // Kiểm tra xem controller hiện tại có trong danh sách các controller admin bị hạn chế hay không
+                bool isAdminRestrictedController = Array.Exists(adminRestrictedControllers, controller => controller.Equals(context.RouteData.Values["Controller"].ToString()));
 
                 if (userRole == "Admin" && isRedirectedFromAdmin && !isAdminController)
                 {
                     // Nếu có cố gắng truy cập trái phép vào trang Admin, trả về mã lỗi 404
+                    context.Result = new NotFoundResult();
+                }
+                else if (userRole == "Admin" && isAdminRestrictedController)
+                {
+                    // Nếu admin cố gắng truy cập vào controller bị hạn chế, trả về mã lỗi 404
                     context.Result = new NotFoundResult();
                 }
                 else if (userRole == "User" && isAdminController)

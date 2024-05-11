@@ -63,102 +63,102 @@
 
         <div class="card-content">
 
-           
-                @if (Model.Count == 0)
-                {
-                    <div class="alert alert-warning" role="alert">
-                        No Student found.
-                    </div>
-                }
-                else
-                {
-                    <table class="table table-hover table-bordered js-copytextarea" cellpadding="0" cellspacing="0" border="0" id="sampleTable">
-                        <thead>
+
+            @if (Model.Count(osc => osc.DeleteStatus == 0) == 0)
+            {
+                <div class="alert alert-warning" role="alert">
+                    No Student found.
+                </div>
+            }
+            else
+            {
+                <table class="table table-hover table-bordered js-copytextarea" cellpadding="0" cellspacing="0" border="0" id="sampleTable">
+                    <thead>
+                        <tr>
+                            <th width="10"><input type="checkbox" id="all"></th>
+                            <th>Classes Id </th>
+                            <th>Student Id</th>
+                            <th>Student Code</th>
+                            <th>Student Name</th>
+                            <th>Email</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var officialStudentClass in Model.Where(osc => osc.DeleteStatus == 0))
+                        {
                             <tr>
-                                <th width="10"><input type="checkbox" id="all"></th>
-                                <th>Classes Id </th>
-                                <th>Student Id</th>
-                                <th>Student Code</th>
-                                <th>Student Name</th>
-                                <th>Email</th>
-                                <th>Start Date</th>
-                                <th>End Date</th>
-                                <th>Status</th>
-                                <th>Action</th>
+                                <td width="10"><input type="checkbox" name="check1" value="1"></td>
+                                <td>
+                                    @officialStudentClass.Classes.ClassesId
+                                </td>
+                                <td>
+                                    @officialStudentClass.OfficialStudent.OfficialStudentId
+                                </td>
+                                <td>
+                                    @officialStudentClass.OfficialStudent.StudentCode
+                                </td>
+                                <td>
+                                    @officialStudentClass.OfficialStudent.StudentInformation.StudentName
+                                </td>
+                                <td>
+                                    @officialStudentClass.OfficialStudent.User.Email
+                                </td>
+
+                                <td>
+                                    @officialStudentClass.StartDate.ToString("yyyy-MM-dd")
+                                </td>
+                                <td>
+                                    @officialStudentClass.EndDate.ToString("yyyy-MM-dd")
+                                </td>
+                                <td>
+                                    @if (officialStudentClass.StudentStatus == "Studying")
+                                    {
+                                        <span class="badge bg-warning text-studying">@officialStudentClass.StudentStatus</span>
+                                    }
+                                    else if (officialStudentClass.StudentStatus == "Complete")
+                                    {
+                                        <span class="badge bg-primary text-complete">@officialStudentClass.StudentStatus</span>
+                                    }
+                                    else if (officialStudentClass.StudentStatus == "Reserve")
+                                    {
+                                        <span class="badge bg-info text-reserve">@officialStudentClass.StudentStatus</span>
+                                    }
+                                    else if (officialStudentClass.StudentStatus == "Rest")
+                                    {
+                                        <span class="badge bg-info text-rest">@officialStudentClass.StudentStatus</span>
+                                    }
+
+                                </td>
+                                <td>
+                                    <div class="button-group">
+
+
+                                        <form asp-action="RemoveStudentFromClass" asp-controller="Classes" method="post" onsubmit="return confirm('Do you want to remove this student from the class?')">
+                                            <input type="hidden" name="classesId" value="@ViewBag.ClassesId" />
+                                            <input type="hidden" name="officialStudentId" value="@officialStudentClass.OfficialStudentId" />
+                                            <button class="btn btn-danger">
+                                                <span class="icon"><i class="mdi mdi-delete"></i></span>
+                                            </button>
+                                        </form>
+                                        <a style="background-color:green; color:white;" class="btn btn-primary" href="@Url.Action("DetailsStudent", "Classes", new { Id = officialStudentClass.Id, classesId = ViewBag.ClassesId })">
+                                            <span class="icon"><i class="mdi mdi-eye"></i></span>
+                                        </a>
+
+
+
+                                    </div>
+
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var officialStudentClass in Model)
-                            {
-                                <tr>
-                                    <td width="10"><input type="checkbox" name="check1" value="1"></td>
-                                    <td>
-                                        @officialStudentClass.Classes.ClassesId
-                                    </td>
-                                    <td>
-                                        @officialStudentClass.OfficialStudent.OfficialStudentId
-                                    </td>
-                                    <td>
-                                        @officialStudentClass.OfficialStudent.StudentCode
-                                    </td>
-                                    <td>
-                                        @officialStudentClass.OfficialStudent.StudentInformation.StudentName
-                                    </td>
-                                    <td>
-                                        @officialStudentClass.OfficialStudent.User.Email
-                                    </td>
+                        }
 
-                                    <td>
-                                        @officialStudentClass.StartDate.ToString("yyyy-MM-dd")
-                                    </td>
-                                    <td>
-                                        @officialStudentClass.EndDate.ToString("yyyy-MM-dd")
-                                    </td>
-                                    <td>
-                                        @if (officialStudentClass.StudentStatus == "Studying")
-                                        {
-                                            <span class="badge bg-warning text-studying">@officialStudentClass.StudentStatus</span>
-                                        }
-                                        else if (officialStudentClass.StudentStatus == "Complete")
-                                        {
-                                            <span class="badge bg-primary text-complete">@officialStudentClass.StudentStatus</span>
-                                        }
-                                        else if (officialStudentClass.StudentStatus == "Reserve")
-                                        {
-                                            <span class="badge bg-info text-reserve">@officialStudentClass.StudentStatus</span>
-                                        }
-                                        else if (officialStudentClass.StudentStatus == "Rest")
-                                        {
-                                            <span class="badge bg-info text-rest">@officialStudentClass.StudentStatus</span>
-                                        }
-
-                                    </td>
-                                    <td>
-                                        <div class="button-group">
-
-
-                                            <form asp-action="RemoveStudentFromClass" asp-controller="Classes" method="post" onsubmit="return confirm('Do you want to remove this student from the class?')">
-                                                <input type="hidden" name="classesId" value="@ViewBag.ClassesId" />
-                                                <input type="hidden" name="officialStudentId" value="@officialStudentClass.OfficialStudentId" />
-                                                <button class="btn btn-danger">
-                                                    <span class="icon"><i class="mdi mdi-delete"></i></span>
-                                                </button>
-                                            </form>
-                                            <a style="background-color:green; color:white;" class="btn btn-primary" href="@Url.Action("DetailsStudent", "Classes", new { Id = officialStudentClass.Id, classesId = ViewBag.ClassesId })">
-                                                <span class="icon"><i class="mdi mdi-eye"></i></span>
-                                            </a>
-
-
-
-                                        </div>
-
-                                    </td>
-                                </tr>
-                            }
-
-                        </tbody>
-                    </table>
-                }
+                    </tbody>
+                </table>
+            }
 
         </div>
     </div>

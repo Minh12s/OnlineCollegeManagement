@@ -151,7 +151,7 @@ namespace OnlineCollegeManagement.Controllers
                 var officialStudent = new OfficialStudent
                 {
                     StudentsInformationId = student.StudentsInformationId,
-                    UsersId = newUser.UsersId,
+                    UsersId = newUser.UsersId, 
                     StudentCode = GenerateRandomCode(),
                 };
 
@@ -168,7 +168,7 @@ namespace OnlineCollegeManagement.Controllers
                 if (student != null)
                 {
                     // Gửi email từ chối
-                    await SendNotAdmittedConfirmationEmail("dungprohn1409@gmail.com", student.StudentName);
+                    await SendNotAdmittedConfirmationEmail("", student.StudentName);
                 }
 
             }

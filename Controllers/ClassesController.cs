@@ -309,6 +309,7 @@ namespace OnlineCollegeManagement.Controllers
                                 StartDate = classes.StartDate,
                                 EndDate = classes.EndDate,
                                 StudentStatus = "Studying",
+                                DeleteStatus = 0,
                                 OfficialStudentId = studentId,
                                 ClassesId = classesId
                             };
@@ -359,8 +360,10 @@ namespace OnlineCollegeManagement.Controllers
                 return NotFound(); // Trả về NotFound nếu không tìm thấy
             }
 
-            // Xóa OfficialStudentClasses khỏi cơ sở dữ liệu và lưu thay đổi
-            _context.OfficialStudentClasses.Remove(officialStudentClass);
+            // Thay đổi thuộc tính DeleteStatus thành 1 thay vì xóa khỏi cơ sở dữ liệu
+            officialStudentClass.DeleteStatus = 1;
+
+            // Lưu thay đổi
             await _context.SaveChangesAsync();
 
             // Chuyển hướng đến action hiển thị danh sách học sinh trong lớp học
@@ -368,7 +371,8 @@ namespace OnlineCollegeManagement.Controllers
         }
 
 
-       public async Task<IActionResult> DetailsStudent(int? Id, int? classesId)
+
+        public async Task<IActionResult> DetailsStudent(int? Id, int? classesId)
         {
             var classes = await _context.Classes.FindAsync(classesId);
             ViewBag.ClassesId = classesId;
