@@ -203,10 +203,11 @@ namespace OnlineCollegeManagement.Data
                 }
                 // Seed data for Courses
                 var majors1 = context.Majors.ToList();
-               
+
                 var teachers1 = context.Teachers.ToList();
                 var thumbnailPaths4 = Enumerable.Range(1, 6).Select(i => $"/images/course-{i}.jpg").ToList();
                 var courseNames = new List<string> { "Web Development", "Database Management", "Machine Learning", "Software Testing", "Computer Graphics", "Network Security", "Digital Signal Processing", "Operating Systems", "Data Mining", "Artificial Intelligence" };
+                var CourseTime = new List<string> { "Six months", "one year", "two year", "three year" };
 
                 var courses = new List<Courses>();
 
@@ -214,18 +215,20 @@ namespace OnlineCollegeManagement.Data
                 {
                     for (int i = 0; i < 5; i++)
                     {
-                        
+
                         var randomTeacherId = teachers1[random.Next(teachers1.Count)].TeachersId;
                         var randomCourseName = courseNames[random.Next(courseNames.Count)];
+                        var randomCourseTime = CourseTime[random.Next(CourseTime.Count)];
+
                         var course = new Courses
                         {
                             CourseName = randomCourseName,
                             Description = $"Course description for {randomCourseName}",
                             MajorsId = major.MajorsId,
-                            CourseDate = DateTime.Now,
+                            CourseTime = randomCourseTime,
                             CoursesImageUrl = thumbnailPaths4[random.Next(thumbnailPaths4.Count)],
                             TeachersId = randomTeacherId,
-                           
+
                         };
                         courses.Add(course);
                     }

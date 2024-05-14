@@ -27,7 +27,7 @@ namespace OnlineCollegeManagement.Controllers
             _configuration = configuration;
             _env = env;
         }
-       
+
         public async Task<IActionResult> Courses(int? page, string courseName = null, DateTime? startDate = null, DateTime? endDate = null, string search = null, int? majorsId = null, int? teachersId = null, int pageSize = 10)
         {
             int pageNumber = page ?? 1;
@@ -40,15 +40,7 @@ namespace OnlineCollegeManagement.Controllers
             {
                 courses = courses.Where(c => c.CourseName.Contains(courseName));
             }
-            if (startDate != null)
-            {
-                courses = courses.Where(c => c.CourseDate >= startDate);
-            }
-            if (endDate != null)
-            {
-                // Chú ý: Khi lọc theo ngày kết thúc, hãy thêm 1 ngày vào để bao gồm tất cả các bài đăng được đăng vào ngày kết thúc
-                courses = courses.Where(c => c.CourseDate < endDate.Value.AddDays(1));
-            }
+
             if (majorsId != null)
             {
                 courses = courses.Where(c => c.MajorsId == majorsId);
@@ -60,14 +52,16 @@ namespace OnlineCollegeManagement.Controllers
             if (!string.IsNullOrEmpty(search))
             {
                 courses = courses.Where(c => c.CourseName.Contains(search)
-                                        || c.Description.Contains(search));
+                                        || c.Description.Contains(search)
+                                        || c.CourseTime.Contains(search));
             }
 
-            // Phân trang danh sách bài đăng và sắp xếp theo thời gian gần nhất
-            var paginatedCourses = await courses.OrderByDescending(c => c.CourseDate)
-                                                .Skip((pageNumber - 1) * pageSize)
-                                                .Take(pageSize)
-                                                .ToListAsync();
+            var paginatedCourses = await courses
+      .OrderByDescending(c => c.CoursesId)
+      .Skip((pageNumber - 1) * pageSize)
+      .Take(pageSize)
+      .ToListAsync();
+
 
             // Lấy tổng số bài đăng sau khi áp dụng các tiêu chí lọc
             int totalCourses = await courses.CountAsync();
@@ -83,33 +77,52 @@ namespace OnlineCollegeManagement.Controllers
             return View(paginatedCourses);
         }
 
-        public IActionResult AddCourses()
+        public async Task<IActionResult> AddCourses(int? page, int pageSize = 5)
         {
-            var majors = _context.Majors.OrderBy(c => c.MajorName).ToList();
-            var teachers = _context.Teachers.OrderBy(c => c.TeacherName).ToList();
-            var subjects = _context.Subjects.OrderBy(s => s.SubjectName).ToList();
+            int pageNumber = page ?? 1;
 
-            if (subjects != null)
-            {
-                ViewBag.Subjects = subjects;
-            }
-            else
-            {
-                // Xử lý trường hợp khi không có dữ liệu môn học
-                // Ví dụ: ViewBag.Subjects = new List<Subject>();
-            }
+            // Sắp xếp danh sách môn học theo tên môn học
+            var subjects = _context.Subjects.OrderBy(s => s.SubjectName);
 
+            // Tính toán số lượng trang và số lượng môn học
+            int totalSubjects = await subjects.CountAsync();
+            int totalPages = (int)Math.Ceiling((double)totalSubjects / pageSize);
+
+            // Kiểm tra nếu pageNumber vượt quá số trang tối đa hoặc nhỏ hơn 1
+            pageNumber = Math.Max(1, Math.Min(pageNumber, totalPages));
+
+            // Lấy danh sách các môn học trên trang hiện tại
+            var paginatedSubjects = await subjects
+                                              .Skip((pageNumber - 1) * pageSize)
+                                              .Take(pageSize)
+                                              .ToListAsync();
+
+            var majors = await _context.Majors.OrderBy(c => c.MajorName).ToListAsync();
+            var teachers = await _context.Teachers.OrderBy(c => c.TeacherName).ToListAsync();
+
+
+
+            // Gán dữ liệu cho ViewBag
+            ViewBag.Subjects = paginatedSubjects;
             ViewBag.Majors = new SelectList(majors, "MajorsId", "MajorName");
             ViewBag.Teachers = new SelectList(teachers, "TeachersId", "TeacherName");
+            ViewBag.CurrentPage = pageNumber;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.TotalSubjects = totalSubjects;
+            ViewBag.PageSize = pageSize;
+
+
 
             return View();
         }
 
 
 
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddCourses(Courses model, IFormFile CoursesImageUrl, List<int> SelectedSubjects)
+        public async Task<IActionResult> AddCourses(Courses model, IFormFile CoursesImageUrl)
         {
             if (true)
             {
@@ -127,20 +140,20 @@ namespace OnlineCollegeManagement.Controllers
                         await CoursesImageUrl.CopyToAsync(stream);
                     }
                     model.CoursesImageUrl = "/images/Courses/" + Path.GetFileName(imagePath);
+
                 }
 
-                model.CourseDate = DateTime.Now;
+
 
                 _context.Add(model);
                 await _context.SaveChangesAsync();
-
-               
 
                 return RedirectToAction(nameof(Courses));
             }
 
             return View(model);
         }
+
 
 
 
@@ -196,7 +209,6 @@ namespace OnlineCollegeManagement.Controllers
                     }
                 }
 
-                model.CourseDate = DateTime.Now;
 
                 _context.Update(model);
                 await _context.SaveChangesAsync();

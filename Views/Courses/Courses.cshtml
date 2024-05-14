@@ -16,7 +16,7 @@
     <div class="flex flex-col md:flex-row items-center justify-start">
         <!-- Phần này để chứa nút "Add Blog" -->
         <div class="col-sm-2" style="margin-right: 5px;">
-            <a class="btn btn-add" asp-controller="Courses" asp-action="AddCourses" title="Thêm">
+            <a class="btn btn-add" asp-controller="Courses" asp-action="AddCourses" asp-route-clearSessionStorage="true" title="Thêm">
                 <i class="fas fa-plus"></i>
                 Add Courses
             </a>
@@ -67,11 +67,6 @@
                 <option value="@teachers.TeachersId">@teachers.TeacherName</option>
             }
         </select>
-    </div>
-
-    <div class="input-group input-group-sm" style="margin-right: 5px; margin-bottom: 10px;">
-        <input value="" class="form-control" type="date" name="StartDate" placeholder="Start Date" style="height: 45px; font-size: 0.765625rem; padding: 4px 8px; background-color: #F1F1F1; border-radius: 5px; width: 150px; margin-left: 10px;" />
-        <input value="" class="form-control" type="date" name="EndDate" placeholder="End Date" style="height: 45px; font-size: 0.765625rem; padding: 4px 8px; background-color: #F1F1F1; border-radius: 5px; width: 150px; margin-left: 10px;" />
     </div>
 
     <div class="input-group input-group-sm" style="margin-left: -5px; margin-bottom: 10px;">
@@ -144,7 +139,7 @@
                             <td>@courses.CourseName</td>
                             <td><img src="@courses.CoursesImageUrl" alt="Thumbnail" width="100" height="100"></td>
                             <td>@Html.Raw(courses.Description)</td>
-                            <td>@courses.CourseDate.ToString("yyyy-MM-dd")</td>
+                            <td>@courses.CourseTime</td>
                             <td>@courses.Major.MajorName</td>
                             <td>@courses.Teacher.TeacherName</td>
 
@@ -176,7 +171,7 @@
                     <div class="buttons">
                         @for (int i = 1; i <= ViewBag.TotalPages; i++)
                         {
-                            <button type="button" class="button @(ViewBag.CurrentPage == i ? "active" : "")" onclick="location.href='@Url.Action("Courses", "Courses", new { page = i, pageSize = ViewBag.PageSize })'">@i</button>
+                            <button type="button" class="button @(ViewBag.CurrentPage == i ? "active" : "")" onclick="location.href='@Url.Action("Courses", "Courses", new { page = i, pageSize = ViewBag.PageSize, MajorsId = Context.Request.Query["MajorsId"], TeachersId = Context.Request.Query["TeachersId"], search = Context.Request.Query["search"] })'">@i</button>
                         }
                     </div>
                     <small>Page @ViewBag.CurrentPage of @ViewBag.TotalPages</small>

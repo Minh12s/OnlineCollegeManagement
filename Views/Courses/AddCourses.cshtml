@@ -76,6 +76,41 @@
     .main-section {
         margin-left: 15px;
     }
+
+    /* Định dạng cho bảng */
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        border-spacing: 0;
+    }
+
+        /* Định dạng cho hàng */
+        .table tr {
+            border-bottom: 1px solid #ddd; /* Đường kẻ dưới cho mỗi hàng */
+        }
+
+        /* Định dạng cho cột */
+        .table th, .table td {
+            padding: 8px; /* Khoảng cách giữa nội dung và biên của mỗi ô */
+            text-align: left; /* Căn lề trái cho nội dung */
+        }
+
+        /* Định dạng cho tiêu đề của bảng */
+        .table th {
+            background-color: #f2f2f2; /* Màu nền của tiêu đề */
+            font-weight: bold; /* In đậm cho tiêu đề */
+        }
+
+        /* Định dạng cho ô checkbox */
+        .table input[type="checkbox"] {
+            margin: 0; /* Không margin */
+        }
+
+        /* Định dạng cho hàng chẵn */
+        .table tbody tr:nth-child(even) {
+            background-color: #f9f9f9; /* Màu nền của hàng chẵn */
+        }
+
 </style>
 <section class="is-title-bar">
     <div class="flex flex-col md:flex-row items-center justify-between space-y-6 md:space-y-0">
@@ -96,20 +131,32 @@
 
                         <div class="form-group col-md-3">
                             <label class="control-label">Title</label>
-                            <input asp-for="CourseName" class="form-control" name="CourseName" placeholder="Name" />
+                            <input asp-for="CourseName" id="CourseName" class="form-control" name="CourseName" placeholder="Name" oninput="saveFormData()" />
                         </div>
                         <div class="form-group col-md-3">
                             <label class="control-label">Majors</label>
-                            <select class="form-control" name="MajorsId" asp-for="MajorsId" asp-items="@ViewBag.Majors">
+                            <select class="form-control" id="MajorsId" name="MajorsId" asp-for="MajorsId" asp-items="@ViewBag.Majors" onchange="saveFormData()">
                                 <option value="">-- Select majors --</option>
                                 <!-- Thêm các tùy chọn danh mục tại đây -->
                             </select>
                         </div>
                         <div class="form-group col-md-3">
                             <label class="control-label">Teachers</label>
-                            <select class="form-control" name="TeachersId" asp-for="TeachersId" asp-items="@ViewBag.Teachers">
+                            <select class="form-control" id="TeachersId" name="TeachersId" asp-for="TeachersId" asp-items="@ViewBag.Teachers" onchange="saveFormData()">
                                 <option value="">-- Select Teachers --</option>
                                 <!-- Thêm các tùy chọn danh mục tại đây -->
+                            </select>
+                        </div>
+
+                        <div class="form-group col-md-3">
+                            <label class="control-label">Course Time</label>
+                            <select class="form-control" id="CourseTime" name="CourseTime" asp-for="CourseTime" onchange="saveFormData()">
+                                <option value="">-- Select --</option>
+
+                                <option value="Six months">Six months</option>
+                                <option value="One year">One year</option>
+                                <option value="Two years">Two years</option>
+                                <option value="Three years">Three years</option>
                             </select>
                         </div>
 
@@ -118,29 +165,140 @@
                             <div>
                                 <input asp-for="CoursesImageUrl" type="file" name="CoursesImageUrl" class="form-control" onchange="displayThumbnail(this);" />
                                 <img id="thumbnailImage" style="display: none; max-width: 50%;" alt="Thumbnail image" />
-
                             </div>
                         </div>
                         <div class="form-group col-md-6">
                             <label class="control-label">Description</label>
-                            <textarea asp-for="Description" class="form-control" name="Description" placeholder="Description"></textarea>
+                            <textarea asp-for="Description" id="Description" class="form-control" name="Description" placeholder="Description" oninput="saveFormData()"></textarea>
                         </div>
 
-                       
 
                         <button class="btn btn-save" type="submit">Save</button>
                         <a class="btn btn-cancel" href="/Courses/Courses">Cancel</a>
+
                     </form>
+
                 </div>
             </div>
         </div>
     </div>
 </section>
 <script src="https://cdn.tiny.cloud/1/6a4ufu188x8itoqtz2agsuahgg475yn7bxva9xzabribtvjm/tinymce/5/tinymce.min.js"></script>
-<script>tinymce.init({
-        selector: 'textarea[name="Description"]'
-    });</script>
-<script>function displayThumbnail(input) {
+<script>
+    tinymce.init({
+        selector: 'textarea[name="Description"]',
+        setup: function (editor) {
+            editor.on('change', function () {
+                editor.save(); // Lưu nội dung từ TinyMCE vào trường mô tả
+            });
+        }
+    });
+
+    window.addEventListener("beforeunload", function () {
+        var descriptionInput = document.querySelector('textarea[name="Description"]').value;
+        localStorage.setItem("description", descriptionInput);
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        var savedDescription = localStorage.getItem("description");
+        if (savedDescription) {
+            document.querySelector('textarea[name="Description"]').value = savedDescription;
+        }
+    });
+
+
+
+</script>
+
+
+<script>
+    // Kiểm tra xem tham số clearSessionStorage có tồn tại trong URL không
+    const urlParams = new URLSearchParams(window.location.search);
+    const clearSessionStorage = urlParams.has('clearSessionStorage');
+
+    // Nếu có, xóa dữ liệu sessionStorage và localStorage
+    if (clearSessionStorage) {
+        sessionStorage.clear();
+        localStorage.clear();
+    }
+</script>
+
+
+
+<script>
+    // Function to save form data to sessionStorage
+    function saveFormData() {
+        sessionStorage.setItem('CourseName', document.getElementById('CourseName').value);
+        sessionStorage.setItem('MajorsId', document.getElementById('MajorsId').value);
+        sessionStorage.setItem('TeachersId', document.getElementById('TeachersId').value);
+
+    }
+
+    // Function to fill form fields with data from sessionStorage
+    function fillFormFields() {
+        document.getElementById('CourseName').value = sessionStorage.getItem('CourseName') || '';
+        document.getElementById('MajorsId').value = sessionStorage.getItem('MajorsId') || '';
+        document.getElementById('TeachersId').value = sessionStorage.getItem('TeachersId') || '';
+    }
+
+    // Call fillFormFields() function when the page is loaded
+    window.onload = fillFormFields;
+</script>
+
+
+<script>
+    // Đoạn mã JavaScript
+    document.addEventListener("DOMContentLoaded", function () {
+        // Khởi tạo mảng để lưu trữ các mục đã chọn
+        var selectedSubjects = [];
+
+        // Load dữ liệu từ localStorage nếu có
+        var storedSubjects = localStorage.getItem("selectedSubjects");
+        if (storedSubjects) {
+            selectedSubjects = JSON.parse(storedSubjects);
+            // Hiển thị các mục đã chọn khi trang được tải lại
+            displaySelectedSubjects();
+        }
+
+        // Function để hiển thị các mục đã chọn
+        function displaySelectedSubjects() {
+            selectedSubjects.forEach(function (subjectId) {
+                // Tìm checkbox tương ứng với subjectId và đánh dấu là đã chọn
+                var checkbox = document.querySelector('input[name="SelectedSubjects"][value="' + subjectId + '"]');
+                if (checkbox) {
+                    checkbox.checked = true;
+                }
+            });
+        }
+
+        // Lưu trữ dữ liệu vào localStorage khi checkbox được chọn hoặc bỏ chọn
+        var checkboxes = document.querySelectorAll('input[name="SelectedSubjects"]');
+        checkboxes.forEach(function (checkbox) {
+            checkbox.addEventListener("change", function () {
+                var subjectId = this.value;
+                if (this.checked) {
+                    // Nếu checkbox được chọn, thêm subjectId vào mảng selectedSubjects
+                    selectedSubjects.push(subjectId);
+                } else {
+                    // Nếu checkbox bị bỏ chọn, loại bỏ subjectId khỏi mảng selectedSubjects
+                    var index = selectedSubjects.indexOf(subjectId);
+                    if (index !== -1) {
+                        selectedSubjects.splice(index, 1);
+                    }
+                }
+                // Lưu mảng selectedSubjects vào localStorage
+                localStorage.setItem("selectedSubjects", JSON.stringify(selectedSubjects));
+            });
+        });
+
+
+    });
+
+</script>
+
+
+<script>
+    function displayThumbnail(input) {
         var thumbnailImage = document.getElementById('thumbnailImage');
         if (input.files && input.files[0]) {
             var reader = new FileReader();
