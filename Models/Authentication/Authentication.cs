@@ -25,7 +25,7 @@ namespace OnlineCollegeManagement.Models.Authentication
 
                 // Lấy danh sách các controller mà cần kiểm tra quyền
                 string[] adminControllers = {
-                    "Admin", "Courses", "Classes" , "Admissions", "Achievements",
+                    "Admin", "Courses", "Classes" , "Admissions", "Achievements","Student",
                     "Departments", "Events", "Facilities" , "Majors" ,"Subjects","Teachers"
                 };
 
