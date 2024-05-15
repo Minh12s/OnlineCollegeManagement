@@ -188,11 +188,10 @@
                             <td>@student.StudentInformation.StudentName</td>
                             <td>@student.User.Email</td>
                             <td>@student.Telephone</td>
-                            <td>@student.EnrollmentStartDate?.ToString("yyyy-MM-dd")</td>
-                            <td>@student.EnrollmentEndDate?.ToString("yyyy-MM-dd")</td>
-                            <td>@student.Course.CourseName</td>
+                            <td>@(student.EnrollmentStartDate?.ToString("yyyy-MM-dd") ?? "N/A")</td>
+                            <td>@(student.EnrollmentEndDate?.ToString("yyyy-MM-dd") ?? "N/A")</td>
+                            <td>@(student.Course?.CourseName ?? "N/A")</td>
                             <td>@student.StudentInformation.Major.MajorName</td>
-
                             <td>
                                 <div class="button-group">
                                     <a style="background-color:green; color:white;" class="btn btn-primary"
@@ -204,6 +203,7 @@
                             </td>
                         </tr>
                     }
+
                 </tbody>
             </table>
 
