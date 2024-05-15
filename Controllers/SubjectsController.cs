@@ -50,6 +50,7 @@ namespace OnlineCollegeManagement.Controllers
             ViewBag.TotalSubjects = totalSubjects;
             ViewBag.PageSize = pageSize;
             ViewBag.SearchString = searchString;
+            ViewBag.Subjects = subjects;
 
             return View(paginatedSubjects);
         }
@@ -192,22 +193,48 @@ namespace OnlineCollegeManagement.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> delete(int id)
         {
-            var Subject = await _context.Subjects.FindAsync(id);
+            var subject = await _context.Subjects.FindAsync(id);
 
-            if (Subject == null)
+            if (subject == null)
             {
                 return NotFound();
             }
 
-            // Xóa ảnh đại diện của blog khỏi thư mục
+            // Xác định khóa học mà môn học đó thuộc về
+            var courseOfSubject = await _context.CoursesSubjects
+                .Where(cs => cs.SubjectsId == id)
+                .Select(cs => cs.Course)
+                .FirstOrDefaultAsync();
 
+            if (courseOfSubject != null)
+            {// Lấy danh sách tên các khóa học
+             // Lấy danh sách các khóa học mà môn học đang thuộc về
+                var courseNames = await _context.CoursesSubjects
+                    .Where(cs => cs.SubjectsId == id)
+                    .Select(cs => cs.Course.CourseName)
+                    .ToListAsync();
 
-            _context.Subjects.Remove(Subject);
+                // Lưu danh sách tên khóa học vào TempData để hiển thị trong view Index
+                TempData["CourseNames"] = courseNames;
+
+                // Lưu thông báo lỗi vào TempData
+                TempData["ErrorMessage"] = $"That subject is available in the following courses: {string.Join(", ", courseNames)}.";
+
+                var subjects = _context.Subjects.ToList();
+                ViewBag.Subjects = subjects;
+
+                // Trả về view Index cùng với thông báo lỗi
+                return RedirectToAction("Index", "Subjects");
+            }
+
+            // Xóa môn học
+            _context.Subjects.Remove(subject);
             await _context.SaveChangesAsync();
 
-            // Chuyển hướng về trang BlogManagement/Blog
+            // Chuyển hướng về trang quản lý môn học
             return RedirectToAction("Index", "Subjects");
         }
+
 
 
     }

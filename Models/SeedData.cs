@@ -623,13 +623,16 @@ namespace OnlineCollegeManagement.Data
                 for (int i = 0; i < 10; i++)
                 {
                     var randomCoursesId = Courses1[random.Next(Courses1.Count)].CoursesId;
-                    var randomSubjectId = subjects[random.Next(subjects1.Count)].SubjectsId;
+                    var randomSubjectId = subjects1[random.Next(subjects1.Count)].SubjectsId;
+                    var randomNumberOfSessions = random.Next(1, 21); // Số ngẫu nhiên từ 1 đến 20
+                    var randomNumericalOrder = random.Next(1, 51); // Số ngẫu nhiên từ 1 đến 50
 
                     var newCoursesSubjects = new CoursesSubjects
                     {
                         CoursesId = randomCoursesId,
                         SubjectsId = randomSubjectId,
-
+                        NumberOfSessions = randomNumberOfSessions,
+                        NumericalOrder = randomNumericalOrder
                     };
 
                     context.CoursesSubjects.Add(newCoursesSubjects);
@@ -637,6 +640,20 @@ namespace OnlineCollegeManagement.Data
 
                 context.SaveChanges();
 
+
+
+                // Cập nhật CourseTime cho từng khóa học
+                foreach (var course in courses)
+                {
+                    var totalSessions = context.CoursesSubjects
+                        .Where(cs => cs.CoursesId == course.CoursesId)
+                        .Sum(cs => cs.NumberOfSessions);
+
+                    course.CourseTime = $"{totalSessions} sessions";
+                    context.Courses.Update(course);
+                }
+
+                context.SaveChanges();
 
                 // Seed data for ContactInfo
                 var contactInfos = new ContactInfo[]

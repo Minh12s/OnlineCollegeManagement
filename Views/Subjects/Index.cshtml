@@ -62,7 +62,12 @@
     </div>
 </form>
 
-
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger error-message" role="alert">
+        @TempData["ErrorMessage"]
+    </div>
+}
 
 <section class="section main-section">
 
@@ -111,7 +116,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var sub in Model)
+                    @foreach (var sub in ViewBag.Subjects)
                     {
                         <tr>
                             <td>@sub.SubjectsId</td>
@@ -220,6 +225,12 @@
         .button-group > * {
             margin-right: 10px; /* Khoảng cách giữa các nút */
         }
+
+    .error-message {
+        text-align: center;
+        color: red;
+        font-weight: bold;
+    }
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
