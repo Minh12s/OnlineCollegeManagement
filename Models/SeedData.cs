@@ -392,7 +392,10 @@ namespace OnlineCollegeManagement.Data
                        UsersId = users1[random.Next(users1.Count)],
                        Telephone = "1234567890",
                         EnrollmentStartDate = DateTime.UtcNow, // Set the enrollment start date
-                        EnrollmentEndDate = DateTime.UtcNow.AddDays(30) // Set the enrollment end date, for example, 30 days from now
+                        EnrollmentEndDate = DateTime.UtcNow.AddDays(30), // Set the enrollment end date, for example, 30 days from now
+                            // Thêm dữ liệu về ngày học và ca học
+                        StudyDays = "Monday, Wednesday, Friday", // Ví dụ: Học vào thứ 2, 4, 6
+                        StudySession = "Morning" // Ví dụ: Ca học buổi sáng
                 },
 
                 new OfficialStudent{
@@ -404,7 +407,11 @@ namespace OnlineCollegeManagement.Data
                        UsersId = users1[random.Next(users1.Count)],
                        Telephone = "0987654321",
                        EnrollmentStartDate = DateTime.UtcNow.AddDays(10), // Set the enrollment start date, for example, 10 days from now
-                       EnrollmentEndDate = DateTime.UtcNow.AddDays(40) // Set the enrollment end date, for example, 40 days from now
+                       EnrollmentEndDate = DateTime.UtcNow.AddDays(40), // Set the enrollment end date, for example, 40 days from now
+                         // Thêm dữ liệu về ngày học và ca học
+                       StudyDays = "Tuesday, Thursday, Saturday", // Ví dụ: Học vào thứ 3, 5, 7
+                       StudySession = "Afternoon" // Ví dụ: Ca học buổi chiều
+
                 }
 
                  };

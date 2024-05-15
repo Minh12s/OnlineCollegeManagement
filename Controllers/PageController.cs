@@ -132,24 +132,146 @@ namespace OnlineCollegeManagement.Controllers
         {
             int pageNumber = page ?? 1; // Trang hiện tại, mặc định là trang 1 nếu không có page được cung cấp
 
-            // Truy vấn dữ liệu sự kiện từ cơ sở dữ liệu
-            var coursesQuery = _context.Courses.AsQueryable();
-            var paginatedCourses = await coursesQuery
-                                          .Skip((pageNumber - 1) * pageSize)
-                                          .Take(pageSize)
-                                          .ToListAsync();
+            // Lấy userId từ session
+            var userIdString = HttpContext.Session.GetString("UserId");
 
-            // Lấy tổng số bài đăng sau khi áp dụng các tiêu chí lọc
-            int totalCourses = await coursesQuery.CountAsync();
+            // Kiểm tra xem user đã đăng nhập hay chưa
+            bool isLoggedIn = !string.IsNullOrEmpty(userIdString);
 
-            // Chuyển thông tin phân trang vào ViewBag
-            ViewBag.CurrentPage = pageNumber;
-            ViewBag.TotalPages = (int)Math.Ceiling((double)totalCourses / pageSize);
-            ViewBag.totalCourses = totalCourses;
-            ViewBag.PageSize = pageSize;
-            // Truyền danh sách sự kiện vào view để hiển thị
-            return View(paginatedCourses);
+            // Truy vấn danh sách khóa học
+            if (isLoggedIn)
+            {
+                int userId = Convert.ToInt32(userIdString);
 
+                // Truy vấn cơ sở dữ liệu để lấy thông tin sinh viên chính thức từ bảng OfficialStudent dựa trên user id
+                var officialStudent = await _context.OfficialStudents
+                                                    .FirstOrDefaultAsync(os => os.UsersId == userId);
+
+                // Nếu không tìm thấy thông tin sinh viên hoặc không phải là sinh viên chính thức, xử lý tùy ý
+                if (officialStudent == null)
+                {
+                    // Xử lý khi không tìm thấy thông tin sinh viên
+                    // Ví dụ: Redirect hoặc hiển thị thông báo lỗi
+                    return RedirectToAction("Error");
+                }
+
+                // Lấy student information id từ thông tin sinh viên chính thức
+                int studentInformationId = officialStudent.StudentsInformationId;
+
+                // Truy vấn thông tin sinh viên từ bảng StudentInformation dựa trên student information id
+                var studentInformation = await _context.StudentsInformation
+                                                       .FirstOrDefaultAsync(si => si.StudentsInformationId == studentInformationId);
+
+                // Nếu không tìm thấy thông tin sinh viên, xử lý tùy ý
+                if (studentInformation == null)
+                {
+                    // Xử lý khi không tìm thấy thông tin sinh viên
+                    // Ví dụ: Redirect hoặc hiển thị thông báo lỗi
+                    return RedirectToAction("Error");
+                }
+
+                // Lấy major id từ thông tin sinh viên
+                int majorId = studentInformation.MajorsId;
+
+                // Truy vấn danh sách khóa học dựa trên major id
+                var coursesQuery = _context.Courses.Where(c => c.MajorsId == majorId).AsQueryable();
+                var paginatedCourses = await coursesQuery
+                                              .Skip((pageNumber - 1) * pageSize)
+                                              .Take(pageSize)
+                                              .ToListAsync();
+
+                // Lấy tổng số bài đăng sau khi áp dụng các tiêu chí lọc
+                int totalCourses = await coursesQuery.CountAsync();
+
+                // Chuyển thông tin phân trang vào ViewBag
+                ViewBag.CurrentPage = pageNumber;
+                ViewBag.TotalPages = (int)Math.Ceiling((double)totalCourses / pageSize);
+                ViewBag.totalCourses = totalCourses;
+                ViewBag.PageSize = pageSize;
+
+                // Truyền thông tin đăng nhập xuống view
+                ViewBag.IsLoggedIn = true;
+
+                // Truyền danh sách sự kiện vào view để hiển thị
+                return View(paginatedCourses);
+            }
+            else
+            {
+                // Nếu không có user id, truy vấn tất cả các khóa học
+                var allCourses = await _context.Courses.ToListAsync();
+
+                // Phân trang tất cả các khóa học
+                var paginatedCourses = allCourses.Skip((pageNumber - 1) * pageSize)
+                                                 .Take(pageSize)
+                                                 .ToList();
+
+                // Tính toán thông tin phân trang
+                int totalCourses = allCourses.Count;
+                ViewBag.CurrentPage = pageNumber;
+                ViewBag.TotalPages = (int)Math.Ceiling((double)totalCourses / pageSize);
+                ViewBag.totalCourses = totalCourses;
+                ViewBag.PageSize = pageSize;
+
+                // Truyền thông tin đăng nhập xuống view
+                ViewBag.IsLoggedIn = false;
+
+                // Truyền danh sách sự kiện vào view để hiển thị
+                return View(paginatedCourses);
+            }
+        }
+        [HttpPost]
+        public async Task<IActionResult> EnrollInCourse( string telephone, string studyDays, string studySession)
+        {
+
+
+            // Lấy userId từ session
+            var userIdString = HttpContext.Session.GetString("UserId");
+
+            // Kiểm tra xem user đã đăng nhập hay chưa
+            if (!string.IsNullOrEmpty(userIdString))
+            {
+                int userId = Convert.ToInt32(userIdString);
+
+              
+
+                // Truy vấn để lấy thông tin sinh viên chính thức từ bảng OfficialStudent dựa trên user id
+                var officialStudent = await _context.OfficialStudents
+                                                    .FirstOrDefaultAsync(os => os.UsersId == userId);
+
+                // Nếu không tìm thấy thông tin sinh viên, xử lý tùy ý
+                if (officialStudent == null)
+                {
+                    // Xử lý khi không tìm thấy thông tin sinh viên
+                    return RedirectToAction("Error");
+                }
+
+                // Cập nhật thông tin sinh viên với các dữ liệu từ form
+                officialStudent.Telephone = telephone;
+                officialStudent.StudyDays = studyDays;
+                officialStudent.StudySession = studySession;
+                officialStudent.EnrollmentStartDate = DateTime.Now; // Lưu thời gian hiện tại
+
+                try
+                {
+                    // Lưu các thay đổi vào cơ sở dữ liệu
+                    await _context.SaveChangesAsync();
+                    // Đặt thông báo thành công vào TempData
+                    TempData["SuccessMessage"] = "You have successfully enrolled in the course!";
+                }
+                catch (DbUpdateException ex)
+                {
+                    // Xử lý lỗi khi lưu thay đổi vào cơ sở dữ liệu
+                    return StatusCode(500, "An error occurred while saving the data: " + ex.Message);
+                }
+
+                // Redirect hoặc hiển thị thông báo thành công
+                return RedirectToAction("Courses");
+            }
+            else
+            {
+                // Nếu user chưa đăng nhập, chuyển hướng đến trang đăng nhập
+                return RedirectToAction("Login", "Page");
+            }
         }
         public async Task<IActionResult> coursesDetails(int id)
         {

@@ -13,6 +13,8 @@ namespace OnlineCollegeManagement.Models
         public string? Telephone { get; set; }
         public DateTime? EnrollmentStartDate { get; set; }
         public DateTime? EnrollmentEndDate { get; set; }
+        public string? StudyDays { get; set; } 
+        public string? StudySession { get; set; } // Ví dụ: "Morning" hoặc "Afternoon"
 
         public StudentsInformation StudentInformation { get; set; }
         public Users User { get; set; }

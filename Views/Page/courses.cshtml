@@ -15,20 +15,32 @@
         </div>
     </div>
 </div>
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success" style="text-align: center;">
+        @TempData["SuccessMessage"]
+    </div>
+}
 
 <section class="ftco-section">
     <div class="container">
         <div class="row">
-            @foreach (var courses in Model)
+            @foreach (var course in Model)
             {
                 <div class="col-md-4 d-flex ftco-animate">
                     <div class="course align-self-stretch">
-                        <a href="#" class="img" style="background-image: url(@courses.CoursesImageUrl)"></a>
+                        <a href="#" class="img" style="background-image: url(@course.CoursesImageUrl)"></a>
                         <div class="text p-4">
-
-                            <h3 class="mb-3"><a asp-controller="Page" asp-action="coursesDetails" asp-route-id="@courses.CoursesId">@courses.CourseName</a></h3>
+                            <h3 class="mb-3"><a asp-controller="Page" asp-action="coursesDetails" asp-route-id="@course.CoursesId">@course.CourseName</a></h3>
                             <p>Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name</p>
-                            <p><a asp-controller="Page" asp-action="coursesDetails" asp-route-id="@courses.CoursesId" class="btn btn-primary">Enroll now!</a></p>
+                            @if (ViewBag.IsLoggedIn)
+                            {
+                                <p><button id="enrollButton" class="btn btn-primary" data-course-id="@course.CoursesId" data-toggle="modal" data-target="#enrollModal">Enroll now!</button></p>
+                            }
+                            else
+                            {
+                                <p><a href="/Page/Login" class="btn btn-primary"> Enroll now!</a></p>
+                            }
                         </div>
                     </div>
                 </div>
@@ -48,6 +60,56 @@
         </div>
     </div>
 </section>
+
+<!-- Modal for Enrollment -->
+<div class="modal fade" id="enrollModal" tabindex="-1" role="dialog" aria-labelledby="enrollModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="enrollModalLabel">Enroll in Course</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="enrollForm" method="post" action="/Page/EnrollInCourse">
+                    <input type="hidden" id="courseIdInput" name="courseId" />
+                    <div class="form-group">
+                        <label for="Telephone">Telephone:</label>
+                        <input type="text" class="form-control" id="Telephone" name="telephone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="StudyDays">Study Days:</label>
+                        <select class="form-control" id="StudyDays" name="studyDays" required>
+                            <option value="Monday, Wednesday, Friday">Monday, Wednesday, Friday</option>
+                            <option value="Tuesday, Thursday, Saturday">Tuesday, Thursday, Saturday</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="StudySession">Study Session:</label>
+                        <select class="form-control" id="StudySession" name="studySession" required>
+                            <option value="morning">Morning</option>
+                            <option value="afternoon">Afternoon</option>
+                            <option value="evening">Evening</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#enrollModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var courseId = button.data('course-id');
+            var modal = $(this);
+            modal.find('#courseIdInput').val(courseId);
+        });
+    });
+</script>
 
 <section class="ftco-section-parallax">
     <div class="parallax-img d-flex align-items-center">
