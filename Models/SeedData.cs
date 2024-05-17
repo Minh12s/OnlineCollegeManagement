@@ -167,10 +167,12 @@ namespace OnlineCollegeManagement.Data
                 // Seed data for Subjects
                 for (int i = 0; i < 10; i++)
                 {
+                    var randomNumberOfSessions = random.Next(1, 21); // Số ngẫu nhiên từ 1 đến 20
                     var subject = new Subjects
                     {
                         SubjectCode = GenerateRandomSubjectCode(),
                         SubjectName = GenerateRandomSubjectName(),
+                        NumberOfSessions = randomNumberOfSessions,
                     };
 
                     // Thêm môn học vào danh sách
@@ -627,14 +629,13 @@ namespace OnlineCollegeManagement.Data
                 {
                     var randomCoursesId = Courses1[random.Next(Courses1.Count)].CoursesId;
                     var randomSubjectId = subjects1[random.Next(subjects1.Count)].SubjectsId;
-                    var randomNumberOfSessions = random.Next(1, 21); // Số ngẫu nhiên từ 1 đến 20
                     var randomNumericalOrder = random.Next(1, 51); // Số ngẫu nhiên từ 1 đến 50
 
                     var newCoursesSubjects = new CoursesSubjects
                     {
                         CoursesId = randomCoursesId,
                         SubjectsId = randomSubjectId,
-                        NumberOfSessions = randomNumberOfSessions,
+                      
                         NumericalOrder = randomNumericalOrder
                     };
 
@@ -646,17 +647,17 @@ namespace OnlineCollegeManagement.Data
 
 
                 // Cập nhật CourseTime cho từng khóa học
-                foreach (var course in courses)
-                {
-                    var totalSessions = context.CoursesSubjects
-                        .Where(cs => cs.CoursesId == course.CoursesId)
-                        .Sum(cs => cs.NumberOfSessions);
+                //foreach (var course in courses)
+                //{
+                //    var totalSessions = context.CoursesSubjects
+                //        .Where(cs => cs.CoursesId == course.CoursesId)
+                //        .Sum(cs => cs.NumberOfSessions);
 
-                    course.CourseTime = $"{totalSessions} sessions";
-                    context.Courses.Update(course);
-                }
+                //    course.CourseTime = $"{totalSessions} sessions";
+                //    context.Courses.Update(course);
+                //}
 
-                context.SaveChanges();
+                //context.SaveChanges();
 
                 // Seed data for ContactInfo
                 var contactInfos = new ContactInfo[]

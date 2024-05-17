@@ -11,7 +11,6 @@ namespace OnlineCollegeManagement.Models
         [Key]
         public int SubjectsId { get; set; }
         public int NumericalOrder { get; set; }
-        public int NumberOfSessions { get; set; }
         // Navigation properties
         public Courses Course { get; set; }
         public Subjects Subject { get; set; }

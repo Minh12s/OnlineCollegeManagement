@@ -8,8 +8,8 @@ namespace OnlineCollegeManagement.Models
         public int SubjectsId { get; set; }
         public string SubjectCode { get; set; }
         public string SubjectName { get; set; }
+        public int NumberOfSessions { get; set; }
 
 
     }
 }
-
