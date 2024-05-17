@@ -449,7 +449,8 @@ namespace OnlineCollegeManagement.Data
                         CoursesId = randomCoursesId,
                         StudyDays = "Tuesday, Thursday, Saturday", // Ví dụ: Học vào thứ 3, 5, 7
                         StudySession = "Afternoon",// Ví dụ: Ca học buổi chiều
-                        SchedulesDate = DateTime.Now.AddHours(random.Next(24)), 
+                        SchedulesDate = DateTime.Now.AddHours(random.Next(24)),
+                        SubjectName = "IT"
                     };
 
                     context.ClassSchedules.Add(newSchedule);

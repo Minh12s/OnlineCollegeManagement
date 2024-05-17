@@ -6,6 +6,7 @@ namespace OnlineCollegeManagement.Models
         public int ClassSchedulesId { get; set; }
         public int ClassesId { get; set; }
         public int CoursesId { get; set; }
+        public string SubjectName { get; set; }
         public string? StudyDays { get; set; }
         public string? StudySession { get; set; }
         public DateTime SchedulesDate{ get; set; }
