@@ -25,7 +25,7 @@ namespace OnlineCollegeManagement.Data
                     context.StudentsInformation.Any() || context.OfficialStudents.Any() ||
                     context.Subjects.Any() || context.ClassSchedules.Any() || context.ExamScores.Any() ||
                     context.Registrations.Any() || context.Events.Any() || context.Achievements.Any() ||
-                    context.Facilities.Any() || context.ContactInfo.Any() || context.CoursesSubjects.Any())
+                    context.Facilities.Any() || context.ContactInfo.Any() || context.CoursesSubjects.Any() || context.OfficialStudentCourse.Any())
                 {
                     return; // Database has been seeded
                 }
@@ -382,47 +382,55 @@ namespace OnlineCollegeManagement.Data
 
                 // Seed data for OfficialStudents
                 var studentsInformationIds = context.StudentsInformation.Select(s => s.StudentsInformationId).ToList();
-               
                 var users1 = context.Users.Select(u => u.UsersId).ToList();
-                var courses1 = context.Courses.Select(u => u.CoursesId).ToList();
-                var officialStudents = new OfficialStudent[]{
-                new OfficialStudent{
-                       StudentCode = GenerateRandomStudentCode(),
-                       StudentsInformationId =
-                       studentsInformationIds[random.Next(studentsInformationIds.Count)],
-                     
-                       CoursesId = courses1[random.Next(courses1.Count)],
-                       UsersId = users1[random.Next(users1.Count)],
-                       Telephone = "1234567890",
-                        EnrollmentStartDate = DateTime.UtcNow, // Set the enrollment start date
-                        EnrollmentEndDate = DateTime.UtcNow.AddDays(30), // Set the enrollment end date, for example, 30 days from now
-                            // Thêm dữ liệu về ngày học và ca học
-                        StudyDays = "Monday, Wednesday, Friday", // Ví dụ: Học vào thứ 2, 4, 6
-                        StudySession = "Morning" // Ví dụ: Ca học buổi sáng
-                },
+                var courses1 = context.Courses.Select(c => c.CoursesId).ToList();
 
-                new OfficialStudent{
-                       StudentCode = GenerateRandomStudentCode(),
-                       StudentsInformationId =
-                       studentsInformationIds[random.Next(studentsInformationIds.Count)],
-                      
-                       CoursesId = courses1[random.Next(courses1.Count)],
-                       UsersId = users1[random.Next(users1.Count)],
-                       Telephone = "0987654321",
-                       EnrollmentStartDate = DateTime.UtcNow.AddDays(10), // Set the enrollment start date, for example, 10 days from now
-                       EnrollmentEndDate = DateTime.UtcNow.AddDays(40), // Set the enrollment end date, for example, 40 days from now
-                         // Thêm dữ liệu về ngày học và ca học
-                       StudyDays = "Tuesday, Thursday, Saturday", // Ví dụ: Học vào thứ 3, 5, 7
-                       StudySession = "Afternoon" // Ví dụ: Ca học buổi chiều
-
-                }
-
-                 };
-
-                foreach (var student in officialStudents)
+                var officialStudents = new List<OfficialStudent>
                 {
-                    context.OfficialStudents.Add(student);
-                }
+                    new OfficialStudent
+                    {
+                        StudentCode = GenerateRandomStudentCode(),
+                        StudentsInformationId = studentsInformationIds[random.Next(studentsInformationIds.Count)],
+                        UsersId = users1[random.Next(users1.Count)]
+                    },
+                    new OfficialStudent
+                    {
+                        StudentCode = GenerateRandomStudentCode(),
+                        StudentsInformationId = studentsInformationIds[random.Next(studentsInformationIds.Count)],
+                        UsersId = users1[random.Next(users1.Count)]
+                    }
+                };
+
+                context.OfficialStudents.AddRange(officialStudents);
+                context.SaveChanges();
+
+                // Seed data for OfficialStudentCourses
+                var officialStudents1 = context.OfficialStudents.ToList();
+                var officialStudentCourses = new List<OfficialStudentCourse>
+                {
+                    new OfficialStudentCourse
+                    {
+                        OfficialStudentId = officialStudents1[0].OfficialStudentId,
+                        CoursesId = courses1[random.Next(courses1.Count)],
+                        Telephone = "1234567890",
+                        EnrollmentStartDate = DateTime.UtcNow,
+                        EnrollmentEndDate = DateTime.UtcNow.AddDays(30),
+                        StudyDays = "Monday, Wednesday, Friday",
+                        StudySession = "Morning"
+                    },
+                    new OfficialStudentCourse
+                    {
+                        OfficialStudentId = officialStudents1[1].OfficialStudentId,
+                        CoursesId = courses1[random.Next(courses1.Count)],
+                        Telephone = "0987654321",
+                        EnrollmentStartDate = DateTime.UtcNow.AddDays(10),
+                        EnrollmentEndDate = DateTime.UtcNow.AddDays(40),
+                        StudyDays = "Tuesday, Thursday, Saturday",
+                        StudySession = "Afternoon"
+                    }
+                };
+
+                context.OfficialStudentCourse.AddRange(officialStudentCourses);
                 context.SaveChanges();
 
 
