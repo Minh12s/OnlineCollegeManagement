@@ -29,7 +29,7 @@ namespace OnlineCollegeManagement.Data
                 {
                     return; // Database has been seeded
                 }
-
+               
                 // Seed data for Users
                 var users = new Users[]
                 {
@@ -64,15 +64,15 @@ namespace OnlineCollegeManagement.Data
                 context.SaveChanges();
 
                 // Seed data for Majors
+                var majorNames = new List<string> { "Software Engineering", "Data Science", "Applied Mathematics", "Computer Engineering", "Electrical Engineering" };
                 var departments1 = context.Departments.ToList();
-                var random = new Random();
-                var majorNames = new List<string> { "Software Engineering", "Data Science", "Applied Mathematics", "Computer Engineering", "Electrical Engineering", "Mechanical Engineering", "Physics", "Chemistry", "Biology", "Economics", "Psychology", "Sociology", "English Literature", "History", "Political Science", "Environmental Science", "Geology", "Philosophy", "Art History", "Music" };
 
                 var majors = new List<Majors>();
                 foreach (var name in majorNames)
                 {
-                    var randomDepartmentId = departments[random.Next(departments1.Count)].DepartmentsId;
-                    var major = new Majors { MajorName = name, DepartmentsId = randomDepartmentId };
+                    // Chọn phòng ban theo thứ tự từ danh sách đã có
+                    var departmentId = departments1[majors.Count % departments1.Count].DepartmentsId;
+                    var major = new Majors { MajorName = name, DepartmentsId = departmentId };
                     majors.Add(major);
                 }
 
@@ -82,7 +82,9 @@ namespace OnlineCollegeManagement.Data
                 }
                 context.SaveChanges();
 
+
                 // Seed data for Teachers
+                var random = new Random();
                 var departments2 = context.Departments.ToList();
                 var thumbnailPaths2 = Enumerable.Range(1, 9).Select(i => $"/images/person_{i}.jpg").ToList();
                 var teachers = new List<Teachers>
@@ -201,36 +203,35 @@ namespace OnlineCollegeManagement.Data
                     var subjectName = subjectNames[random.Next(subjectNames.Length)];
                     return subjectName;
                 }
-                // Seed data for Courses
                 var majors1 = context.Majors.ToList();
-
                 var teachers1 = context.Teachers.ToList();
                 var thumbnailPaths4 = Enumerable.Range(1, 6).Select(i => $"/images/course-{i}.jpg").ToList();
-                var courseNames = new List<string> { "Web Development", "Database Management", "Machine Learning", "Software Testing", "Computer Graphics", "Network Security", "Digital Signal Processing", "Operating Systems", "Data Mining", "Artificial Intelligence" };
+                var courseNames = new List<string> { "Web Development", "Database Management", "Machine Learning", "Software Testing", "Computer Graphics", "Network Security", "Digital Signal Processing", "Operating Systems", "Data Mining", "Artificial Intelligence", "Computer Vision", "Mobile Application Development", "Information Security", "Cloud Computing", "Data Analysis", "Game Development", "Embedded Systems", "Robotics", "Human-Computer Interaction", "IoT Development", "Natural Language Processing", "Quantum Computing", "Blockchain Technology", "Virtual Reality" , "Design microchips" };
                 var CourseTime = new List<string> { "Six months", "one year", "two year", "three year" };
 
                 var courses = new List<Courses>();
 
+                int courseIndex = 0; // Biến đếm tên khóa học đã sử dụng
                 foreach (var major in majors1)
                 {
                     for (int i = 0; i < 5; i++)
                     {
-
+                        var courseName = courseNames[courseIndex % courseNames.Count]; // Sử dụng toán tử modulo để lặp lại từ đầu danh sách
                         var randomTeacherId = teachers1[random.Next(teachers1.Count)].TeachersId;
-                        var randomCourseName = courseNames[random.Next(courseNames.Count)];
                         var randomCourseTime = CourseTime[random.Next(CourseTime.Count)];
 
                         var course = new Courses
                         {
-                            CourseName = randomCourseName,
-                            Description = $"Course description for {randomCourseName}",
+                            CourseName = courseName,
+                            Description = $"Course description for {courseName}",
                             MajorsId = major.MajorsId,
                             CourseTime = randomCourseTime,
                             CoursesImageUrl = thumbnailPaths4[random.Next(thumbnailPaths4.Count)],
                             TeachersId = randomTeacherId,
-
                         };
                         courses.Add(course);
+
+                        courseIndex++;
                     }
                 }
 
@@ -435,19 +436,20 @@ namespace OnlineCollegeManagement.Data
 
                 // Seed data for ClassSchedules
                 var classes2 = context.Classes.ToList();
-                var subjects = context.Subjects.ToList();
+                var courses3 = context.Courses.ToList();
 
                 for (int i = 0; i < 10; i++)
                 {
                     var randomClassId = classes2[random.Next(classes2.Count)].ClassesId;
-                    var randomSubjectId = subjects[random.Next(subjects.Count)].SubjectsId;
+                    var randomCoursesId = courses3[random.Next(courses3.Count)].CoursesId;
 
                     var newSchedule = new ClassSchedules
                     {
                         ClassesId = randomClassId,
-                        SubjectsId = randomSubjectId,
-                        StartTime = DateTime.Now.AddHours(random.Next(24)), // Random start time within 24 hours
-                        EndTime = DateTime.Now.AddHours(random.Next(24))    // Random end time within 24 hours
+                        CoursesId = randomCoursesId,
+                        StudyDays = "Tuesday, Thursday, Saturday", // Ví dụ: Học vào thứ 3, 5, 7
+                        StudySession = "Afternoon",// Ví dụ: Ca học buổi chiều
+                        SchedulesDate = DateTime.Now.AddHours(random.Next(24)), 
                     };
 
                     context.ClassSchedules.Add(newSchedule);
