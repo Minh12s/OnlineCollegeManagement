@@ -42,7 +42,7 @@ namespace OnlineCollegeManagement.Controllers
                .ToList();
             // Classes
             var recentClasses = _context.Classes
-               .OrderByDescending(c => c.StartDate)
+               .OrderByDescending(c => c.ClassStartDate)
                .Take(10)
                .ToList();
             // pending Registrations

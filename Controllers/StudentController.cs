@@ -34,15 +34,14 @@ namespace OnlineCollegeManagement.Controllers
             _configuration = configuration;
             _env = env;
         }
-        public async Task<IActionResult> Student(int? page, string studentCode = null, string studentName = null, int? majorsId = null, int? courseId = null, string email = null, string telephone = null, int pageSize = 10)
+        public async Task<IActionResult> Student(int? page, string studentCode = null, string studentName = null, int? majorsId = null, int? courseId = null, string email = null, int pageSize = 10)
         {
             int pageNumber = page ?? 1;
             var officialStudents = _context.OfficialStudents
                 .Include(s => s.StudentInformation)
                     .ThenInclude(si => si.Major)
                 .Include(s => s.User)
-                .Include(s => s.Course) // Ensure this is included
-                .Include(s => s.Classes)
+              
                 .AsQueryable();
 
             // Fetch the list of courses and majors
@@ -62,19 +61,12 @@ namespace OnlineCollegeManagement.Controllers
             {
                 officialStudents = officialStudents.Where(s => s.StudentInformation.MajorsId == majorsId.Value);
             }
-            if (courseId.HasValue)
-            {
-                officialStudents = officialStudents.Where(s => s.Course.CoursesId == courseId.Value); // Corrected
-            }
+          
             if (!string.IsNullOrEmpty(email))
             {
                 officialStudents = officialStudents.Where(s => s.User.Email.Contains(email));
             }
-            if (!string.IsNullOrEmpty(telephone))
-            {
-                officialStudents = officialStudents.Where(s => s.Telephone.Contains(telephone));
-            }
-
+          
             // Pagination
             var paginatedStudents = await officialStudents
                 .OrderBy(s => s.StudentCode)
@@ -94,11 +86,20 @@ namespace OnlineCollegeManagement.Controllers
             ViewBag.MajorsId = majorsId;
             ViewBag.CourseId = courseId;
             ViewBag.Email = email;
-            ViewBag.Telephone = telephone;
+          
 
             return View(paginatedStudents);
         }
+        public async Task<IActionResult> ViewClassStudent(int officialStudentId)
+        {
+            // Lấy dữ liệu từ cơ sở dữ liệu
+            var studentDataList = await _context.MergedStudentData
+                .Where(s => s.OfficialStudentId == officialStudentId)
+                .ToListAsync();
 
+            // Trả về view với danh sách view model
+            return View(studentDataList);
+        }
 
 
         public async Task<IActionResult> DetailsStudent(int? StudentsInformationId)
@@ -129,7 +130,7 @@ namespace OnlineCollegeManagement.Controllers
             }
             return View(student); // Trả về view "AdmissionsDetail" với dữ liệu sinh viên
         }
-       
+
     }
 }
 

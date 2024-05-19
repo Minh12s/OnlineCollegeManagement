@@ -25,7 +25,7 @@ namespace OnlineCollegeManagement.Data
                     context.StudentsInformation.Any() || context.OfficialStudents.Any() ||
                     context.Subjects.Any() || context.ClassSchedules.Any() || context.ExamScores.Any() ||
                     context.Registrations.Any() || context.Events.Any() || context.Achievements.Any() ||
-                    context.Facilities.Any() || context.ContactInfo.Any() || context.CoursesSubjects.Any() || context.OfficialStudentCourse.Any())
+                    context.Facilities.Any() || context.ContactInfo.Any() || context.CoursesSubjects.Any() || context.MergedStudentData.Any())
                 {
                     return; // Database has been seeded
                 }
@@ -257,8 +257,8 @@ namespace OnlineCollegeManagement.Data
                     var classObj = new Classes
                     {
                         ClassName = randomClassName,
-                        StartDate = DateTime.Now,
-                        EndDate = DateTime.Now.AddMonths(3)
+                        ClassStartDate = DateTime.Now,
+                        ClassEndDate = DateTime.Now.AddMonths(3)
                     };
                     classes.Add(classObj);
                 }
@@ -404,34 +404,34 @@ namespace OnlineCollegeManagement.Data
                 context.OfficialStudents.AddRange(officialStudents);
                 context.SaveChanges();
 
-                // Seed data for OfficialStudentCourses
-                var officialStudents1 = context.OfficialStudents.ToList();
-                var officialStudentCourses = new List<OfficialStudentCourse>
-                {
-                    new OfficialStudentCourse
-                    {
-                        OfficialStudentId = officialStudents1[0].OfficialStudentId,
-                        CoursesId = courses1[random.Next(courses1.Count)],
-                        Telephone = "1234567890",
-                        EnrollmentStartDate = DateTime.UtcNow,
-                        EnrollmentEndDate = DateTime.UtcNow.AddDays(30),
-                        StudyDays = "Monday, Wednesday, Friday",
-                        StudySession = "Morning"
-                    },
-                    new OfficialStudentCourse
-                    {
-                        OfficialStudentId = officialStudents1[1].OfficialStudentId,
-                        CoursesId = courses1[random.Next(courses1.Count)],
-                        Telephone = "0987654321",
-                        EnrollmentStartDate = DateTime.UtcNow.AddDays(10),
-                        EnrollmentEndDate = DateTime.UtcNow.AddDays(40),
-                        StudyDays = "Tuesday, Thursday, Saturday",
-                        StudySession = "Afternoon"
-                    }
-                };
+                //// Seed data for OfficialStudentCourses
+                //var officialStudents1 = context.OfficialStudents.ToList();
+                //var officialStudentCourses = new List<OfficialStudentCourse>
+                //{
+                //    new OfficialStudentCourse
+                //    {
+                //        OfficialStudentId = officialStudents1[0].OfficialStudentId,
+                //        CoursesId = courses1[random.Next(courses1.Count)],
+                //        Telephone = "1234567890",
+                //        EnrollmentStartDate = DateTime.UtcNow,
+                //        EnrollmentEndDate = DateTime.UtcNow.AddDays(30),
+                //        StudyDays = "Monday, Wednesday, Friday",
+                //        StudySession = "Morning"
+                //    },
+                //    new OfficialStudentCourse
+                //    {
+                //        OfficialStudentId = officialStudents1[1].OfficialStudentId,
+                //        CoursesId = courses1[random.Next(courses1.Count)],
+                //        Telephone = "0987654321",
+                //        EnrollmentStartDate = DateTime.UtcNow.AddDays(10),
+                //        EnrollmentEndDate = DateTime.UtcNow.AddDays(40),
+                //        StudyDays = "Tuesday, Thursday, Saturday",
+                //        StudySession = "Afternoon"
+                //    }
+                //};
 
-                context.OfficialStudentCourse.AddRange(officialStudentCourses);
-                context.SaveChanges();
+                //context.OfficialStudentCourse.AddRange(officialStudentCourses);
+                //context.SaveChanges();
 
 
                 // Function to generate random student code

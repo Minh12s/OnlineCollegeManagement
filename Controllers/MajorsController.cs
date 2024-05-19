@@ -117,7 +117,7 @@ namespace OnlineCollegeManagement.Controllers
 
         public async Task<IActionResult> EditMajors(int id)
         {
-            // Truy vấn thông tin về giáo viên từ cơ sở dữ liệu
+           
             var Majors = await _context.Majors.Include(t => t.Department).FirstOrDefaultAsync(t => t.MajorsId == id);
 
             if (Majors == null)
@@ -129,7 +129,7 @@ namespace OnlineCollegeManagement.Controllers
             var departments = await _context.Departments.ToListAsync();
 
             // Đưa danh sách phòng ban vào ViewBag hoặc ViewData
-            ViewBag.Departments = departments; // hoặc ViewData["Departments"] = departments;
+            ViewBag.Departments = departments; 
 
             return View(Majors);
         }

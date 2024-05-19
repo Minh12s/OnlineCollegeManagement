@@ -28,18 +28,16 @@ namespace OnlineCollegeManagement.Data
         public DbSet<Achievements> Achievements { get; set; }
         public DbSet<Facilities> Facilities { get; set; }
         public DbSet<ContactInfo> ContactInfo { get; set; }
-        public DbSet<OfficialStudentClasses> OfficialStudentClasses { get; set; }
-
-
         public DbSet<CoursesSubjects> CoursesSubjects { get; set; }
-        public DbSet<OfficialStudentCourse> OfficialStudentCourse { get; set; }
+        public DbSet<MergedStudentData> MergedStudentData { get; set; }
 
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<CoursesSubjects>().HasKey(cs => new { cs.CoursesId, cs.SubjectsId });
-            modelBuilder.Entity<OfficialStudentCourse>().HasKey(cs => new { cs.CoursesId, cs.OfficialStudentId });
+            modelBuilder.Entity<MergedStudentData>().HasKey(cs => new { cs.OfficialStudentId, cs.CoursesId });
+           
 
         }
 

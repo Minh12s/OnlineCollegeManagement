@@ -1,4 +1,4 @@
-﻿@model List<OnlineCollegeManagement.Models.OfficialStudent>
+﻿
 
 @{
     ViewData["Title"] = "List Student";
@@ -147,7 +147,7 @@
         </div>
     </div>
 </section>
-<form id="addStudentsForm" method="post" asp-controller="Classes" asp-action="AddStudentToClass" asp-route-classesId="@ViewBag.ClassesId">
+<form id="addStudentsForm" method="post" asp-controller="Classes" asp-action="AddStudentToClass" asp-route-classesId="@ViewBag.ClassesId" >
     <section class="section main-section">
         <div class="card has-table">
             <header class="card-header">
@@ -161,6 +161,7 @@
 
             <div class="card-content">
                 @if (Model.Count == 0)
+
                 {
                     <div class="alert alert-warning" role="alert">
                         No Student found.
@@ -168,8 +169,7 @@
                 }
                 else
                 {
-
-                    @if (ViewData.ModelState.IsValid == false)
+                    @if (!ViewData.ModelState.IsValid)
                     {
                         <div class="alert alert-danger" role="alert">
                             @foreach (var key in ViewData.ModelState.Keys)
@@ -177,7 +177,6 @@
                                 foreach (var error in ViewData.ModelState[key].Errors)
                                 {
                                     <p class="text-error">@error.ErrorMessage</p>
-
                                 }
                             }
                         </div>
@@ -190,24 +189,29 @@
                                 <th>Student ID</th>
                                 <th>Student Code</th>
                                 <th>Telephone</th>
-                                <th>Courses</th>
                                 <th>Start Date</th>
                                 <th>End Date</th>
+                                <th>Study Days</th>
+                                <th>Study Session</th>
+                                <th>Course Name</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var student in Model)
                             {
                                 <tr>
-                                    <td width="10"><input type="checkbox" name="selectedStudents" value="@student.OfficialStudentId"></td>
-                                    <td>@student.OfficialStudentId</td>
-                                    <td>@student.StudentCode</td>
+                                    <td width="10"><input type="checkbox" name="selectedStudents" value="@student.OfficialStudent.OfficialStudentId"></td>
+                                    <td>@student.OfficialStudent.OfficialStudentId</td>
+                                    <td>@student.OfficialStudent.StudentCode</td>
                                     <td>@student.Telephone</td>
-                                    <td>@(student.Course != null ? student.Course.CourseName : "N/A")</td>
-                                    <td>@(student.EnrollmentStartDate.HasValue ? student.EnrollmentStartDate.Value.ToString("yyyy-MM-dd") : "N/A")</td>
-                                    <td>@(student.EnrollmentEndDate.HasValue ? student.EnrollmentEndDate.Value.ToString("yyyy-MM-dd") : "N/A")</td>
+                                    <td>@student.EnrollmentStartDate</td>
+                                    <td>@student.EnrollmentEndDate</td>
+                                    <td>@student.StudyDays</td>
+                                    <td>@student.StudySession</td>
+                                    <td>@student.Course.CourseName</td>
                                 </tr>
                             }
+
                         </tbody>
                     </table>
 
@@ -222,7 +226,6 @@
                             <small>Page @ViewBag.PageNumber of @ViewBag.TotalPages</small>
                         </div>
                     </div>
-
                 }
 
             </div>

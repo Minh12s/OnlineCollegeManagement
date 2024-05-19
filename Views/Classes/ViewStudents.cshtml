@@ -1,4 +1,4 @@
-﻿@model List<OnlineCollegeManagement.Models.OfficialStudentClasses>
+﻿@model List<OnlineCollegeManagement.Models.MergedStudentData>
 
 @{
     ViewData["Title"] = "List Student";
@@ -109,10 +109,10 @@
                                 </td>
 
                                 <td>
-                                    @officialStudentClass.StartDate.ToString("yyyy-MM-dd")
+                                    @(officialStudentClass.ClassStartDate.HasValue ? officialStudentClass.ClassStartDate.Value.ToString("yyyy-MM-dd") : "")
                                 </td>
                                 <td>
-                                    @officialStudentClass.EndDate.ToString("yyyy-MM-dd")
+                                    @(officialStudentClass.ClassEndDate.HasValue ? officialStudentClass.ClassEndDate.Value.ToString("yyyy-MM-dd") : "")
                                 </td>
                                 <td>
                                     @if (officialStudentClass.StudentStatus == "Studying")
@@ -144,10 +144,9 @@
                                                 <span class="icon"><i class="mdi mdi-delete"></i></span>
                                             </button>
                                         </form>
-                                        <a style="background-color:green; color:white;" class="btn btn-primary" href="@Url.Action("DetailsStudent", "Classes", new { Id = officialStudentClass.Id, classesId = ViewBag.ClassesId })">
+                                        <a style="background-color:green; color:white;" class="btn btn-primary" href="@Url.Action("DetailsStudent", "Classes", new { officialStudentId = officialStudentClass.OfficialStudentId, courseId = officialStudentClass.CoursesId, classesId = ViewBag.ClassesId })">
                                             <span class="icon"><i class="mdi mdi-eye"></i></span>
                                         </a>
-
 
 
                                     </div>

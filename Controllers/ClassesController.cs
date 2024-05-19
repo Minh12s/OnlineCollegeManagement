@@ -41,12 +41,12 @@ namespace OnlineCollegeManagement.Controllers
 
             if (StartDate != null && EndDate != null)
             {
-                classes = classes.Where(c => c.StartDate >= StartDate && c.EndDate <= EndDate);
+                classes = classes.Where(c => c.ClassStartDate >= StartDate && c.ClassEndDate <= EndDate);
             }
 
 
             // Phân trang danh sách bài đăng và sắp xếp theo thời gian gần nhất
-            var paginatedClasses = await classes.OrderByDescending(c => c.EndDate)
+            var paginatedClasses = await classes.OrderByDescending(c => c.ClassEndDate)
                                                 .Skip((pageNumber - 1) * pageSize)
                                                 .Take(pageSize)
                                                 .ToListAsync();
@@ -72,7 +72,7 @@ namespace OnlineCollegeManagement.Controllers
         // POST: Classes/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddClasses([Bind("ClassesId,ClassName,StartDate,EndDate")] Classes classes)
+        public async Task<IActionResult> AddClasses([Bind("ClassesId,ClassName,ClassStartDate,ClassEndDate")] Classes classes)
         {
             // Kiểm tra xem tên lớp đã tồn tại hay chưa
             if (ClassesExists(classes.ClassName))
@@ -193,8 +193,8 @@ namespace OnlineCollegeManagement.Controllers
             try
             {
                 // Xóa tất cả các bản ghi OfficialStudentClasses có ClassesId tương ứng
-                var studentClasses = _context.OfficialStudentClasses.Where(osc => osc.ClassesId == id);
-                _context.OfficialStudentClasses.RemoveRange(studentClasses);
+                var studentClasses = _context.MergedStudentData.Where(osc => osc.ClassesId == id);
+                _context.MergedStudentData.RemoveRange(studentClasses);
 
                 // Xóa lớp khỏi cơ sở dữ liệu
                 _context.Classes.Remove(classes);
@@ -218,7 +218,7 @@ namespace OnlineCollegeManagement.Controllers
             // Lưu classesId vào ViewBag để sử dụng trong view
             ViewBag.ClassesId = classesId;
 
-            var officialStudentClasses = await _context.OfficialStudentClasses
+            var officialStudentClasses = await _context.MergedStudentData
                 .Include(osc => osc.Classes)
                 .Include(osc => osc.OfficialStudent)
                     .ThenInclude(os => os.StudentInformation)
@@ -229,9 +229,8 @@ namespace OnlineCollegeManagement.Controllers
 
             return View(officialStudentClasses);
         }
-
         [HttpGet]
-        public async Task<IActionResult> AddStudentToClass(int classesId, int page = 1, int pageSize = 1)
+        public async Task<IActionResult> AddStudentToClass(int classesId, int page = 1, int pageSize = 10)
         {
             // Lấy thông tin lớp học từ ID
             var classes = await _context.Classes.FindAsync(classesId);
@@ -241,29 +240,31 @@ namespace OnlineCollegeManagement.Controllers
                 return NotFound();
             }
 
-            // Lấy danh sách sinh viên từ cơ sở dữ liệu, phân trang
-            var students = await _context.OfficialStudents
-                                        .Include(s => s.Course)
-                                        .Skip((page - 1) * pageSize)
-                                        .Take(pageSize)
-                                        .ToListAsync();
+            // Retrieve all students from the MergedStudentData table
+            var students = await _context.MergedStudentData
+                .Include(msd => msd.OfficialStudent)
+                .ThenInclude(os => os.StudentInformation)
+                .Include(msd => msd.Course)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
 
             // Tính toán số trang
             int totalStudents = await _context.OfficialStudents.CountAsync();
             int totalPages = (int)Math.Ceiling(totalStudents / (double)pageSize);
 
             // Truy vấn lại thông tin lớp học và gán cho ViewBag
+   
             ViewBag.ClassesId = classesId;
-            ViewBag.ClassesStartDate = classes.StartDate;
-            ViewBag.ClassesEndDate = classes.EndDate;
-
+            ViewBag.ClassesStartDate = classes.ClassStartDate;
+            ViewBag.ClassesEndDate = classes.ClassEndDate;
             // Pass paging info through ViewBag
             ViewBag.PageNumber = page;
             ViewBag.TotalPages = totalPages;
 
             return View(students);
         }
-
 
         [HttpPost]
         public async Task<IActionResult> AddStudentToClass(int classesId, List<int> selectedStudents, int page = 1, int pageSize = 1)
@@ -278,18 +279,17 @@ namespace OnlineCollegeManagement.Controllers
 
             // Truy vấn lại thông tin lớp học và gán cho ViewBag
             ViewBag.ClassesId = classesId;
-            ViewBag.ClassesStartDate = classes.StartDate;
-            ViewBag.ClassesEndDate = classes.EndDate;
+            ViewBag.ClassesStartDate = classes.ClassStartDate;
+            ViewBag.ClassesEndDate = classes.ClassEndDate;
 
             if (selectedStudents != null && selectedStudents.Any())
             {
                 // Biến để lưu trữ danh sách các sinh viên trùng lặp
                 List<int> duplicateStudentIds = new List<int>();
-
                 // Kiểm tra xem sinh viên đã tồn tại trong lớp học chưa
                 foreach (var studentId in selectedStudents)
                 {
-                    var existingRecord = await _context.OfficialStudentClasses
+                    var existingRecord = await _context.MergedStudentData
                         .FirstOrDefaultAsync(sc => sc.OfficialStudentId == studentId && sc.ClassesId == classesId);
 
                     if (existingRecord != null)
@@ -304,16 +304,16 @@ namespace OnlineCollegeManagement.Controllers
                         if (student != null)
                         {
                             // Tạo một đối tượng OfficialStudentClasses và thêm vào bảng
-                            var studentClass = new OfficialStudentClasses
+                            var studentClass = new MergedStudentData
                             {
-                                StartDate = classes.StartDate,
-                                EndDate = classes.EndDate,
+                                ClassStartDate = classes.ClassStartDate,
+                                ClassEndDate = classes.ClassEndDate,
                                 StudentStatus = "Studying",
                                 DeleteStatus = 0,
                                 OfficialStudentId = studentId,
                                 ClassesId = classesId
                             };
-                            _context.OfficialStudentClasses.Add(studentClass);
+                            _context.MergedStudentData.Add(studentClass);
                         }
                     }
                 }
@@ -323,12 +323,14 @@ namespace OnlineCollegeManagement.Controllers
                     // Nếu có sinh viên trùng lặp, thêm thông báo lỗi vào ModelState
                     ModelState.AddModelError("", $"Students with ID {string.Join(", ", duplicateStudentIds)} already exist in this class.");
 
-                    // Lấy lại dữ liệu sinh viên với phân trang và hiển thị lại trang
-                    var students = await _context.OfficialStudents
-                                                .Include(s => s.Course)
-                                                .Skip((page - 1) * pageSize)
-                                                .Take(pageSize)
-                                                .ToListAsync();
+                    // Retrieve all students from the MergedStudentData table
+                    var students = await _context.MergedStudentData
+                        .Include(msd => msd.OfficialStudent)
+                        .ThenInclude(os => os.StudentInformation)
+                        .Include(msd => msd.Course)
+                        .Skip((page - 1) * pageSize)
+                        .Take(pageSize)
+                        .ToListAsync();
                     ViewBag.PageNumber = page;
                     ViewBag.TotalPages = (int)Math.Ceiling(await _context.OfficialStudents.CountAsync() / (double)pageSize);
                     return View(students);
@@ -352,7 +354,7 @@ namespace OnlineCollegeManagement.Controllers
         public async Task<IActionResult> RemoveStudentFromClass(int classesId, int officialStudentId)
         {
             // Tìm OfficialStudentClasses dựa trên ClassesId và OfficialStudentId
-            var officialStudentClass = await _context.OfficialStudentClasses
+            var officialStudentClass = await _context.MergedStudentData
                 .FirstOrDefaultAsync(osc => osc.ClassesId == classesId && osc.OfficialStudentId == officialStudentId);
 
             if (officialStudentClass == null)
@@ -370,25 +372,20 @@ namespace OnlineCollegeManagement.Controllers
             return RedirectToAction(nameof(ViewStudents), new { classesId = classesId });
         }
 
-
-
-        public async Task<IActionResult> DetailsStudent(int? Id, int? classesId)
+        public async Task<IActionResult> DetailsStudent(int? officialStudentId, int? courseId, int? classesId)
         {
-            var classes = await _context.Classes.FindAsync(classesId);
-            ViewBag.ClassesId = classesId;
-
-            if (Id == null)
+            if (officialStudentId == null || courseId == null || classesId == null)
             {
                 return NotFound();
             }
 
             // Lấy thông tin sinh viên từ bảng OfficialStudentClasses kèm theo thông tin liên quan
-            var student = await _context.OfficialStudentClasses
+            var student = await _context.MergedStudentData
                 .Include(os => os.OfficialStudent)
                     .ThenInclude(os => os.StudentInformation) // Load thông tin sinh viên
                 .Include(os => os.OfficialStudent)
                     .ThenInclude(os => os.User) // Load thông tin người dùng
-                .FirstOrDefaultAsync(s => s.Id == Id);
+                .FirstOrDefaultAsync(s => s.OfficialStudentId == officialStudentId && s.CoursesId == courseId && s.ClassesId == classesId);
 
             if (student == null)
             {
@@ -401,9 +398,14 @@ namespace OnlineCollegeManagement.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateStatus(int id, string studentStatus, string returnUrl)
+        public async Task<IActionResult> UpdateStatus(int? officialStudentId, int? courseId, int? classesId, string studentStatus, string returnUrl)
         {
-            var officialStudentClasses = await _context.OfficialStudentClasses.FindAsync(id);
+            if (officialStudentId == null || courseId == null || classesId == null)
+            {
+                return NotFound();
+            }
+
+            var officialStudentClasses = await _context.MergedStudentData.FirstOrDefaultAsync(s => s.OfficialStudentId == officialStudentId && s.CoursesId == courseId && s.ClassesId == classesId);
 
             if (officialStudentClasses == null)
             {
@@ -415,9 +417,10 @@ namespace OnlineCollegeManagement.Controllers
             _context.Update(officialStudentClasses);
             await _context.SaveChangesAsync();
 
-            // Chuyển hướng đến returnUrl
-            return Redirect(returnUrl);
+            // Chuyển hướng đến action "ViewStudents" trong controller "Classes" với tham số "classesId"
+            return RedirectToAction("ViewStudents", "Classes", new { classesId = classesId });
         }
-    }
- }
 
+
+    }
+}

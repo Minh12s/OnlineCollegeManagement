@@ -12,7 +12,6 @@ namespace OnlineCollegeManagement.Models
 
         public StudentsInformation StudentInformation { get; set; }
         public Users User { get; set; }
-        public virtual ICollection<OfficialStudentClasses> Classes { get; set; }
 
     }
 }

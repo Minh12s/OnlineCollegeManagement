@@ -1,4 +1,5 @@
-﻿@{
+﻿@model IEnumerable<OnlineCollegeManagement.Models.Classes>
+@{
     ViewData["Title"] = "Classes";
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
@@ -6,7 +7,7 @@
     <div class="flex flex-col md:flex-row items-center justify-between space-y-6 md:space-y-0">
         <ul>
             <li style="margin-left:-50px;">Admin</li>
-            <li>Classes</li>
+            <li>Class Schedules</li>
         </ul>
 
     </div>
@@ -14,13 +15,6 @@
 </section>
 <section class="is-hero-bar">
     <div class="flex flex-col md:flex-row items-center justify-start">
-        <!-- Phần này để chứa nút "Add Blog" -->
-        <div class="col-sm-2" style="margin-right: 5px;">
-            <a class="btn btn-add" asp-controller="Classes" asp-action="AddClasses" title="Thêm">
-                <i class="fas fa-plus"></i>
-                Add Classes
-            </a>
-        </div>
 
         <!-- Phần này để chứa nút "Print PDF" -->
         <div class="col-sm-2" style="margin-right: 5px;">
@@ -48,13 +42,13 @@
     </div>
 </section>
 
-<form style="display: flex; align-items: center; border-radius: 5px; margin-top: 10px; flex-wrap: wrap;" asp-action="Classes" asp-controller="Classes" method="get">
+<form style="display: flex; align-items: center; border-radius: 5px; margin-top: 10px; flex-wrap: wrap;" asp-action="Schedule" asp-controller="Schedule" method="get">
     <div class="input-group input-group-sm" style="margin-right: 5px; margin-bottom: 10px;">
         <input value="" class="form-control" type="text" name="ClassName" placeholder="Class Name" style="height: 45px; font-size: 0.765625rem; padding: 4px 8px; background-color: #F1F1F1; border-radius: 5px; width: 120px; margin-left: 28px;" />
     </div>
     <div class="input-group input-group-sm" style="margin-right: 5px; margin-bottom: 10px;">
-        <input value="" class="form-control" type="date" name="ClassStartDate" placeholder="Start Date" style="height: 45px; font-size: 0.765625rem; padding: 4px 8px; background-color: #F1F1F1; border-radius: 5px; width: 150px; margin-left: 10px;" />
-        <input value="" class="form-control" type="date" name="ClassEndDate" placeholder="End Date" style="height: 45px; font-size: 0.765625rem; padding: 4px 8px; background-color: #F1F1F1; border-radius: 5px; width: 150px; margin-left: 10px;" />
+        <input value="" class="form-control" type="date" name="StartDate" placeholder="Start Date" style="height: 45px; font-size: 0.765625rem; padding: 4px 8px; background-color: #F1F1F1; border-radius: 5px; width: 150px; margin-left: 10px;" />
+        <input value="" class="form-control" type="date" name="EndDate" placeholder="End Date" style="height: 45px; font-size: 0.765625rem; padding: 4px 8px; background-color: #F1F1F1; border-radius: 5px; width: 150px; margin-left: 10px;" />
     </div>
 
     <div class="input-group input-group-sm" style="margin-bottom: 10px; margin-left: -5px;">
@@ -69,10 +63,10 @@
         <header class="card-header">
             <p class="card-header-title">
                 @*<span class="icon"><i class="mdi mdi-shopping"></i></span>*@
-                Classes
+                Class Schedules
             </p>
 
-            <form class="card-header-icon" asp-controller="Classes" asp-action="Classes" method="get" onchange="this.submit()">
+            <form class="card-header-icon" asp-controller="Schedule" asp-action="Schedule" method="get" onchange="this.submit()">
 
                 <select style="margin-left:-10px; padding: 5px 10px;border:1px solid #F1F1F1 " name="PageSize">
                     <option value="10"
@@ -126,17 +120,7 @@
 
                             <td>
                                 <div class="button-group">
-
-                                    <a class="btn btn-primary" asp-controller="Classes" asp-action="EditClasses" asp-route-id="@classes.ClassesId">
-                                        <span class="icon"><i class="mdi mdi-pencil"></i></span>
-                                    </a>
-
-                                    <form asp-controller="Classes" asp-action="DeleteClasses" asp-route-id="@classes.ClassesId" method="post" onsubmit="return confirm('Are you sure you want to delete this classes?')">
-                                        <button class="btn btn-danger">
-                                            <span class="icon"><i class="mdi mdi-delete"></i></span>
-                                        </button>
-                                    </form>
-                                    <a style="background-color:green; color:white;" class="btn btn-primary" href="@Url.Action("ViewStudents", "Classes", new { classesId = classes.ClassesId })">
+                                    <a style="background-color:green; color:white;" class="btn btn-primary" href="@Url.Action("ViewSchedule", "Schedule", new { classesId = classes.ClassesId })">
                                         <span class="icon"><i class="mdi mdi-eye"></i></span>
                                     </a>
                                 </div>
@@ -152,7 +136,7 @@
                     <div class="buttons">
                         @for (int i = 1; i <= ViewBag.TotalPages; i++)
                         {
-                            <button type="button" class="button @(ViewBag.CurrentPage == i ? "active" : "")" onclick="location.href='@Url.Action("Classes", "Classes", new { page = i, pageSize = ViewBag.PageSize })'">@i</button>
+                            <button type="button" class="button @(ViewBag.CurrentPage == i ? "active" : "")" onclick="location.href='@Url.Action("Schedule", "Schedule", new { page = i, pageSize = ViewBag.PageSize })'">@i</button>
                         }
                     </div>
                     <small>Page @ViewBag.CurrentPage of @ViewBag.TotalPages</small>

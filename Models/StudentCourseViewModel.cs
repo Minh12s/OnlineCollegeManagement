@@ -1,21 +1,19 @@
-﻿using System.ComponentModel.DataAnnotations;
-
+﻿using System;
 namespace OnlineCollegeManagement.Models
 {
-    public class OfficialStudentCourse
+    public class StudentCourseViewModel
     {
-        [Key]
-
         public int OfficialStudentId { get; set; }
-        [Key]
-
         public int CoursesId { get; set; }
+        public string StudentCode { get; set; }
         public string Telephone { get; set; }
+        public string ClassName { get; set; }
         public DateTime EnrollmentStartDate { get; set; }
         public DateTime? EnrollmentEndDate { get; set; }
         public string StudyDays { get; set; }
         public string StudySession { get; set; }
-        public OfficialStudent OfficialStudent { get; set; }
-        public Courses Course { get; set; }
+        public string CourseName { get; set; }
     }
 }
+
+

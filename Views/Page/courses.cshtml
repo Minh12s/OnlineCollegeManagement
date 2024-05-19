@@ -72,7 +72,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form id="enrollForm" method="post" action="/Page/EnrollInCourse">
+                <form id="enrollForm" method="post" asp-controller="Page" asp-action="EnrollInCourse">
                     <input type="hidden" id="courseIdInput" name="courseId" />
                     <div class="form-group">
                         <label for="Telephone">Telephone:</label>
@@ -100,16 +100,14 @@
     </div>
 </div>
 
-<script>
-    $(document).ready(function () {
+<script>$(document).ready(function () {
         $('#enrollModal').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget);
             var courseId = button.data('course-id');
             var modal = $(this);
             modal.find('#courseIdInput').val(courseId);
         });
-    });
-</script>
+    });</script>
 
 <section class="ftco-section-parallax">
     <div class="parallax-img d-flex align-items-center">

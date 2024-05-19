@@ -1,7 +1,8 @@
 ﻿
-@model OnlineCollegeManagement.Models.Classes
+@model OnlineCollegeManagement.Models.ClassSchedules
+
 @{
-    ViewData["Title"] = "Add Classes";
+    ViewData["Title"] = "Add Schedule";
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
 
@@ -77,17 +78,12 @@
     .main-section {
         margin-left: 15px;
     }
-
-    .error-message {
-        color: red;
-        font-size: 15px;
-    }
 </style>
 <section class="is-title-bar">
     <div class="flex flex-col md:flex-row items-center justify-between space-y-6 md:space-y-0">
         <ul>
             <li style="margin-left:-50px;">Admin</li>
-            <li>Add Classes</li>
+            <li>Add Facilities</li>
         </ul>
 
     </div>
@@ -98,34 +94,43 @@
             <div class="tile">
 
                 <div class="tile-body">
-                    <form class="edit-product-form" asp-controller="Classes" asp-action="AddClasses" method="post" enctype="multipart/form-data">
+                    <form class="edit-product-form" asp-controller="Schedule" asp-action="AddSchedule" method="post" enctype="multipart/form-data">
                         <!-- Thay thế Tag Helper asp-for bằng các giá trị cụ thể -->
 
-
                         <div class="form-group col-md-3">
-                            <label class="control-label">Name</label>
-                            <input asp-for="ClassName" class="form-control" name="ClassName" placeholder="Name" />
-                            <span asp-validation-for="ClassName" class="error-message"></span>
+                            <label class="control-label">Study Days</label>
+                            <select asp-for="StudyDays" class="form-control" name="StudyDays">
+                                <option value="">Select Study Days</option>
+                                <option value="Monday,Wednesday,Friday">Monday, Wednesday, Friday</option>
+                                <option value="Tuesday,Thursday,Saturday">Tuesday, Thursday, Saturday</option>
+
+                            </select>
+                        </div>
+                        @if (ViewBag.Courses != null)
+                        {
+                            <div class="form-group col-md-3">
+                                <label class="control-label">Courses</label>
+                                <select asp-for="CoursesId" class="form-control" asp-items="ViewBag.Courses">
+                                    <option value="">-- Select Courses --</option>
+                                </select>
+                            </div>
+                        }
+                        <div class="form-group col-md-3">
+                            <label class="control-label">Study Session</label>
+                            <select asp-for="StudySession" class="form-control" name="StudySession">
+                                <option value="">Select Study Session</option>
+                                <option value="Morning(7:30-11:30)">Morning(7:30-11:30)</option>
+                                <option value="Afternoon(13:30-17:30)">Afternoon(13:30-17:30)</option>
+                                <option value="Evening(18:30-20:30)">Evening(18:30-20:30)</option>
+                            </select>
                         </div>
 
-                        <div class="form-group col-md-3">
-                            <label class="control-label">Start Date</label>
-                            <input type="date" asp-for="ClassStartDate" class="form-control" name="ClassStartDate" />
-                            
-                        </div>
-
-                        <div class="form-group col-md-3">
-                            <label class="control-label">End Date</label>
-                            <input type="date" asp-for="ClassEndDate" class="form-control" name="ClassEndDate" />
-                           
-                        </div>
                         <button class="btn btn-save" type="submit">Save</button>
-                        <a class="btn btn-cancel" href="/Classes/Classes">Cancel</a>
+                        <a class="btn btn-cancel" href="/FacilitiesManagement/Facilities">Cancel</a>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 </section>
-
 

@@ -41,7 +41,7 @@ namespace OnlineCollegeManagement.Controllers
             // Thực hiện tìm kiếm dựa trên UniqueCode
             var registrations = await _context.Registrations
                 .Include(r => r.StudentInformation)
-                    .ThenInclude(si => si.Major) 
+                    .ThenInclude(si => si.Major)
                 .Where(r => r.UniqueCode.Contains(searchTerm))
                 .ToListAsync();
 
@@ -219,60 +219,60 @@ namespace OnlineCollegeManagement.Controllers
                 return View(paginatedCourses);
             }
         }
-        [HttpPost]
-        public async Task<IActionResult> EnrollInCourse( string telephone, string studyDays, string studySession)
-        {
+        //[HttpPost]
+        //public async Task<IActionResult> EnrollInCourse(string telephone, string studyDays, string studySession)
+        //{
 
 
-            // Lấy userId từ session
-            var userIdString = HttpContext.Session.GetString("UserId");
+        //    // Lấy userId từ session
+        //    var userIdString = HttpContext.Session.GetString("UserId");
 
-            // Kiểm tra xem user đã đăng nhập hay chưa
-            if (!string.IsNullOrEmpty(userIdString))
-            {
-                int userId = Convert.ToInt32(userIdString);
+        //    // Kiểm tra xem user đã đăng nhập hay chưa
+        //    if (!string.IsNullOrEmpty(userIdString))
+        //    {
+        //        int userId = Convert.ToInt32(userIdString);
 
-              
 
-                // Truy vấn để lấy thông tin sinh viên chính thức từ bảng OfficialStudent dựa trên user id
-                var officialStudent = await _context.OfficialStudents
-                                                    .FirstOrDefaultAsync(os => os.UsersId == userId);
 
-                // Nếu không tìm thấy thông tin sinh viên, xử lý tùy ý
-                if (officialStudent == null)
-                {
-                    // Xử lý khi không tìm thấy thông tin sinh viên
-                    return RedirectToAction("Error");
-                }
+        //        // Truy vấn để lấy thông tin sinh viên chính thức từ bảng OfficialStudent dựa trên user id
+        //        var officialStudent = await _context.OfficialStudents
+        //                                            .FirstOrDefaultAsync(os => os.UsersId == userId);
 
-                // Cập nhật thông tin sinh viên với các dữ liệu từ form
-                officialStudent.Telephone = telephone;
-                officialStudent.StudyDays = studyDays;
-                officialStudent.StudySession = studySession;
-                officialStudent.EnrollmentStartDate = DateTime.Now; // Lưu thời gian hiện tại
+        //        // Nếu không tìm thấy thông tin sinh viên, xử lý tùy ý
+        //        if (officialStudent == null)
+        //        {
+        //            // Xử lý khi không tìm thấy thông tin sinh viên
+        //            return RedirectToAction("Error");
+        //        }
 
-                try
-                {
-                    // Lưu các thay đổi vào cơ sở dữ liệu
-                    await _context.SaveChangesAsync();
-                    // Đặt thông báo thành công vào TempData
-                    TempData["SuccessMessage"] = "You have successfully enrolled in the course!";
-                }
-                catch (DbUpdateException ex)
-                {
-                    // Xử lý lỗi khi lưu thay đổi vào cơ sở dữ liệu
-                    return StatusCode(500, "An error occurred while saving the data: " + ex.Message);
-                }
+        //        // Cập nhật thông tin sinh viên với các dữ liệu từ form
+        //        officialStudent.Telephone = telephone;
+        //        officialStudent.StudyDays = studyDays;
+        //        officialStudent.StudySession = studySession;
+        //        officialStudent.EnrollmentStartDate = DateTime.Now; // Lưu thời gian hiện tại
 
-                // Redirect hoặc hiển thị thông báo thành công
-                return RedirectToAction("Courses");
-            }
-            else
-            {
-                // Nếu user chưa đăng nhập, chuyển hướng đến trang đăng nhập
-                return RedirectToAction("Login", "Page");
-            }
-        }
+        //        try
+        //        {
+        //            // Lưu các thay đổi vào cơ sở dữ liệu
+        //            await _context.SaveChangesAsync();
+        //            // Đặt thông báo thành công vào TempData
+        //            TempData["SuccessMessage"] = "You have successfully enrolled in the course!";
+        //        }
+        //        catch (DbUpdateException ex)
+        //        {
+        //            // Xử lý lỗi khi lưu thay đổi vào cơ sở dữ liệu
+        //            return StatusCode(500, "An error occurred while saving the data: " + ex.Message);
+        //        }
+
+        //        // Redirect hoặc hiển thị thông báo thành công
+        //        return RedirectToAction("Courses");
+        //    }
+        //    else
+        //    {
+        //        // Nếu user chưa đăng nhập, chuyển hướng đến trang đăng nhập
+        //        return RedirectToAction("Login", "Page");
+        //    }
+        //}
         public async Task<IActionResult> coursesDetails(int id)
         {
             // Tìm kiếm sự kiện theo ID

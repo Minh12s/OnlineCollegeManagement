@@ -7,10 +7,9 @@ namespace OnlineCollegeManagement.Models
     {
         public int ClassesId { get; set; }
         public string ClassName { get; set; }
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
- 
-        public virtual ICollection<OfficialStudentClasses> OfficialStudent { get; set; }
+        public DateTime ClassStartDate { get; set; }
+        public DateTime ClassEndDate { get; set; }
+
 
     }
 }
