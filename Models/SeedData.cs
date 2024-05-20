@@ -475,16 +475,19 @@ namespace OnlineCollegeManagement.Data
 
                 var examScores = new ExamScores[]
                 {
-    new ExamScores { OfficialStudentId = officialStudent[random.Next(officialStudent.Count)].OfficialStudentId, SubjectsId = subjects2[random.Next(subjects2.Count)].SubjectsId, ExamDate = DateTime.Now.AddDays(-1), Score = 80 },
-    new ExamScores { OfficialStudentId = officialStudent[random.Next(officialStudent.Count)].OfficialStudentId, SubjectsId = subjects2[random.Next(subjects2.Count)].SubjectsId, ExamDate = DateTime.Now.AddDays(-1), Score = 85 },
-    new ExamScores { OfficialStudentId = officialStudent[random.Next(officialStudent.Count)].OfficialStudentId, SubjectsId = subjects2[random.Next(subjects2.Count)].SubjectsId, ExamDate = DateTime.Now.AddDays(-1), Score = 75 }
+    new ExamScores { OfficialStudentId = officialStudent[random.Next(officialStudent.Count)].OfficialStudentId, SubjectsId = subjects2[random.Next(subjects2.Count)].SubjectsId, Score = 80 },
+    new ExamScores { OfficialStudentId = officialStudent[random.Next(officialStudent.Count)].OfficialStudentId, SubjectsId = subjects2[random.Next(subjects2.Count)].SubjectsId, Score = 85 },
+    new ExamScores { OfficialStudentId = officialStudent[random.Next(officialStudent.Count)].OfficialStudentId, SubjectsId = subjects2[random.Next(subjects2.Count)].SubjectsId, Score = 75 }
                 };
 
+                // Cập nhật Status dựa trên Score
                 foreach (var score in examScores)
                 {
+                    score.Status = score.Score >= 40 ? "Passed" : "Not Passed";
                     context.ExamScores.Add(score);
                 }
-                context.SaveChanges();
+
+                context.SaveChanges(); // Lưu các thay đổi vào cơ sở dữ liệu
 
 
                 // Seed data for Registrations
@@ -655,17 +658,34 @@ namespace OnlineCollegeManagement.Data
 
 
                 // Cập nhật CourseTime cho từng khóa học
-                //foreach (var course in courses)
-                //{
-                //    var totalSessions = context.CoursesSubjects
-                //        .Where(cs => cs.CoursesId == course.CoursesId)
-                //        .Sum(cs => cs.NumberOfSessions);
+                foreach (var course in courses)
+                {
+                    var totalSessionsTask = context.CoursesSubjects
+                        .Where(cs => cs.CoursesId == course.CoursesId)
+                        .Include(cs => cs.Subject)
+                        .SumAsync(cs => cs.Subject.NumberOfSessions);
 
-                //    course.CourseTime = $"{totalSessions} sessions";
-                //    context.Courses.Update(course);
-                //}
+                    // Đợi tác vụ hoàn thành và nhận kết quả
+                    var totalSessions = totalSessionsTask.Result;
 
-                //context.SaveChanges();
+                    // Tính số tuần cần thiết để hoàn thành các buổi học (3 buổi học mỗi tuần)
+                    int sessionsPerWeek = 3;
+                    double totalWeeks = (double)totalSessions / sessionsPerWeek;
+
+                    // Tính số tháng (giả sử mỗi tháng có 4 tuần)
+                    double totalMonths = totalWeeks / 4;
+
+                    // Làm tròn số tháng đến số nguyên gần nhất
+                    int roundedMonths = (int)Math.Round(totalMonths);
+
+                    // Cập nhật CourseTime với giá trị đã làm tròn
+                    course.CourseTime = $"{roundedMonths} months";
+
+                    context.Courses.Update(course);
+                }
+
+                context.SaveChanges(); // Lưu các thay đổi vào cơ sở dữ liệu
+
 
                 // Seed data for ContactInfo
                 var contactInfos = new ContactInfo[]

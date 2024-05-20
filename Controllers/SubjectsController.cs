@@ -7,11 +7,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using OnlineCollegeManagement.Data;
 using OnlineCollegeManagement.Models;
-using OnlineCollegeManagement.Models.Authentication;
 
 namespace OnlineCollegeManagement.Controllers
 {
-    [Authentication]
     public class SubjectsController : Controller
     {
         private readonly CollegeManagementContext _context;
@@ -27,7 +25,7 @@ namespace OnlineCollegeManagement.Controllers
             int pageNumber = page ?? 1;
 
             // Lấy danh sách môn học từ cơ sở dữ liệu
-            var subjects = _context.Subjects.AsQueryable();
+            var subjects = _context.Subjects.OrderByDescending(s => s.SubjectsId).AsQueryable();
 
             // Áp dụng tìm kiếm nếu có
             if (!string.IsNullOrEmpty(searchString))
@@ -50,8 +48,7 @@ namespace OnlineCollegeManagement.Controllers
             ViewBag.TotalSubjects = totalSubjects;
             ViewBag.PageSize = pageSize;
             ViewBag.SearchString = searchString;
-            ViewBag.Subjects = subjects;
-
+            ViewBag.Subjects = paginatedSubjects;
             return View(paginatedSubjects);
         }
 
@@ -173,10 +170,11 @@ namespace OnlineCollegeManagement.Controllers
             }
 
             // Kiểm tra tính hợp lệ của mô hình
-            if (ModelState.IsValid)
+            if (true)
             {
                 existingSubject.SubjectCode = model.SubjectCode;
                 existingSubject.SubjectName = model.SubjectName;
+                existingSubject.NumberOfSessions = model.NumberOfSessions;
 
                 _context.Update(existingSubject);
                 await _context.SaveChangesAsync();

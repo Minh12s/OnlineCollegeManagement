@@ -140,7 +140,7 @@
                             <td><img src="@courses.CoursesImageUrl" alt="Thumbnail" width="100" height="100"></td>
                             <td>@Html.Raw(courses.Description)</td>
                             <td>@courses.CourseTime</td>
-                            <td>@courses.Major.MajorName</td>
+                            <td>@courses.Major.MajorName</td> 
                             <td>@courses.Teacher.TeacherName</td>
 
                             <td>
@@ -254,8 +254,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.2/xlsx.full.min.js"></script>
-<script>
-    function exportBlogToExcel() {
+<script>function exportBlogToExcel() {
         $.ajax({
             url: '/Excel/ExportBlogToExcel',
             type: 'GET',
@@ -286,8 +285,7 @@
     }</script>
 <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
 
-<script>
-    this.exportExcel = function () {
+<script>this.exportExcel = function () {
         // Lấy bảng cần xuất
         var tab = document.getElementById('sampleTable');
         // Tạo một đối tượng Excel

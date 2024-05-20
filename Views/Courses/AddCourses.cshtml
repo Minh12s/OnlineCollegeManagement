@@ -148,17 +148,7 @@
                             </select>
                         </div>
 
-                        <div class="form-group col-md-3">
-                            <label class="control-label">Course Time</label>
-                            <select class="form-control" id="CourseTime" name="CourseTime" asp-for="CourseTime" onchange="saveFormData()">
-                                <option value="">-- Select --</option>
-
-                                <option value="Six months">Six months</option>
-                                <option value="One year">One year</option>
-                                <option value="Two years">Two years</option>
-                                <option value="Three years">Three years</option>
-                            </select>
-                        </div>
+                       
 
                         <div class="form-group col-md-12">
                             <label class="control-label">Thumbnail</label>
@@ -172,7 +162,7 @@
                             <textarea asp-for="Description" id="Description" class="form-control" name="Description" placeholder="Description" oninput="saveFormData()"></textarea>
                         </div>
 
-
+                      
                         <button class="btn btn-save" type="submit">Save</button>
                         <a class="btn btn-cancel" href="/Courses/Courses">Cancel</a>
 
@@ -207,7 +197,7 @@
     });
 
 
-
+    
 </script>
 
 
@@ -243,10 +233,10 @@
 
     // Call fillFormFields() function when the page is loaded
     window.onload = fillFormFields;
-</script>
+    </script>
 
 
-<script>
+    <script>
     // Đoạn mã JavaScript
     document.addEventListener("DOMContentLoaded", function () {
         // Khởi tạo mảng để lưu trữ các mục đã chọn
@@ -291,10 +281,10 @@
             });
         });
 
-
+       
     });
 
-</script>
+    </script>
 
 
 <script>

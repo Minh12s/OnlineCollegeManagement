@@ -55,7 +55,7 @@
     <div class="input-group input-group-sm" style="margin-right: 5px; margin-bottom: 10px;">
         <input value="@ViewBag.SearchString" class="form-control" type="text" name="searchString" placeholder="Search " style="height: 45px; font-size: 0.765625rem; padding: 4px 8px; background-color: #F1F1F1; border-radius: 5px; width: 200px; margin-left: 10px;" />
     </div>
-    <div class="input-group input-group-sm" style="margin-bottom: 10px; margin-left: -5px;">
+     <div class="input-group input-group-sm" style="margin-bottom: 10px; margin-left: -5px;">
         <button style="margin-left:10px; height: 45px; background-color: #F1F1F1; border: none; border-radius: 5px;" type="submit" class="btn btn-default">
             <i class="mdi mdi-magnify" style="padding: 10px;"></i>
         </button>
@@ -112,6 +112,8 @@
                         <th>SubjectsId</th>
                         <th>SubjectCode</th>
                         <th>SubjectName</th>
+                        <th>NumberOfSessions</th>
+
                         <th></th>
                     </tr>
                 </thead>
@@ -123,6 +125,7 @@
 
                             <td>@sub.SubjectCode</td>
                             <td>@sub.SubjectName</td>
+                            <td>@sub.NumberOfSessions</td>
 
 
                             <td>
