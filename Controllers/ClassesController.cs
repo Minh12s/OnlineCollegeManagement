@@ -267,9 +267,8 @@ namespace OnlineCollegeManagement.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddStudentToClass(int classesId, List<int> selectedStudents, int page = 1, int pageSize = 1)
+        public async Task<IActionResult> AddStudentToClass(int classesId, List<string> selectedStudents, int page = 1, int pageSize = 10)
         {
-            // Lấy thông tin lớp học từ ID
             var classes = await _context.Classes.FindAsync(classesId);
 
             if (classes == null)
@@ -277,76 +276,104 @@ namespace OnlineCollegeManagement.Controllers
                 return NotFound();
             }
 
-            // Truy vấn lại thông tin lớp học và gán cho ViewBag
             ViewBag.ClassesId = classesId;
             ViewBag.ClassesStartDate = classes.ClassStartDate;
             ViewBag.ClassesEndDate = classes.ClassEndDate;
 
             if (selectedStudents != null && selectedStudents.Any())
             {
-                // Biến để lưu trữ danh sách các sinh viên trùng lặp
-                List<int> duplicateStudentIds = new List<int>();
-                // Kiểm tra xem sinh viên đã tồn tại trong lớp học chưa
-                foreach (var studentId in selectedStudents)
-                {
-                    var existingRecord = await _context.MergedStudentData
-                        .FirstOrDefaultAsync(sc => sc.OfficialStudentId == studentId && sc.ClassesId == classesId);
+                List<string> errors = new List<string>();
 
-                    if (existingRecord != null)
+                foreach (var student in selectedStudents)
+                {
+                    var parts = student.Split('-');
+                    int officialStudentId = int.Parse(parts[0]);
+                    int coursesId = int.Parse(parts[1]);
+
+                    // Kiểm tra xem sinh viên đã đăng ký khoá học khác trong cùng một lớp hay không
+                    var existingRecordWithSameStudentAndDifferentCourse = await _context.MergedStudentData
+                        .FirstOrDefaultAsync(sc => sc.OfficialStudentId == officialStudentId
+                                                    && sc.ClassesId == classesId
+                                                    && sc.CoursesId != coursesId);
+
+                    if (existingRecordWithSameStudentAndDifferentCourse != null)
                     {
-                        // Nếu sinh viên đã tồn tại trong lớp học, thêm vào danh sách sinh viên trùng lặp
-                        duplicateStudentIds.Add(studentId);
+                        errors.Add($"Student with ID {officialStudentId} is already enrolled in class {existingRecordWithSameStudentAndDifferentCourse.Classes.ClassName} for a different course.");
                     }
                     else
                     {
-                        // Nếu sinh viên không tồn tại, thêm vào lớp học
-                        var student = await _context.OfficialStudents.FindAsync(studentId);
-                        if (student != null)
+                        var existingRecord = await _context.MergedStudentData
+                            .Include(sc => sc.Classes) // Include related class data
+                            .FirstOrDefaultAsync(sc => sc.OfficialStudentId == officialStudentId && sc.CoursesId == coursesId);
+
+                        if (existingRecord != null && existingRecord.ClassesId.HasValue)
                         {
-                            // Tạo một đối tượng OfficialStudentClasses và thêm vào bảng
-                            var studentClass = new MergedStudentData
+                            errors.Add($"Student with ID {officialStudentId} is already enrolled in class {existingRecord.Classes.ClassName}.");
+                        }
+                        else if (existingRecord != null)
+                        {
+                            existingRecord.ClassesId = classesId;
+                            existingRecord.ClassStartDate = classes.ClassStartDate;
+                            existingRecord.ClassEndDate = classes.ClassEndDate;
+                            existingRecord.StudentStatus = "Studying";
+                            existingRecord.DeleteStatus = 0;
+                            _context.MergedStudentData.Update(existingRecord);
+                        }
+                        else
+                        {
+                            var studentEntity = await _context.OfficialStudents.FindAsync(officialStudentId);
+                            if (studentEntity != null)
                             {
-                                ClassStartDate = classes.ClassStartDate,
-                                ClassEndDate = classes.ClassEndDate,
-                                StudentStatus = "Studying",
-                                DeleteStatus = 0,
-                                OfficialStudentId = studentId,
-                                ClassesId = classesId
-                            };
-                            _context.MergedStudentData.Add(studentClass);
+                                var studentClass = new MergedStudentData
+                                {
+                                    OfficialStudentId = officialStudentId,
+                                    CoursesId = coursesId,
+                                    ClassesId = classesId,
+                                    ClassStartDate = classes.ClassStartDate,
+                                    ClassEndDate = classes.ClassEndDate,
+                                    StudentStatus = "Studying",
+                                    DeleteStatus = 0
+                                };
+                                _context.MergedStudentData.Add(studentClass);
+                            }
                         }
                     }
                 }
 
-                if (duplicateStudentIds.Any())
+                if (errors.Any())
                 {
-                    // Nếu có sinh viên trùng lặp, thêm thông báo lỗi vào ModelState
-                    ModelState.AddModelError("", $"Students with ID {string.Join(", ", duplicateStudentIds)} already exist in this class.");
-
-                    // Retrieve all students from the MergedStudentData table
-                    var students = await _context.MergedStudentData
-                        .Include(msd => msd.OfficialStudent)
-                        .ThenInclude(os => os.StudentInformation)
-                        .Include(msd => msd.Course)
-                        .Skip((page - 1) * pageSize)
-                        .Take(pageSize)
-                        .ToListAsync();
-                    ViewBag.PageNumber = page;
-                    ViewBag.TotalPages = (int)Math.Ceiling(await _context.OfficialStudents.CountAsync() / (double)pageSize);
-                    return View(students);
+                    foreach (var error in errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error);
+                    }
+                    return View(await GetStudentsPagedList(page, pageSize));
                 }
-
-                // Lưu các thay đổi vào cơ sở dữ liệu
-                await _context.SaveChangesAsync();
-
-                // Thay đổi đường dẫn trả về
-                return Redirect("/Classes/ViewStudents?classesId=" + classesId);
+                else
+                {
+                    await _context.SaveChangesAsync();
+                    return Redirect("/Classes/ViewStudents?classesId=" + classesId);
+                }
             }
             else
             {
-                // Trả về view với thông tin lớp học nếu không có sinh viên được chọn
-                return View(classes);
+                return View(await GetStudentsPagedList(page, pageSize));
             }
+        }
+
+
+
+
+
+        // Helper method to retrieve paginated student list
+        private async Task<List<MergedStudentData>> GetStudentsPagedList(int page, int pageSize)
+        {
+            return await _context.MergedStudentData
+                .Include(msd => msd.OfficialStudent)
+                .ThenInclude(os => os.StudentInformation)
+                .Include(msd => msd.Course)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
         }
 
 
