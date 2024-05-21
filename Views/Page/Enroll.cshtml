@@ -15,6 +15,12 @@
         </div>
     </div>
 </div>
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger" style="text-align: center;">
+        @TempData["ErrorMessage"]
+    </div>
+}
 <section class="ftco-section">
 
     <div class="container">
@@ -53,6 +59,6 @@
         font-size: 18px; /* Đặt kích thước font */
         padding: 12px 24px;
         width: 200px;
-        margin-left: 280px; /* Đặt kích thước padding */
+        margin-left: 270px; /* Đặt kích thước padding */
     }
 </style>

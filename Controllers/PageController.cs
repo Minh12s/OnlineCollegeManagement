@@ -284,20 +284,28 @@ namespace OnlineCollegeManagement.Controllers
             }
 
             var existingEnrollment = await _context.MergedStudentData
-                                                    .FirstOrDefaultAsync(osc => osc.OfficialStudentId == officialStudent.OfficialStudentId && osc.CoursesId == courseId);
+                                                   .FirstOrDefaultAsync(osc => osc.OfficialStudentId == officialStudent.OfficialStudentId && osc.CoursesId == courseId);
             if (existingEnrollment != null)
             {
                 TempData["ErrorMessage"] = "You have already enrolled in this course.";
-                return RedirectToAction("Courses");
+                ViewBag.Course = course;
+                return View(course);
             }
 
             var conflictingEnrollment = await _context.MergedStudentData
-                                                      .FirstOrDefaultAsync(osc => osc.OfficialStudentId == officialStudent.OfficialStudentId && osc.StudyDays == studyDays);
-            if (conflictingEnrollment != null)
+      .Where(osc => osc.OfficialStudentId == officialStudent.OfficialStudentId && osc.StudyDays == studyDays)
+      .ToListAsync();
+
+            if (conflictingEnrollment.Any())
             {
-                TempData["ErrorMessage"] = "You have already enrolled in another course with the same study days.";
-                return RedirectToAction("Courses");
+                // Tạo một chuỗi để lưu trữ các ngày học trùng
+                string conflictingStudyDays = string.Join(", ", conflictingEnrollment.Select(ce => ce.StudyDays));
+
+                TempData["ErrorMessage"] = $"You have already enrolled in another course with the same study days: {conflictingStudyDays}.";
+                ViewBag.Course = course;
+                return View(course);
             }
+
 
             var mergedStudentData = new MergedStudentData
             {
@@ -309,34 +317,27 @@ namespace OnlineCollegeManagement.Controllers
                 EnrollmentStartDate = DateTime.Now
             };
 
-            // Phân tích CourseTime để trích xuất số tháng
             Match match = Regex.Match(course.CourseTime, @"(\d+)\s*months?");
             if (match.Success && match.Groups.Count > 1)
             {
                 if (int.TryParse(match.Groups[1].Value, out int courseDurationInMonths))
                 {
-                    // Tạo một đối tượng TimeSpan từ số tháng
-                    var courseDuration = TimeSpan.FromDays(courseDurationInMonths * 30); // Giả sử mỗi tháng có 30 ngày
-
-                    // Thực hiện phép cộng để tính toán EnrollmentEndDate
-                    mergedStudentData.EnrollmentEndDate = mergedStudentData.EnrollmentStartDate.Value.Add(courseDuration);
+                    mergedStudentData.EnrollmentEndDate = mergedStudentData.EnrollmentStartDate.Value.AddMonths(courseDurationInMonths);
                 }
                 else
                 {
-                    // Xử lý trường hợp không thể chuyển đổi CourseTime thành TimeSpan
-                    var errorMessage = $"Invalid format for CourseTime: {course.CourseTime}. Unable to convert to TimeSpan.";
-                    Console.WriteLine(errorMessage);
+                    var errorMessage = $"Invalid format for CourseTime: {course.CourseTime}. Unable to convert to months.";
                     TempData["ErrorMessage"] = errorMessage;
-                    return RedirectToAction("Courses");
+                    ViewBag.Course = course;
+                    return View(course);
                 }
             }
             else
             {
-                // Xử lý trường hợp không phù hợp với biểu thức chính quy
                 var errorMessage = $"Invalid format for CourseTime: {course.CourseTime}. Unable to extract months.";
-                Console.WriteLine(errorMessage);
                 TempData["ErrorMessage"] = errorMessage;
-                return RedirectToAction("Courses");
+                ViewBag.Course = course;
+                return View(course);
             }
 
             try
@@ -344,23 +345,17 @@ namespace OnlineCollegeManagement.Controllers
                 _context.MergedStudentData.Add(mergedStudentData);
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "You have successfully enrolled in the course!";
-
-                // Gọi phương thức gửi email xác nhận đăng ký
-                await SendEnrollmentConfirmationEmail("", course.CourseName);
+                return RedirectToAction("Courses");
             }
             catch (DbUpdateException ex)
             {
-                // Ghi lại chi tiết lỗi vào nhật ký
                 var errorMessage = $"An error occurred while saving the data: {ex.InnerException?.Message}";
-                // Ghi lỗi ra nhật ký hoặc hiển thị thông tin chi tiết
                 Console.WriteLine(errorMessage);
                 TempData["ErrorMessage"] = errorMessage;
-                return StatusCode(500, errorMessage);
+                ViewBag.Course = course;
+                return View(course);
             }
-
-            return RedirectToAction("Courses");
         }
-
         private async Task SendEnrollmentConfirmationEmail(string recipientEmail, string courseName)
         {
             try
