@@ -1,0 +1,58 @@
+﻿@model OnlineCollegeManagement.Models.Courses
+
+@{
+    Layout = "~/Views/Shared/User_Layout.cshtml";
+    ViewData["Title"] = "Enroll in Course";
+}
+<div class="hero-wrap hero-wrap-2" style="background-image: url('/images/bg_2.jpg'); background-attachment:fixed;">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row no-gutters slider-text align-items-center justify-content-center" data-scrollax-parent="true">
+            <div class="col-md-8 ftco-animate text-center">
+                <p class="breadcrumbs"><span class="mr-2"><a href="/Page/Courses">Course</a></span> <span>Course</span></p>
+                <h1 class="mb-3 bread">Enroll</h1>
+            </div>
+        </div>
+    </div>
+</div>
+<section class="ftco-section">
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <h2>Enroll in @ViewBag.Course.CourseName</h2>
+                <form method="post" action="@Url.Action("Enroll", "Page")">
+                    <input type="hidden" name="courseId" value="@ViewBag.Course.CoursesId" />
+                    <div class="form-group">
+                        <label for="Telephone">Telephone:</label>
+                        <input type="text" class="form-control" id="Telephone" name="telephone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="StudyDays">Study Days:</label>
+                        <select class="form-control" id="StudyDays" name="studyDays" required>
+                            <option value="Monday, Wednesday, Friday">Monday, Wednesday, Friday</option>
+                            <option value="Tuesday, Thursday, Saturday">Tuesday, Thursday, Saturday</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="StudySession">Study Session:</label>
+                        <select class="form-control" id="StudySession" name="studySession" required>
+                            <option value="Morning">Morning</option>
+                            <option value="Afternoon">Afternoon</option>
+                            <option value="Evening">Evening</option>
+                        </select>
+                    </div>
+                    <input type="submit" value="Submit" class="btn btn-primary submit">
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+<style>
+    .btn-primary {
+        font-size: 18px; /* Đặt kích thước font */
+        padding: 12px 24px;
+        width: 200px;
+        margin-left: 350px; /* Đặt kích thước padding */
+    }
+</style>

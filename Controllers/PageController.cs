@@ -16,6 +16,7 @@ using System.Net;
 using System.IO;
 using OnlineCollegeManagement.Heplers;
 using OnlineCollegeManagement.Models.Authentication;
+using System.Text.RegularExpressions;
 
 namespace OnlineCollegeManagement.Controllers
 {
@@ -138,7 +139,6 @@ namespace OnlineCollegeManagement.Controllers
             // Kiểm tra xem user đã đăng nhập hay chưa
             bool isLoggedIn = !string.IsNullOrEmpty(userIdString);
 
-            // Truy vấn danh sách khóa học
             if (isLoggedIn)
             {
                 int userId = Convert.ToInt32(userIdString);
@@ -147,11 +147,9 @@ namespace OnlineCollegeManagement.Controllers
                 var officialStudent = await _context.OfficialStudents
                                                     .FirstOrDefaultAsync(os => os.UsersId == userId);
 
-                // Nếu không tìm thấy thông tin sinh viên hoặc không phải là sinh viên chính thức, xử lý tùy ý
                 if (officialStudent == null)
                 {
                     // Xử lý khi không tìm thấy thông tin sinh viên
-                    // Ví dụ: Redirect hoặc hiển thị thông báo lỗi
                     return RedirectToAction("Error");
                 }
 
@@ -162,11 +160,9 @@ namespace OnlineCollegeManagement.Controllers
                 var studentInformation = await _context.StudentsInformation
                                                        .FirstOrDefaultAsync(si => si.StudentsInformationId == studentInformationId);
 
-                // Nếu không tìm thấy thông tin sinh viên, xử lý tùy ý
                 if (studentInformation == null)
                 {
                     // Xử lý khi không tìm thấy thông tin sinh viên
-                    // Ví dụ: Redirect hoặc hiển thị thông báo lỗi
                     return RedirectToAction("Error");
                 }
 
@@ -180,8 +176,17 @@ namespace OnlineCollegeManagement.Controllers
                                               .Take(pageSize)
                                               .ToListAsync();
 
-                // Lấy tổng số bài đăng sau khi áp dụng các tiêu chí lọc
+                // Lấy tổng số khóa học sau khi áp dụng các tiêu chí lọc
                 int totalCourses = await coursesQuery.CountAsync();
+
+                // Kiểm tra xem sinh viên đã đăng ký cả hai nhóm ngày học hay chưa
+                var studyDaysGroups = await _context.MergedStudentData
+                                                    .Where(msd => msd.OfficialStudentId == officialStudent.OfficialStudentId)
+                                                    .Select(msd => msd.StudyDays)
+                                                    .Distinct()
+                                                    .ToListAsync();
+                bool hasEnrolledAllStudyDays = studyDaysGroups.Contains("Monday, Wednesday, Friday") &&
+                                               studyDaysGroups.Contains("Tuesday, Thursday, Saturday");
 
                 // Chuyển thông tin phân trang vào ViewBag
                 ViewBag.CurrentPage = pageNumber;
@@ -189,10 +194,10 @@ namespace OnlineCollegeManagement.Controllers
                 ViewBag.totalCourses = totalCourses;
                 ViewBag.PageSize = pageSize;
 
-                // Truyền thông tin đăng nhập xuống view
+                // Truyền thông tin đăng nhập và trạng thái đăng ký ngày học xuống view
                 ViewBag.IsLoggedIn = true;
+                ViewBag.HasEnrolledAllStudyDays = hasEnrolledAllStudyDays;
 
-                // Truyền danh sách sự kiện vào view để hiển thị
                 return View(paginatedCourses);
             }
             else
@@ -214,65 +219,191 @@ namespace OnlineCollegeManagement.Controllers
 
                 // Truyền thông tin đăng nhập xuống view
                 ViewBag.IsLoggedIn = false;
+                ViewBag.HasEnrolledAllStudyDays = false;
 
-                // Truyền danh sách sự kiện vào view để hiển thị
                 return View(paginatedCourses);
             }
         }
-        //[HttpPost]
-        //public async Task<IActionResult> EnrollInCourse(string telephone, string studyDays, string studySession)
-        //{
+        public async Task<IActionResult> Enroll(int courseId)
+        {
+            // Kiểm tra xem user đã đăng nhập hay chưa
+            var userIdString = HttpContext.Session.GetString("UserId");
 
+            if (string.IsNullOrEmpty(userIdString))
+            {
+                // Nếu user chưa đăng nhập, chuyển hướng đến trang đăng nhập
+                return RedirectToAction("Login", "Page");
+            }
 
-        //    // Lấy userId từ session
-        //    var userIdString = HttpContext.Session.GetString("UserId");
+            // Lấy thông tin khóa học
+            var course = await _context.Courses.FindAsync(courseId);
+            if (course == null)
+            {
+                // Xử lý khi khóa học không tồn tại
+                return NotFound("Course not found");
+            }
 
-        //    // Kiểm tra xem user đã đăng nhập hay chưa
-        //    if (!string.IsNullOrEmpty(userIdString))
-        //    {
-        //        int userId = Convert.ToInt32(userIdString);
+            int userId = Convert.ToInt32(userIdString);
 
+            // Kiểm tra xem sinh viên đã đăng ký khóa học này chưa
+            var existingEnrollment = await _context.MergedStudentData
+                                                   .FirstOrDefaultAsync(osc => osc.OfficialStudent.UsersId == userId && osc.CoursesId == courseId);
+            if (existingEnrollment != null)
+            {
+                // Nếu đã đăng ký, hiển thị thông báo lỗi hoặc chuyển hướng
+                TempData["ErrorMessage"] = "You have already enrolled in this course.";
+                return RedirectToAction("Courses");
+            }
 
+            // Truyền thông tin khóa học vào view
+            ViewBag.Course = course;
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> Enroll(int courseId, string telephone, string studyDays, string studySession)
+        {
+            var userIdString = HttpContext.Session.GetString("UserId");
 
-        //        // Truy vấn để lấy thông tin sinh viên chính thức từ bảng OfficialStudent dựa trên user id
-        //        var officialStudent = await _context.OfficialStudents
-        //                                            .FirstOrDefaultAsync(os => os.UsersId == userId);
+            if (string.IsNullOrEmpty(userIdString))
+            {
+                return RedirectToAction("Login", "Page");
+            }
 
-        //        // Nếu không tìm thấy thông tin sinh viên, xử lý tùy ý
-        //        if (officialStudent == null)
-        //        {
-        //            // Xử lý khi không tìm thấy thông tin sinh viên
-        //            return RedirectToAction("Error");
-        //        }
+            int userId = Convert.ToInt32(userIdString);
 
-        //        // Cập nhật thông tin sinh viên với các dữ liệu từ form
-        //        officialStudent.Telephone = telephone;
-        //        officialStudent.StudyDays = studyDays;
-        //        officialStudent.StudySession = studySession;
-        //        officialStudent.EnrollmentStartDate = DateTime.Now; // Lưu thời gian hiện tại
+            var course = await _context.Courses.FindAsync(courseId);
+            if (course == null)
+            {
+                return NotFound("Course not found");
+            }
 
-        //        try
-        //        {
-        //            // Lưu các thay đổi vào cơ sở dữ liệu
-        //            await _context.SaveChangesAsync();
-        //            // Đặt thông báo thành công vào TempData
-        //            TempData["SuccessMessage"] = "You have successfully enrolled in the course!";
-        //        }
-        //        catch (DbUpdateException ex)
-        //        {
-        //            // Xử lý lỗi khi lưu thay đổi vào cơ sở dữ liệu
-        //            return StatusCode(500, "An error occurred while saving the data: " + ex.Message);
-        //        }
+            var officialStudent = await _context.OfficialStudents.FirstOrDefaultAsync(os => os.UsersId == userId);
+            if (officialStudent == null)
+            {
+                return RedirectToAction("Error");
+            }
 
-        //        // Redirect hoặc hiển thị thông báo thành công
-        //        return RedirectToAction("Courses");
-        //    }
-        //    else
-        //    {
-        //        // Nếu user chưa đăng nhập, chuyển hướng đến trang đăng nhập
-        //        return RedirectToAction("Login", "Page");
-        //    }
-        //}
+            var existingEnrollment = await _context.MergedStudentData
+                                                    .FirstOrDefaultAsync(osc => osc.OfficialStudentId == officialStudent.OfficialStudentId && osc.CoursesId == courseId);
+            if (existingEnrollment != null)
+            {
+                TempData["ErrorMessage"] = "You have already enrolled in this course.";
+                return RedirectToAction("Courses");
+            }
+
+            var conflictingEnrollment = await _context.MergedStudentData
+                                                      .FirstOrDefaultAsync(osc => osc.OfficialStudentId == officialStudent.OfficialStudentId && osc.StudyDays == studyDays);
+            if (conflictingEnrollment != null)
+            {
+                TempData["ErrorMessage"] = "You have already enrolled in another course with the same study days.";
+                return RedirectToAction("Courses");
+            }
+
+            var mergedStudentData = new MergedStudentData
+            {
+                OfficialStudentId = officialStudent.OfficialStudentId,
+                CoursesId = courseId,
+                Telephone = telephone,
+                StudyDays = studyDays,
+                StudySession = studySession,
+                EnrollmentStartDate = DateTime.Now
+            };
+
+            // Phân tích CourseTime để trích xuất số tháng
+            Match match = Regex.Match(course.CourseTime, @"(\d+)\s*months?");
+            if (match.Success && match.Groups.Count > 1)
+            {
+                if (int.TryParse(match.Groups[1].Value, out int courseDurationInMonths))
+                {
+                    // Tạo một đối tượng TimeSpan từ số tháng
+                    var courseDuration = TimeSpan.FromDays(courseDurationInMonths * 30); // Giả sử mỗi tháng có 30 ngày
+
+                    // Thực hiện phép cộng để tính toán EnrollmentEndDate
+                    mergedStudentData.EnrollmentEndDate = mergedStudentData.EnrollmentStartDate.Value.Add(courseDuration);
+                }
+                else
+                {
+                    // Xử lý trường hợp không thể chuyển đổi CourseTime thành TimeSpan
+                    var errorMessage = $"Invalid format for CourseTime: {course.CourseTime}. Unable to convert to TimeSpan.";
+                    Console.WriteLine(errorMessage);
+                    TempData["ErrorMessage"] = errorMessage;
+                    return RedirectToAction("Courses");
+                }
+            }
+            else
+            {
+                // Xử lý trường hợp không phù hợp với biểu thức chính quy
+                var errorMessage = $"Invalid format for CourseTime: {course.CourseTime}. Unable to extract months.";
+                Console.WriteLine(errorMessage);
+                TempData["ErrorMessage"] = errorMessage;
+                return RedirectToAction("Courses");
+            }
+
+            try
+            {
+                _context.MergedStudentData.Add(mergedStudentData);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "You have successfully enrolled in the course!";
+
+                // Gọi phương thức gửi email xác nhận đăng ký
+                await SendEnrollmentConfirmationEmail("", course.CourseName);
+            }
+            catch (DbUpdateException ex)
+            {
+                // Ghi lại chi tiết lỗi vào nhật ký
+                var errorMessage = $"An error occurred while saving the data: {ex.InnerException?.Message}";
+                // Ghi lỗi ra nhật ký hoặc hiển thị thông tin chi tiết
+                Console.WriteLine(errorMessage);
+                TempData["ErrorMessage"] = errorMessage;
+                return StatusCode(500, errorMessage);
+            }
+
+            return RedirectToAction("Courses");
+        }
+
+        private async Task SendEnrollmentConfirmationEmail(string recipientEmail, string courseName)
+        {
+            try
+            {
+                // Đường dẫn tới mẫu email
+                string emailTemplatePath = Path.Combine(_env.ContentRootPath, "Views", "Email", "EnrollmentConfirmation.cshtml");
+
+                // Đọc nội dung mẫu email từ file
+                string emailContent = await System.IO.File.ReadAllTextAsync(emailTemplatePath);
+
+                // Thay thế các thẻ placeholder trong mẫu email bằng thông tin thích hợp
+                emailContent = emailContent.Replace("{courseName}", courseName);
+
+                // Tạo đối tượng MailMessage
+                var message = new MailMessage();
+                message.To.Add(new MailAddress(recipientEmail)); // Địa chỉ email của sinh viên
+                message.From = new MailAddress(_configuration["EmailSettings:Username"]);
+                message.Subject = "Confirmed successful course registration!";
+                message.Body = emailContent;
+                message.IsBodyHtml = true;
+
+                // Tạo đối tượng SmtpClient để gửi email
+                using (var smtp = new SmtpClient(_configuration["EmailSettings:SmtpServer"], int.Parse(_configuration["EmailSettings:Port"])))
+                {
+                    var credentials = new NetworkCredential
+                    {
+                        UserName = _configuration["EmailSettings:Username"],
+                        Password = _configuration["EmailSettings:Password"]
+                    };
+                    smtp.Credentials = credentials;
+                    smtp.EnableSsl = true;
+
+                    // Gửi email
+                    await smtp.SendMailAsync(message);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Xử lý nếu có lỗi xảy ra khi gửi email
+                // Log lỗi ex.Message
+            }
+        }
+
         public async Task<IActionResult> coursesDetails(int id)
         {
             // Tìm kiếm sự kiện theo ID
