@@ -153,6 +153,49 @@ namespace OnlineCollegeManagement.Controllers
             HttpContext.Session.Remove("Username");
             return RedirectToAction("Login", "Admin");
         }
+        public async Task<IActionResult> ContactInfo(int? page, string Name = null, string Message = null, string Subject = null, string Email = null, DateTime? ContactDate = null, int pageSize = 10)
+        {
+            int pageNumber = page ?? 1;
+            var contactInfo = _context.ContactInfo.AsQueryable();
+
+            // Áp dụng các tiêu chí lọc nếu chúng được cung cấp
+            if (!string.IsNullOrEmpty(Name))
+            {
+                contactInfo = contactInfo.Where(c => c.Name.Contains(Name));
+            }
+            if (!string.IsNullOrEmpty(Message))
+            {
+                contactInfo = contactInfo.Where(c => c.Message.Contains(Message));
+            }
+            if (!string.IsNullOrEmpty(Subject))
+            {
+                contactInfo = contactInfo.Where(c => c.Subject.Contains(Subject));
+            }
+            if (!string.IsNullOrEmpty(Email))
+            {
+                contactInfo = contactInfo.Where(c => c.Email.Contains(Email));
+            }
+            if (ContactDate != null)
+            {
+                contactInfo = contactInfo.Where(c => c.ContactDate.Date == ContactDate.Value.Date);
+            }
+
+            var paginatedContactInfo = await contactInfo.OrderByDescending(c => c.ContactDate)
+                                                .Skip((pageNumber - 1) * pageSize)
+                                                .Take(pageSize)
+                                                .ToListAsync();
+
+            // Lấy tổng số bài đăng sau khi áp dụng các tiêu chí lọc
+            int totalContactInfo = await contactInfo.CountAsync();
+
+            // Chuyển thông tin phân trang vào ViewBag
+            ViewBag.CurrentPage = pageNumber;
+            ViewBag.TotalPages = (int)Math.Ceiling((double)totalContactInfo / pageSize);
+            ViewBag.TotalContactInfo = totalContactInfo;
+            ViewBag.PageSize = pageSize;
+
+            return View(paginatedContactInfo);
+        }
 
     }
 }

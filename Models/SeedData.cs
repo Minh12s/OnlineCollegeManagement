@@ -29,7 +29,7 @@ namespace OnlineCollegeManagement.Data
                 {
                     return; // Database has been seeded
                 }
-               
+
                 // Seed data for Users
                 var users = new Users[]
                 {
@@ -208,7 +208,7 @@ namespace OnlineCollegeManagement.Data
                 var majors1 = context.Majors.ToList();
                 var teachers1 = context.Teachers.ToList();
                 var thumbnailPaths4 = Enumerable.Range(1, 6).Select(i => $"/images/course-{i}.jpg").ToList();
-                var courseNames = new List<string> { "Web Development", "Database Management", "Machine Learning", "Software Testing", "Computer Graphics", "Network Security", "Digital Signal Processing", "Operating Systems", "Data Mining", "Artificial Intelligence", "Computer Vision", "Mobile Application Development", "Information Security", "Cloud Computing", "Data Analysis", "Game Development", "Embedded Systems", "Robotics", "Human-Computer Interaction", "IoT Development", "Natural Language Processing", "Quantum Computing", "Blockchain Technology", "Virtual Reality" , "Design microchips" };
+                var courseNames = new List<string> { "Web Development", "Database Management", "Machine Learning", "Software Testing", "Computer Graphics", "Network Security", "Digital Signal Processing", "Operating Systems", "Data Mining", "Artificial Intelligence", "Computer Vision", "Mobile Application Development", "Information Security", "Cloud Computing", "Data Analysis", "Game Development", "Embedded Systems", "Robotics", "Human-Computer Interaction", "IoT Development", "Natural Language Processing", "Quantum Computing", "Blockchain Technology", "Virtual Reality", "Design microchips" };
                 var CourseTime = new List<string> { "Six months", "one year", "two year", "three year" };
 
                 var courses = new List<Courses>();
@@ -646,7 +646,7 @@ namespace OnlineCollegeManagement.Data
                     {
                         CoursesId = randomCoursesId,
                         SubjectsId = randomSubjectId,
-                      
+
                         NumericalOrder = randomNumericalOrder
                     };
 
@@ -690,16 +690,31 @@ namespace OnlineCollegeManagement.Data
                 // Seed data for ContactInfo
                 var contactInfos = new ContactInfo[]
                 {
-                    new ContactInfo { BranchName = "Main Campus", Address = "123 University St", PhoneNumber = "123-456-7890", Email = "info@example.com" },
-                    new ContactInfo { BranchName = "Downtown Campus", Address = "456 College Ave", PhoneNumber = "987-654-3210", Email = "info@downtown.example.com" }
+    new ContactInfo
+    {
+        Name = "Main Campus",
+        Message = "hello",
+        Subject = "hello",
+        Email = "info@example.com",
+        ContactDate = DateTime.Now // hoặc giá trị ngày tháng cụ thể
+    },
+    new ContactInfo
+    {
+        Name = "Downtown Campus",
+        Message = "hi",
+        Subject = "hi",
+        Email = "info@downtown.example.com",
+        ContactDate = DateTime.Now // hoặc giá trị ngày tháng cụ thể
+    }
                 };
+
                 foreach (var contactInfo in contactInfos)
                 {
                     context.ContactInfo.Add(contactInfo);
                 }
                 context.SaveChanges();
-            }
 
+            }
         }
     }
 }

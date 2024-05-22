@@ -511,14 +511,6 @@ namespace OnlineCollegeManagement.Controllers
 
             return View(selectedTeacher);
         }
-        public async Task<IActionResult> Blog()
-        {
-            return View();
-        }
-        public async Task<IActionResult> BlogDetails()
-        {
-            return View();
-        }
         public async Task<IActionResult> Events(int? page, int pageSize = 9)
         {
             int pageNumber = page ?? 1; // Trang hiện tại, mặc định là trang 1 nếu không có page được cung cấp
@@ -559,6 +551,56 @@ namespace OnlineCollegeManagement.Controllers
         {
             return View();
         }
+        [HttpPost]
+        public async Task<IActionResult> Contact(string name, string email, string message, string subject)
+        {
+            // Lưu thông tin liên hệ vào cơ sở dữ liệu
+            var contactInfo = new ContactInfo
+            {
+                Name = name,
+                Email = email,
+                Message = message,
+                Subject = subject,
+                ContactDate = DateTime.Now
+            };
+
+            _context.ContactInfo.Add(contactInfo);
+            await _context.SaveChangesAsync();
+
+            // Gửi email
+            string smtpServer = _configuration["EmailSettings:SmtpServer"];
+            int port = _configuration.GetValue<int>("EmailSettings:Port");
+            string username = _configuration["EmailSettings:Username"];
+            string password = _configuration["EmailSettings:Password"];
+
+            var smtpClient = new SmtpClient(smtpServer)
+            {
+                Port = port,
+                Credentials = new NetworkCredential(username, password),
+                EnableSsl = true
+            };
+
+            var mailMessage = new MailMessage
+            {
+                From = new MailAddress(email),
+                Subject = "New Message from Your Website",
+                Body = $"Name: {name}\nEmail: {email}\nMessage: {message}\nSubject: {subject}"
+            };
+            mailMessage.To.Add("dungprohn1409@gmail.com");
+
+            try
+            {
+                await smtpClient.SendMailAsync(mailMessage);
+                TempData["Message"] = "Information has been sent successfully!";
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = $"Failed to send message: {ex.Message}";
+            }
+
+            return View();
+        }
+
         public IActionResult Admission()
         {
             var majors = _context.Majors.ToList();
