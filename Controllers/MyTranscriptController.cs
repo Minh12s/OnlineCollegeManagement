@@ -23,13 +23,13 @@ namespace OnlineCollegeManagement.Controllers
 
     public class MyTranscriptController : Controller
     {
-        private readonly CollegeManagementContext db;
+        private readonly CollegeManagementContext _context;
         private readonly IConfiguration _configuration;
         private readonly IWebHostEnvironment _env;
 
         public MyTranscriptController(CollegeManagementContext context, IConfiguration configuration, IWebHostEnvironment env)
         {
-            db = context;
+            _context = context;
             _configuration = configuration;
             _env = env;
         }
@@ -40,9 +40,9 @@ namespace OnlineCollegeManagement.Controllers
       
         public async Task<IActionResult> ChangePassword()
         {
-            // Lấy AccountBalance từ session
+           
             int usersId = Convert.ToInt32(HttpContext.Session.GetString("UsersId"));
-            var user = db.Users.FirstOrDefault(u => u.UsersId == usersId);
+            var user = _context.Users.FirstOrDefault(u => u.UsersId == usersId);
 
             return View();
         }
@@ -56,8 +56,8 @@ namespace OnlineCollegeManagement.Controllers
                 TempData["MessageColor"] = "alert-danger"; 
                 return RedirectToAction("ChangePassword", "MyTranscript");
             }
-            int usersId = Convert.ToInt32(HttpContext.Session.GetString("UserId"));
-            var user = db.Users.FirstOrDefault(u => u.UsersId == usersId);
+            int usersId = Convert.ToInt32(HttpContext.Session.GetString("UsersId"));
+            var user = _context.Users.FirstOrDefault(u => u.UsersId == usersId);
             if (user == null)
             {
                 return NotFound();
@@ -71,15 +71,64 @@ namespace OnlineCollegeManagement.Controllers
             }
 
             user.Password = BCrypt.Net.BCrypt.HashPassword(new_password);
-            db.Entry(user).State = EntityState.Modified;
-            await db.SaveChangesAsync();
+            _context.Entry(user).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
             TempData["Message"] = "Password changed successfully.";
             TempData["MessageColor"] = "alert-success"; // Màu xanh lá cây
             return RedirectToAction("ChangePassword", "MyTranscript");
         }
-        public async Task<IActionResult> MyTimetable()
+        public async Task<IActionResult> MyTimetable(int? page, int pageSize = 10)
         {
-            return View();
+            // Lấy UsersId từ session
+            var usersIdString = HttpContext.Session.GetString("UsersId");
+
+            // Kiểm tra nếu session không có UsersId hoặc giá trị không hợp lệ
+            if (string.IsNullOrEmpty(usersIdString) || !int.TryParse(usersIdString, out int usersId) || usersId == 0)
+            {
+                return RedirectToAction("Login", "Page");
+            }
+
+            // Lấy OfficialStudentId dựa trên UsersId
+            var officialStudent = await _context.OfficialStudents
+                .FirstOrDefaultAsync(os => os.UsersId == usersId);
+
+            if (officialStudent == null)
+            {
+                return NotFound("Official student not found.");
+            }
+
+            // Lấy ClassesId từ bảng MergedStudentData dựa trên OfficialStudentId
+            var mergedStudentData = await _context.MergedStudentData
+                .FirstOrDefaultAsync(msd => msd.OfficialStudentId == officialStudent.OfficialStudentId);
+
+            if (mergedStudentData == null || !mergedStudentData.ClassesId.HasValue)
+            {
+                return NotFound("Class not found for the official student.");
+            }
+
+            var classesId = mergedStudentData.ClassesId.Value;
+
+            // Tính toán số lượng lịch học và trang hiện tại
+            int totalClassSchedules = await _context.ClassSchedules
+                .Where(cs => cs.ClassesId == classesId)
+                .CountAsync();
+            int pageNumber = page ?? 1;
+
+            // Truy vấn dữ liệu lịch học cho trang hiện tại
+            var classSchedules = await _context.ClassSchedules
+                .Where(cs => cs.ClassesId == classesId)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            // Truyền thông tin phân trang vào ViewBag
+            ViewBag.CurrentPage = pageNumber;
+            ViewBag.TotalPages = (int)Math.Ceiling((double)totalClassSchedules / pageSize);
+            ViewBag.TotalClassSchedules = totalClassSchedules;
+            ViewBag.PageSize = pageSize;
+
+            return View(classSchedules);
         }
+
     }
 }

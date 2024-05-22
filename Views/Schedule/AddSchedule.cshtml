@@ -78,12 +78,19 @@
     .main-section {
         margin-left: 15px;
     }
+    .alert-danger {
+        color: red; 
+        text-align: center; 
+        padding: 15px; 
+        margin-bottom: 20px; 
+    }
+
 </style>
 <section class="is-title-bar">
     <div class="flex flex-col md:flex-row items-center justify-between space-y-6 md:space-y-0">
         <ul>
             <li style="margin-left:-50px;">Admin</li>
-            <li>Add Facilities</li>
+            <li>Add schedule</li>
         </ul>
 
     </div>
@@ -92,10 +99,17 @@
     <div class="row">
         <div class="col-md-12">
             <div class="tile">
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger">
+                        @TempData["ErrorMessage"]
+                    </div>
+                }
 
                 <div class="tile-body">
                     <form class="edit-product-form" asp-controller="Schedule" asp-action="AddSchedule" method="post" enctype="multipart/form-data">
-                        <!-- Thay thế Tag Helper asp-for bằng các giá trị cụ thể -->
+                       
+                        <input type="hidden" name="classesId" value="@ViewBag.ClassesId" />
 
                         <div class="form-group col-md-3">
                             <label class="control-label">Study Days</label>

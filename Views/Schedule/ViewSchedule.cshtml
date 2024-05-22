@@ -1,150 +1,12 @@
 ﻿
-
+@model List<OnlineCollegeManagement.Models.ClassSchedules>
 @{
     ViewData["Title"] = "List Student";
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
-<section class="is-title-bar">
-    <div class="flex flex-col md:flex-row items-center justify-between space-y-6 md:space-y-0">
-        <ul>
-            <li style="margin-left:-50px;">Admin</li>
-            <li>List Student</li>
-        </ul>
+@using System.Globalization
 
-    </div>
-
-</section>
-<section class="is-hero-bar">
-    <div class="flex flex-col md:flex-row items-center justify-start">
-
-        <div class="col-sm-2" style="margin-right: 5px;">
-            <a class="btn btn-add" asp-controller="Schedule" asp-action="AddSchedule" asp-route-classesId="@ViewBag.ClassesId" title="Thêm">
-                <i class="fas fa-plus"></i>
-                Add Schedule
-            </a>
-        </div>
-
-        <!-- Phần này để chứa nút "Print PDF" -->
-        <div class="col-sm-2" style="margin-right: 5px;">
-            <button onclick="myApp.printTable()" class="btn btn-add">
-                <i class="fas fa-file-pdf"></i>
-                Print PDF
-            </button>
-        </div>
-
-        <!-- Phần này để chứa nút "Export Excel" -->
-        <div class="col-sm-2" style="margin-right: 5px;">
-            <button onclick="exportBlogToExcel()" class="btn btn-add">
-                <i class="fas fa-file-excel"></i>
-                Export Excel
-            </button>
-        </div>
-
-        <!-- Phần này để chứa nút "Excel Filtered" -->
-        <div class="col-sm-2">
-            <button onclick="exportExcel()" class="btn btn-add">
-                <i class="fas fa-file-excel"></i>
-                Excel Filtered
-            </button>
-        </div>
-    </div>
-</section>
-
-<section class="section main-section">
-    <div class="card has-table">
-        <header class="card-header">
-            <p class="card-header-title">
-                @*<span class="icon"><i class="mdi mdi-shopping"></i></span>*@
-                List Student
-            </p>
-
-
-        </header>
-
-        <div class="card-content">
-
-                <table class="table table-hover table-bordered js-copytextarea" cellpadding="0" cellspacing="0" border="0" id="sampleTable">
-                    <thead>
-                        <tr>
-                            <th width="10"><input type="checkbox" id="all"></th>
-                            <th>Classes Id </th>
-                            <th>Student Id</th>
-                            <th>Student Code</th>
-                            <th>Student Name</th>
-                            <th>Email</th>
-                            <th>Start Date</th>
-                            <th>End Date</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                     
-                        <tr>
-                            <td width="10"><input type="checkbox" name="check1" value="1"></td>
-                            <td>b</td>
-                            <td>bal</td>
-                            <td>bal</td>
-                            <td>bal</td>
-                            <td>bal</td>
-                            <td>bal</td>
-                            <td>bal</td>
-                            <td>bal</td>
-                            <td>bal</td>
-                            <td>
-                                <div class="button-group">
-
-
-                                    @*<form asp-action="RemoveStudentFromClass" asp-controller="Classes" method="post" onsubmit="return confirm('Do you want to remove this student from the class?')">
-                                        <input type="hidden" name="classesId" value="@ViewBag.ClassesId" />
-                                        <input type="hidden" name="officialStudentId" value="@officialStudentClass.OfficialStudentId" />
-                                        <button class="btn btn-danger">
-                                            <span class="icon"><i class="mdi mdi-delete"></i></span>
-                                        </button>
-                                    </form>*@
-
-
-
-
-                                </div>
-
-                            </td>
-                        </tr>
-                        
-
-                    </tbody>
-                </table>
-            
-
-        </div>
-    </div>
-
-</section>
 <style>
-    .text-studying {
-        color: orange; /* Màu chữ cho trạng thái "pending" */
-    }
-
-    .text-complete {
-        color: green; /* Màu chữ cho trạng thái "confirmed" */
-    }
-
-    .text-rest {
-        color: red; /* Màu chữ cho trạng thái "shipping" */
-    }
-
-    .text-reserve {
-        color: orange; /* Màu chữ cho trạng thái "shipping" */
-    }
-
-    .alert {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100%; /* Đảm bảo nội dung được căn giữa theo chiều dọc */
-        padding: 20px 15px;
-    }
-
     .btn-primary {
         color: rgb(245 157 57);
         background-color: rgb(251 226 197);
@@ -210,7 +72,148 @@
         .button-group > * {
             margin-right: 10px; /* Khoảng cách giữa các nút */
         }
+
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        text-align: center;
+    }
+
+    .alert-danger {
+        color: red;
+    }
+
+    .alert-success {
+        color: green;
+    }
 </style>
+<section class="is-title-bar">
+    <div class="flex flex-col md:flex-row items-center justify-between space-y-6 md:space-y-0">
+        <ul>
+            <li style="margin-left:-50px;">Admin</li>
+            <li>List schedule</li>
+        </ul>
+
+    </div>
+
+</section>
+<section class="is-hero-bar">
+
+    <div class="flex flex-col md:flex-row items-center justify-start">
+
+        <div class="col-sm-2" style="margin-right: 5px;">
+
+            <a class="btn btn-add" asp-controller="Schedule" asp-action="AddSchedule" asp-route-classesId="@ViewBag.ClassesId" title="Thêm">
+                <i class="fas fa-plus"></i>
+                Add Schedule
+            </a>
+        </div>
+        <div class="col-sm-2" style="margin-right: 5px;">
+            <form asp-controller="Schedule" asp-action="DeleteSchedule" method="post">
+                <input type="hidden" name="classesId" value="@ViewBag.ClassesId" />
+                <button type="submit" class="btn btn-add" title="Delete Schedule">
+                    <i class="fas fa-trash"></i>
+                    Delete Schedule
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+@if (!string.IsNullOrEmpty(TempData["ErrorMessage"] as string))
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+@if (!string.IsNullOrEmpty(TempData["SuccessMessage"] as string))
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+
+<section class="section main-section">
+    <div class="card has-table">
+        <header class="card-header">
+            <p class="card-header-title">
+                schedule
+            </p>
+        </header>
+
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+
+                    <tr>
+                        <th>Form</th>
+                        <th>To</th>
+                        @foreach (var schedule in Model)
+                        {
+                            // Tách các ngày học từ chuỗi StudyDays
+                            var studyDays = schedule.StudyDays?.Split(',') ?? new string[0];
+
+                            // Hiển thị từng ngày học dưới dạng tiêu đề cột
+                            foreach (var day in studyDays)
+                            {
+                                <th>@day</th>
+                            }
+
+                            // Chỉ hiển thị một hàng tiêu đề
+                            break;
+                        }
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        @foreach (var schedule in Model)
+                        {
+                            // Tách các ngày học từ chuỗi StudyDays
+                            var studyDays = schedule.StudyDays?.Split(',') ?? new string[0];
+
+                            // Hiển thị phiên học dưới mỗi tiêu đề ngày
+                            foreach (var day in studyDays)
+                            {
+                                <th>@schedule.StudySession</th>
+                            }
+
+                            // Chỉ hiển thị một hàng phiên học
+                            break;
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var weekGroup in Model.GroupBy(s => CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(s.SchedulesDate, CalendarWeekRule.FirstDay, DayOfWeek.Monday)))
+                    {
+                        // Lấy ngày đầu tiên và ngày cuối cùng của mỗi tuần
+                        var startDate = weekGroup.Min(s => s.SchedulesDate).Date;
+                        var endDate = weekGroup.Max(s => s.SchedulesDate).Date;
+
+                        <tr>
+                            <td>
+                                @startDate.ToString("yyyy-MM-dd")
+                            </td>
+                            <td>
+                                @endDate.ToString("yyyy-MM-dd")
+                            </td>
+
+                            @foreach (var schedule in weekGroup.Take(3))
+                            {
+                                <td>@schedule.SubjectName</td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+
+
+
+            </table>
+        </div>
+    </div>
+</section>
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.2/xlsx.full.min.js"></script>

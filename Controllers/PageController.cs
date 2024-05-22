@@ -606,6 +606,7 @@ namespace OnlineCollegeManagement.Controllers
                 string userRole = HttpContext.Session.GetString("Role");
                 if (userRole == "User")
                 {
+
                     return RedirectToAction("Home", "Page");
                 }
                 else if (userRole == "Admin")
@@ -639,7 +640,7 @@ namespace OnlineCollegeManagement.Controllers
                         // Chỉ đặt Session khi thông tin đăng nhập hợp lệ
                         HttpContext.Session.SetString("Username", u.Username.ToString());
                         HttpContext.Session.SetString("Role", u.Role);
-                        HttpContext.Session.SetString("UserId", u.UsersId.ToString());
+                        HttpContext.Session.SetString("UsersId", u.UsersId.ToString());
 
                         return RedirectToAction("Home", "Page"); // Chuyển hướng đến "Home", "Page" nếu là User
                     }

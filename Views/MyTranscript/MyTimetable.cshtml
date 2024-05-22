@@ -1,7 +1,9 @@
-﻿@{
+﻿@model List<OnlineCollegeManagement.Models.ClassSchedules>
+@{
     Layout = "~/Views/Shared/User_Layout.cshtml";
     ViewData["Title"] = "MyTimetable";
 }
+@using System.Globalization
 <div class="contain1">
     <div class="title-top">
         <p>Home / Account</p>
@@ -17,8 +19,8 @@
         <ul>
             <li>
                 <div class="menu">
-                    <i class="fas fa-shopping-cart" ></i>
-                    <a href="/MyTranscript/MyTranscript" >My Transcript</a>
+                    <i class="fas fa-shopping-cart"></i>
+                    <a href="/MyTranscript/MyTranscript">My Transcript</a>
                 </div>
             </li>
 
@@ -46,106 +48,89 @@
 
         </div>
 
+        <div class="table-responsive">
+            <table class="table table-borderless">
+                <thead>
 
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th style="width:10%">Time</th>
-                    <th style="width:15%">Monday</th>
-                    <th style="width:15%">Tuesday</th>
-                    <th style="width:15%">Wednesday</th>
-                    <th style="width:15%">Thursday</th>
-                    <th style="width:15%">Friday</th>
-                    <th style="width:15%">Saturday</th>
-                    <th style="width:15%">Sunday</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>8:00 AM - 9:00 AM</td>
-                    <td>Mathematics</td>
-                    <td>Physics</td>
-                    <td>English</td>
-                    <td>Chemistry</td>
-                    <td>Physical Education</td>
-                    <td>History</td>
-                    <td>Music</td>
-                </tr>
-                <tr>
-                    <td>9:00 AM - 10:00 AM</td>
-                    <td>Chemistry</td>
-                    <td>History</td>
-                    <td>Computer Science</td>
-                    <td>Mathematics</td>
-                    <td>Physics</td>
-                    <td>Geography</td>
-                    <td>Art</td>
-                </tr>
-                <tr>
-                    <td>10:00 AM - 11:00 AM</td>
-                    <td>Physical Education</td>
-                    <td>Geography</td>
-                    <td>Art</td>
-                    <td>Biology</td>
-                    <td>Chemistry</td>
-                    <td>Physical Education</td>
-                    <td>Geography</td>
-                </tr>
-                <tr>
-                    <td>11:00 AM - 12:00 PM</td>
-                    <td>Biology</td>
-                    <td>Music</td>
-                    <td>Mathematics</td>
-                    <td>Physics</td>
-                    <td>History</td>
-                    <td>Computer Science</td>
-                    <td>Mathematics</td>
-                </tr>
-                <tr>
-                    <td>12:00 PM - 1:00 PM</td>
-                    <td>Lunch Break</td>
-                    <td>Lunch Break</td>
-                    <td>Lunch Break</td>
-                    <td>Lunch Break</td>
-                    <td>Lunch Break</td>
-                    <td>Lunch Break</td>
-                    <td>Lunch Break</td>
-                </tr>
-                <tr>
-                    <td>1:00 PM - 2:00 PM</td>
-                    <td>Physics</td>
-                    <td>Chemistry</td>
-                    <td>Physical Education</td>
-                    <td>Geography</td>
-                    <td>Art</td>
-                    <td>Biology</td>
-                    <td>Physics</td>
-                </tr>
-                <tr>
-                    <td>2:00 PM - 3:00 PM</td>
-                    <td>History</td>
-                    <td>Geography</td>
-                    <td>Biology</td>
-                    <td>Computer Science</td>
-                    <td>Music</td>
-                    <td>Mathematics</td>
-                    <td>Chemistry</td>
-                </tr>
-                <tr>
-                    <td>3:00 PM - 4:00 PM</td>
-                    <td>Computer Science</td>
-                    <td>Art</td>
-                    <td>Music</td>
-                    <td>Physical Education</td>
-                    <td>Geography</td>
-                    <td>Physics</td>
-                    <td>History</td>
-                </tr>
-            </tbody>
-        </table>
-        <div>
+                    <tr>
+                        <th>Form</th>
+                        <th>To</th>
+                        @foreach (var schedule in Model)
+                        {
+                            // Tách các ngày học từ chuỗi StudyDays
+                            var studyDays = schedule.StudyDays?.Split(',') ?? new string[0];
+
+                            // Hiển thị từng ngày học dưới dạng tiêu đề cột
+                            foreach (var day in studyDays)
+                            {
+                                <th>@day</th>
+                            }
+
+                            // Chỉ hiển thị một hàng tiêu đề
+                            break;
+                        }
+
+                    </tr>
+                    <tr>
+
+                        <th></th>
+                        <th></th>
+                        @foreach (var schedule in Model)
+                        {
+                            // Tách các ngày học từ chuỗi StudyDays
+                            var studyDays = schedule.StudyDays?.Split(',') ?? new string[0];
+
+                            // Hiển thị phiên học dưới mỗi tiêu đề ngày
+                            foreach (var day in studyDays)
+                            {
+                                <th>@schedule.StudySession</th>
+                            }
+
+                            // Chỉ hiển thị một hàng phiên học
+                            break;
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var weekGroup in Model.GroupBy(s => CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(s.SchedulesDate, CalendarWeekRule.FirstDay, DayOfWeek.Monday)))
+                    {
+                        // Lấy ngày đầu tiên và ngày cuối cùng của mỗi tuần
+                        var startDate = weekGroup.Min(s => s.SchedulesDate).Date;
+                        var endDate = weekGroup.Max(s => s.SchedulesDate).Date;
+
+                        <tr>
+                            <td>
+                                @startDate.ToString("yyyy-MM-dd")
+                            </td>
+                            <td>
+                                @endDate.ToString("yyyy-MM-dd")
+                            </td>
+
+                            @foreach (var schedule in weekGroup.Take(3))
+                            {
+                                <td>@schedule.SubjectName</td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+
+
+
+            </table>
+            <div class="row mt-5">
+                <div class="col text-center">
+                    <div class="block-27">
+                        <ul>
+                            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                            {
+                                <li class="@(ViewBag.CurrentPage == i ? "active" : "")"><a href="@Url.Action("MyTimetable", new { page = i })">@i</a></li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
-
+       
     </div>
 
 
