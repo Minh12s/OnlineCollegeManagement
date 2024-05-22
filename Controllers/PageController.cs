@@ -35,8 +35,76 @@ namespace OnlineCollegeManagement.Controllers
         }
         public async Task<IActionResult> Home()
         {
+            // Lấy userId từ session
+            var userIdString = HttpContext.Session.GetString("UsersId");
+
+            // Kiểm tra xem user đã đăng nhập hay chưa
+            bool isLoggedIn = !string.IsNullOrEmpty(userIdString);
+
+            // Khai báo biến courses bên ngoài khối điều kiện
+            List<Courses> courses;
+
+            if (isLoggedIn)
+            {
+                int userId = Convert.ToInt32(userIdString);
+
+                // Truy vấn cơ sở dữ liệu để lấy thông tin sinh viên chính thức từ bảng OfficialStudent dựa trên user id
+                var officialStudent = await _context.OfficialStudents
+                                                    .FirstOrDefaultAsync(os => os.UsersId == userId);
+
+                if (officialStudent == null)
+                {
+                    // Xử lý khi không tìm thấy thông tin sinh viên
+                    return RedirectToAction("Error");
+                }
+
+                // Lấy student information id từ thông tin sinh viên chính thức
+                int studentInformationId = officialStudent.StudentsInformationId;
+
+                // Truy vấn thông tin sinh viên từ bảng StudentInformation dựa trên student information id
+                var studentInformation = await _context.StudentsInformation
+                                                       .FirstOrDefaultAsync(si => si.StudentsInformationId == studentInformationId);
+
+                if (studentInformation == null)
+                {
+                    // Xử lý khi không tìm thấy thông tin sinh viên
+                    return RedirectToAction("Error");
+                }
+
+                // Lấy major id từ thông tin sinh viên
+                int majorId = studentInformation.MajorsId;
+
+                // Truy vấn danh sách khóa học dựa trên major id
+                courses = await _context.Courses.Where(c => c.MajorsId == majorId)
+                                                .Take(3)
+                                                .ToListAsync();
+
+                // Truyền thông tin đăng nhập xuống view
+                ViewBag.IsLoggedIn = true;
+                ViewBag.course = courses;
+
+            }
+            else
+            {
+                // Truy vấn ba khóa học ngẫu nhiên từ cơ sở dữ liệu
+                courses = await _context.Courses.Take(3).ToListAsync();
+                ViewBag.IsLoggedIn = false;
+                ViewBag.course = courses;
+            }
+
+            // Truy vấn ba giáo viên từ cơ sở dữ liệu
+            var teachers = await _context.Teachers.Take(3).ToListAsync();
+            // Truy vấn danh sách sự kiện từ cơ sở dữ liệu
+            var events = await _context.Events.Take(3).ToListAsync();
+
+
+            ViewBag.techer = teachers;
+            ViewBag.ev = events;
+
+            // Trả về view và truyền danh sách giáo viên và khóa học vào view
             return View();
         }
+
         public async Task<IActionResult> Search(string searchTerm)
         {
             // Thực hiện tìm kiếm dựa trên UniqueCode
@@ -134,7 +202,7 @@ namespace OnlineCollegeManagement.Controllers
             int pageNumber = page ?? 1; // Trang hiện tại, mặc định là trang 1 nếu không có page được cung cấp
 
             // Lấy userId từ session
-            var userIdString = HttpContext.Session.GetString("UserId");
+            var userIdString = HttpContext.Session.GetString("UsersId");
 
             // Kiểm tra xem user đã đăng nhập hay chưa
             bool isLoggedIn = !string.IsNullOrEmpty(userIdString);
@@ -227,7 +295,7 @@ namespace OnlineCollegeManagement.Controllers
         public async Task<IActionResult> Enroll(int courseId)
         {
             // Kiểm tra xem user đã đăng nhập hay chưa
-            var userIdString = HttpContext.Session.GetString("UserId");
+            var userIdString = HttpContext.Session.GetString("UsersId");
 
             if (string.IsNullOrEmpty(userIdString))
             {
@@ -262,7 +330,7 @@ namespace OnlineCollegeManagement.Controllers
         [HttpPost]
         public async Task<IActionResult> Enroll(int courseId, string telephone, string studyDays, string studySession)
         {
-            var userIdString = HttpContext.Session.GetString("UserId");
+            var userIdString = HttpContext.Session.GetString("UsersId");
 
             if (string.IsNullOrEmpty(userIdString))
             {
@@ -523,7 +591,7 @@ namespace OnlineCollegeManagement.Controllers
                     await _context.SaveChangesAsync();
 
                     // Gửi email thông báo đến địa chỉ email mà người dùng nhập vào trong form
-                    await SendAdmissionConfirmationEmail("dungprohn1409@gmail.com", registration.UniqueCode);
+                    await SendAdmissionConfirmationEmail("", registration.UniqueCode);
 
                     TempData["SuccessMessage"] = "Sign Up Success! The Code has been sent to your email address.";
                     return RedirectToAction("Admission", "Page");
