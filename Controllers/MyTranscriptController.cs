@@ -77,8 +77,10 @@ namespace OnlineCollegeManagement.Controllers
             TempData["MessageColor"] = "alert-success"; // Màu xanh lá cây
             return RedirectToAction("ChangePassword", "MyTranscript");
         }
-        public async Task<IActionResult> MyTimetable(int? page, int pageSize = 10)
+        public async Task<IActionResult> MyTimetable(int? page, int pageSize = 9)
         {
+            int pageNumber = page ?? 1; // Trang hiện tại, mặc định là trang 1 nếu không có page được cung cấp
+
             // Lấy UsersId từ session
             var usersIdString = HttpContext.Session.GetString("UsersId");
 
@@ -108,27 +110,27 @@ namespace OnlineCollegeManagement.Controllers
 
             var classesId = mergedStudentData.ClassesId.Value;
 
-            // Tính toán số lượng lịch học và trang hiện tại
-            int totalClassSchedules = await _context.ClassSchedules
+            // Lấy dữ liệu lịch học từ bảng ClassSchedules dựa trên ClassesId
+            var classSchedulesQuery = _context.ClassSchedules
                 .Where(cs => cs.ClassesId == classesId)
-                .CountAsync();
-            int pageNumber = page ?? 1;
+                .AsQueryable();
 
-            // Truy vấn dữ liệu lịch học cho trang hiện tại
-            var classSchedules = await _context.ClassSchedules
-                .Where(cs => cs.ClassesId == classesId)
+            var paginatedClassSchedules = await classSchedulesQuery
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 
-            // Truyền thông tin phân trang vào ViewBag
+            // Lấy tổng số lịch học để phân trang
+            int totalClassSchedules = await classSchedulesQuery.CountAsync();
+
+            // Chuyển thông tin phân trang vào ViewBag
             ViewBag.CurrentPage = pageNumber;
             ViewBag.TotalPages = (int)Math.Ceiling((double)totalClassSchedules / pageSize);
-            ViewBag.TotalClassSchedules = totalClassSchedules;
             ViewBag.PageSize = pageSize;
 
-            return View(classSchedules);
+            return View(paginatedClassSchedules);
         }
+
 
     }
 }
