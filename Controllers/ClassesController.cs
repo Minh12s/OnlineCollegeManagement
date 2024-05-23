@@ -242,6 +242,7 @@ namespace OnlineCollegeManagement.Controllers
 
             // Retrieve all students from the MergedStudentData table
             var students = await _context.MergedStudentData
+                 .Where(msd => msd.DeleteStatus == 0)
                 .Include(msd => msd.OfficialStudent)
                 .ThenInclude(os => os.StudentInformation)
                 .Include(msd => msd.Course)
@@ -368,6 +369,7 @@ namespace OnlineCollegeManagement.Controllers
         private async Task<List<MergedStudentData>> GetStudentsPagedList(int page, int pageSize)
         {
             return await _context.MergedStudentData
+                 .Where(msd => msd.DeleteStatus == 0)
                 .Include(msd => msd.OfficialStudent)
                 .ThenInclude(os => os.StudentInformation)
                 .Include(msd => msd.Course)
