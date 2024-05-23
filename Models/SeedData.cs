@@ -26,7 +26,8 @@ namespace OnlineCollegeManagement.Data
                     context.StudentsInformation.Any() || context.OfficialStudents.Any() ||
                     context.Subjects.Any() || context.ClassSchedules.Any() || context.ExamScores.Any() ||
                     context.Registrations.Any() || context.Events.Any() || context.Achievements.Any() ||
-                    context.Facilities.Any() || context.ContactInfo.Any() || context.CoursesSubjects.Any() || context.MergedStudentData.Any())
+                    context.Facilities.Any() || context.ContactInfo.Any() || context.CoursesSubjects.Any() || context.StudentCourses.Any()
+                    || context.StudentClasses.Any())
                 {
                     return; // Database has been seeded
                 }
@@ -708,46 +709,46 @@ namespace OnlineCollegeManagement.Data
 
                 context.SaveChanges(); // Lưu các thay đổi vào cơ sở dữ liệu
 
-                // Seed data for MergedStudentData
-                var officialStudents1 = context.OfficialStudents.ToList();
-                var courses4 = context.Courses.ToList();
-                var classes4 = context.Classes.ToList();
-                var mergedStudentData = new List<MergedStudentData>
-                {
-                    new MergedStudentData
-                    {
-                        OfficialStudentId = officialStudents1[0].OfficialStudentId,
-                        CoursesId = courses4[0].CoursesId,
-                        ClassesId = classes4[0].ClassesId,
-                        Telephone = "1234567890",
-                        EnrollmentStartDate = DateTime.UtcNow,
-                        EnrollmentEndDate = DateTime.UtcNow.AddDays(30),
-                        StudyDays = "Monday, Wednesday, Friday",
-                        StudySession = "Morning",
-                        ClassStartDate = DateTime.UtcNow,
-                        ClassEndDate = DateTime.UtcNow,
-                        StudentStatus = "Studying",
-                        DeleteStatus = 0
-                    },
-                    new MergedStudentData
-                    {
-                       OfficialStudentId = officialStudents1[0].OfficialStudentId,
-                        CoursesId = courses4[0].CoursesId,
-                        ClassesId = classes4[0].ClassesId,
-                        Telephone = "0987654321",
-                        EnrollmentStartDate = DateTime.UtcNow.AddDays(10),
-                        EnrollmentEndDate = DateTime.UtcNow.AddDays(40),
-                        StudyDays = "Tuesday, Thursday, Saturday",
-                        StudySession = "Afternoon",
-                         ClassStartDate = DateTime.UtcNow,
-                        ClassEndDate = DateTime.UtcNow,
-                        StudentStatus = "Complete",
-                        DeleteStatus = 0
-                    }
-                };
+                //// Seed data for MergedStudentData
+                //var officialStudents1 = context.OfficialStudents.ToList();
+                //var courses4 = context.Courses.ToList();
+                //var classes4 = context.Classes.ToList();
+                //var mergedStudentData = new List<MergedStudentData>
+                //{
+                //    new MergedStudentData
+                //    {
+                //        OfficialStudentId = officialStudents1[0].OfficialStudentId,
+                //        CoursesId = courses4[0].CoursesId,
+                //        ClassesId = classes4[0].ClassesId,
+                //        Telephone = "1234567890",
+                //        EnrollmentStartDate = DateTime.UtcNow,
+                //        EnrollmentEndDate = DateTime.UtcNow.AddDays(30),
+                //        StudyDays = "Monday, Wednesday, Friday",
+                //        StudySession = "Morning",
+                //        ClassStartDate = DateTime.UtcNow,
+                //        ClassEndDate = DateTime.UtcNow,
+                //        StudentStatus = "Studying",
+                //        DeleteStatus = 0
+                //    },
+                //    new MergedStudentData
+                //    {
+                //       OfficialStudentId = officialStudents1[0].OfficialStudentId,
+                //        CoursesId = courses4[0].CoursesId,
+                //        ClassesId = classes4[0].ClassesId,
+                //        Telephone = "0987654321",
+                //        EnrollmentStartDate = DateTime.UtcNow.AddDays(10),
+                //        EnrollmentEndDate = DateTime.UtcNow.AddDays(40),
+                //        StudyDays = "Tuesday, Thursday, Saturday",
+                //        StudySession = "Afternoon",
+                //         ClassStartDate = DateTime.UtcNow,
+                //        ClassEndDate = DateTime.UtcNow,
+                //        StudentStatus = "Complete",
+                //        DeleteStatus = 0
+                //    }
+                //};
 
-                context.MergedStudentData.AddRange(mergedStudentData);
-                context.SaveChanges();
+                //context.MergedStudentData.AddRange(mergedStudentData);
+                //context.SaveChanges();
             }
 
         }
