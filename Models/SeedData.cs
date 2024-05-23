@@ -9,6 +9,7 @@ using NuGet.DependencyResolver;
 using BCrypt.Net;
 using OnlineCollegeManagement.Models;
 using System.Collections;
+using System.Net.NetworkInformation;
 
 namespace OnlineCollegeManagement.Data
 {
@@ -404,35 +405,6 @@ namespace OnlineCollegeManagement.Data
                 context.OfficialStudents.AddRange(officialStudents);
                 context.SaveChanges();
 
-                //// Seed data for OfficialStudentCourses
-                //var officialStudents1 = context.OfficialStudents.ToList();
-                //var officialStudentCourses = new List<OfficialStudentCourse>
-                //{
-                //    new OfficialStudentCourse
-                //    {
-                //        OfficialStudentId = officialStudents1[0].OfficialStudentId,
-                //        CoursesId = courses1[random.Next(courses1.Count)],
-                //        Telephone = "1234567890",
-                //        EnrollmentStartDate = DateTime.UtcNow,
-                //        EnrollmentEndDate = DateTime.UtcNow.AddDays(30),
-                //        StudyDays = "Monday, Wednesday, Friday",
-                //        StudySession = "Morning"
-                //    },
-                //    new OfficialStudentCourse
-                //    {
-                //        OfficialStudentId = officialStudents1[1].OfficialStudentId,
-                //        CoursesId = courses1[random.Next(courses1.Count)],
-                //        Telephone = "0987654321",
-                //        EnrollmentStartDate = DateTime.UtcNow.AddDays(10),
-                //        EnrollmentEndDate = DateTime.UtcNow.AddDays(40),
-                //        StudyDays = "Tuesday, Thursday, Saturday",
-                //        StudySession = "Afternoon"
-                //    }
-                //};
-
-                //context.OfficialStudentCourse.AddRange(officialStudentCourses);
-                //context.SaveChanges();
-
 
                 // Function to generate random student code
                 string GenerateRandomStudentCode()
@@ -471,13 +443,37 @@ namespace OnlineCollegeManagement.Data
 
                 // Seed data for ExamScores
                 var officialStudent = context.OfficialStudents.ToList();
-                var subjects2 = context.Subjects.ToList();
+                var course3 = context.Courses.ToList();
+                var classes3 = context.Classes.ToList();
+
 
                 var examScores = new ExamScores[]
                 {
-    new ExamScores { OfficialStudentId = officialStudent[random.Next(officialStudent.Count)].OfficialStudentId, SubjectsId = subjects2[random.Next(subjects2.Count)].SubjectsId, Score = 80 },
-    new ExamScores { OfficialStudentId = officialStudent[random.Next(officialStudent.Count)].OfficialStudentId, SubjectsId = subjects2[random.Next(subjects2.Count)].SubjectsId, Score = 85 },
-    new ExamScores { OfficialStudentId = officialStudent[random.Next(officialStudent.Count)].OfficialStudentId, SubjectsId = subjects2[random.Next(subjects2.Count)].SubjectsId, Score = 75 }
+                  new ExamScores {
+                      OfficialStudentId = officialStudent[random.Next(officialStudent.Count)].OfficialStudentId,
+                      CoursesId = course3[random.Next(course3.Count)].CoursesId,
+                      ClassesId = classes3[random.Next(classes3.Count)].ClassesId,
+                   
+                      SubjectName = "IT",
+                      Score = 90
+                  },
+                    new ExamScores {
+                      OfficialStudentId = officialStudent[random.Next(officialStudent.Count)].OfficialStudentId,
+                      CoursesId = course3[random.Next(course3.Count)].CoursesId,
+                      ClassesId = classes3[random.Next(classes3.Count)].ClassesId,
+                     
+                      SubjectName = "IT",
+                      Score = 50
+                  },
+                      new ExamScores {
+                      OfficialStudentId = officialStudent[random.Next(officialStudent.Count)].OfficialStudentId,
+                      CoursesId = course3[random.Next(course3.Count)].CoursesId,
+                      ClassesId = classes3[random.Next(classes3.Count)].ClassesId,
+                      
+                      SubjectName = "IT",
+                      Score = 80
+                  }
+
                 };
 
                 // Cập nhật Status dựa trên Score
@@ -631,6 +627,32 @@ namespace OnlineCollegeManagement.Data
                 }
 
                 context.SaveChanges();
+                // Seed data for ContactInfo
+                var contactInfos = new ContactInfo[]
+                {
+    new ContactInfo
+    {
+        Name = "Main Campus",
+        Message = "hello",
+        Subject = "hello",
+        Email = "info@example.com",
+        ContactDate = DateTime.Now // hoặc giá trị ngày tháng cụ thể
+    },
+    new ContactInfo
+    {
+        Name = "Downtown Campus",
+        Message = "hi",
+        Subject = "hi",
+        Email = "info@downtown.example.com",
+        ContactDate = DateTime.Now // hoặc giá trị ngày tháng cụ thể
+    }
+                };
+
+                foreach (var contactInfo in contactInfos)
+                {
+                    context.ContactInfo.Add(contactInfo);
+                }
+                context.SaveChanges();
 
                 // Seed data for CoursesSubjects
                 var Courses1 = context.Courses.ToList();
@@ -686,35 +708,48 @@ namespace OnlineCollegeManagement.Data
 
                 context.SaveChanges(); // Lưu các thay đổi vào cơ sở dữ liệu
 
-
-                // Seed data for ContactInfo
-                var contactInfos = new ContactInfo[]
+                // Seed data for MergedStudentData
+                var officialStudents1 = context.OfficialStudents.ToList();
+                var courses4 = context.Courses.ToList();
+                var classes4 = context.Classes.ToList();
+                var mergedStudentData = new List<MergedStudentData>
                 {
-    new ContactInfo
-    {
-        Name = "Main Campus",
-        Message = "hello",
-        Subject = "hello",
-        Email = "info@example.com",
-        ContactDate = DateTime.Now // hoặc giá trị ngày tháng cụ thể
-    },
-    new ContactInfo
-    {
-        Name = "Downtown Campus",
-        Message = "hi",
-        Subject = "hi",
-        Email = "info@downtown.example.com",
-        ContactDate = DateTime.Now // hoặc giá trị ngày tháng cụ thể
-    }
+                    new MergedStudentData
+                    {
+                        OfficialStudentId = officialStudents1[0].OfficialStudentId,
+                        CoursesId = courses4[0].CoursesId,
+                        ClassesId = classes4[0].ClassesId,
+                        Telephone = "1234567890",
+                        EnrollmentStartDate = DateTime.UtcNow,
+                        EnrollmentEndDate = DateTime.UtcNow.AddDays(30),
+                        StudyDays = "Monday, Wednesday, Friday",
+                        StudySession = "Morning",
+                        ClassStartDate = DateTime.UtcNow,
+                        ClassEndDate = DateTime.UtcNow,
+                        StudentStatus = "Studying",
+                        DeleteStatus = 0
+                    },
+                    new MergedStudentData
+                    {
+                       OfficialStudentId = officialStudents1[0].OfficialStudentId,
+                        CoursesId = courses4[0].CoursesId,
+                        ClassesId = classes4[0].ClassesId,
+                        Telephone = "0987654321",
+                        EnrollmentStartDate = DateTime.UtcNow.AddDays(10),
+                        EnrollmentEndDate = DateTime.UtcNow.AddDays(40),
+                        StudyDays = "Tuesday, Thursday, Saturday",
+                        StudySession = "Afternoon",
+                         ClassStartDate = DateTime.UtcNow,
+                        ClassEndDate = DateTime.UtcNow,
+                        StudentStatus = "Complete",
+                        DeleteStatus = 0
+                    }
                 };
 
-                foreach (var contactInfo in contactInfos)
-                {
-                    context.ContactInfo.Add(contactInfo);
-                }
+                context.MergedStudentData.AddRange(mergedStudentData);
                 context.SaveChanges();
-
             }
+
         }
     }
 }
