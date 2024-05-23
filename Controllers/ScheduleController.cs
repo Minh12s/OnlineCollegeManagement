@@ -193,7 +193,54 @@ namespace OnlineCollegeManagement.Controllers
             }
 
             await _context.SaveChangesAsync();
+            await SendScheduleConfirmationEmail("", classEntity.ClassName, model.StudyDays, model.StudySession, classEntity.ClassStartDate);
+
             return RedirectToAction("ViewSchedule", "Schedule", new { classesId = classesId });
+        }
+        private async Task SendScheduleConfirmationEmail(string recipientEmail, string className, string studyDays, string studySession, DateTime ClassStartDate)
+        {
+            try
+            {
+                // Đường dẫn tới mẫu email
+                string emailTemplatePath = Path.Combine(_env.ContentRootPath, "Views", "Email", "ScheduleConfirmation.cshtml");
+
+                // Đọc nội dung mẫu email từ file
+                string emailContent = await System.IO.File.ReadAllTextAsync(emailTemplatePath);
+
+                // Thay thế các thẻ placeholder trong mẫu email bằng thông tin thích hợp
+                emailContent = emailContent.Replace("{ClassName}", className)
+                                           .Replace("{StudyDays}", studyDays)
+                                           .Replace("{StudySession}", studySession)
+                                           .Replace("{ClassStartDate}", ClassStartDate.ToString("dd/MM/yyyy"));
+
+                // Tạo đối tượng MailMessage
+                var message = new MailMessage();
+                message.To.Add(new MailAddress(recipientEmail)); // Địa chỉ email của sinh viên
+                message.From = new MailAddress(_configuration["EmailSettings:Username"]);
+                message.Subject = "Confirm Class Schedule";
+                message.Body = emailContent;
+                message.IsBodyHtml = true;
+
+                // Tạo đối tượng SmtpClient để gửi email
+                using (var smtp = new SmtpClient(_configuration["EmailSettings:SmtpServer"], int.Parse(_configuration["EmailSettings:Port"])))
+                {
+                    var credentials = new NetworkCredential
+                    {
+                        UserName = _configuration["EmailSettings:Username"],
+                        Password = _configuration["EmailSettings:Password"]
+                    };
+                    smtp.Credentials = credentials;
+                    smtp.EnableSsl = true;
+
+                    // Gửi email
+                    await smtp.SendMailAsync(message);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Xử lý nếu có lỗi xảy ra khi gửi email
+                // Log lỗi ex.Message
+            }
         }
 
         [HttpPost]

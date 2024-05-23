@@ -1,0 +1,109 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Schedule Confirmation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f8f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #FFA45C;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+
+        .navbar-brand {
+            display: inline-block;
+            padding-top: 0.3125rem;
+            padding-bottom: 0.3125rem;
+            margin-right: 1rem;
+            font-size: 1.25rem;
+            line-height: inherit;
+            white-space: nowrap;
+        }
+
+            .navbar-brand:hover, .navbar-brand:focus {
+                text-decoration: none;
+            }
+
+        .ftco-navbar-light.scrolled .navbar-brand {
+            color: #1b212c;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 22px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            line-height: 1;
+        }
+
+            .navbar-brand small {
+                font-size: 10px;
+                letter-spacing: 6px;
+                font-weight: 700;
+                color: #167ce9;
+            }
+
+            .navbar-brand i {
+                color: #167ce9;
+                font-size: 30px;
+            }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a class="navbar-brand"><i class="flaticon-university"></i>Genius <br><small>University</small></a>
+        <div class="header">
+            <h1> Class Schedule Confirmation</h1>
+        </div>
+        <p>Dear Valued Student,</p>
+        <p>We are pleased to inform you that your class schedule has been successfully created. Below are the details:</p>
+        <div class="details">
+            <p>- Study Session:<strong> {StudySession}</strong></p>
+            <p>- Study Days: <strong>{StudyDays}</strong> </p>
+            <p>- First day of class:<strong>{ClassStartDate}</strong> </p>
+            <p>- Detailed timetable:<a href="https://localhost:7018/Page/login" >{ClassName}</a></p>
+        </div>
+        <p>Please ensure to be punctual and prepared for your classes. We wish you a successful academic journey.</p>
+        <p>If you have any questions or need further assistance, feel free to contact us.</p>
+        <p>Best regards,<br /> Genius University</p>
+    </div>
+</body>
+</html>
+
