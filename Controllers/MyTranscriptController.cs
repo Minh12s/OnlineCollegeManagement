@@ -77,10 +77,8 @@ namespace OnlineCollegeManagement.Controllers
             TempData["MessageColor"] = "alert-success"; // Màu xanh lá cây
             return RedirectToAction("ChangePassword", "MyTranscript");
         }
-        public async Task<IActionResult> MyTimetable(int? page, int pageSize = 9)
+        public async Task<IActionResult> ViewClassesStudent()
         {
-            int pageNumber = page ?? 1; // Trang hiện tại, mặc định là trang 1 nếu không có page được cung cấp
-
             // Lấy UsersId từ session
             var usersIdString = HttpContext.Session.GetString("UsersId");
 
@@ -99,31 +97,67 @@ namespace OnlineCollegeManagement.Controllers
                 return NotFound("Official student not found.");
             }
 
+            var officialStudentId = officialStudent.OfficialStudentId;
+
             // Lấy StudentCoursesId từ bảng StudentCourses dựa trên OfficialStudentId
-            var studentCourses = await _context.StudentCourses
-                .FirstOrDefaultAsync(sc => sc.OfficialStudentId == officialStudent.OfficialStudentId);
+            var studentCoursesList = await _context.StudentCourses
+                .Where(sc => sc.OfficialStudentId == officialStudentId)
+                .ToListAsync();
 
-            if (studentCourses == null)
+            if (studentCoursesList == null || studentCoursesList.Count == 0)
             {
-                return NotFound("Student courses not found for the official student.");
+                return View();
             }
 
-            var studentCoursesId = studentCourses.StudentCoursesId;
+            var studentCoursesIds = studentCoursesList.Select(sc => sc.StudentCoursesId).ToList();
 
-            // Lấy ClassesId từ bảng StudentClasses dựa trên StudentCoursesId
-            var studentClasses = await _context.StudentClasses
-                .FirstOrDefaultAsync(sc => sc.StudentCoursesId == studentCoursesId);
+            // Lấy ClassesId từ bảng StudentClasses dựa trên danh sách StudentCoursesId
+            var studentClassesList = await _context.StudentClasses
+                .Where(sc => studentCoursesIds.Contains(sc.StudentCoursesId))
+                .ToListAsync();
 
-            if (studentClasses == null || !studentClasses.ClassesId.HasValue)
+            if (studentClassesList == null || studentClassesList.Count == 0)
             {
-                return NotFound("Class not found for the official student.");
+                return View();
             }
 
-            var classesId = studentClasses.ClassesId.Value;
+            // Tạo một danh sách chứa thông tin lớp học (bao gồm cả ClassId và ClassName)
+            var classesInfoList = new List<(int ClassId, string ClassName)>();
+
+            // Lặp qua danh sách StudentClasses để lấy thông tin lớp học từ bảng Classes
+            foreach (var studentClass in studentClassesList)
+            {
+                var classInfo = await _context.Classes
+                    .Where(c => c.ClassesId == studentClass.ClassesId)
+                    .Select(c => new { c.ClassesId, c.ClassName })
+                    .FirstOrDefaultAsync();
+
+                if (classInfo != null)
+                {
+                    classesInfoList.Add((classInfo.ClassesId, classInfo.ClassName));
+                }
+            }
+
+            // Truyền danh sách các lớp học vào ViewBag
+            ViewBag.Classes = classesInfoList;
+
+            return View();
+        }
+
+
+        public async Task<IActionResult> MyTimetable(int? classesId, int? page, int pageSize = 9)
+        {
+            int pageNumber = page ?? 1; // Trang hiện tại, mặc định là trang 1 nếu không có page được cung cấp
+
+            // Kiểm tra nếu classesId không được cung cấp
+            if (!classesId.HasValue)
+            {
+                return BadRequest("Class ID is required.");
+            }
 
             // Lấy dữ liệu lịch học từ bảng ClassSchedules dựa trên ClassesId
             var classSchedulesQuery = _context.ClassSchedules
-                .Where(cs => cs.ClassesId == classesId)
+                .Where(cs => cs.ClassesId == classesId.Value)
                 .AsQueryable();
 
             var paginatedClassSchedules = await classSchedulesQuery
@@ -138,9 +172,12 @@ namespace OnlineCollegeManagement.Controllers
             ViewBag.CurrentPage = pageNumber;
             ViewBag.TotalPages = (int)Math.Ceiling((double)totalClassSchedules / pageSize);
             ViewBag.PageSize = pageSize;
+            ViewBag.ClassesId = classesId; // Add this line to pass classesId to the view
 
             return View(paginatedClassSchedules);
         }
+
+
 
 
 

@@ -34,7 +34,7 @@
             <li>
                 <div class="menu">
                     <i class="fas fa-calendar" style="color: #167ce9;"></i>
-                    <a href="/MyTranscript/MyTimetable" style="color: #167ce9;" class="li1">My Timetable</a>
+                    <a href="/MyTranscript/ViewClassesStudent" style="color: #167ce9;" class="li1">My Timetable</a>
                 </div>
             </li>
 
@@ -124,12 +124,15 @@
                         <ul>
                             @for (int i = 1; i <= ViewBag.TotalPages; i++)
                             {
-                                <li class="@(ViewBag.CurrentPage == i ? "active" : "")"><a href="@Url.Action("MyTimetable", new { page = i })">@i</a></li>
+                                <li class="@(ViewBag.CurrentPage == i ? "active" : "")">
+                                    <a href="@Url.Action("MyTimetable", new { classesId = ViewBag.ClassesId, page = i })">@i</a>
+                                </li>
                             }
                         </ul>
                     </div>
                 </div>
             </div>
+
         </div>
        
     </div>

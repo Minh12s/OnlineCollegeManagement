@@ -1,7 +1,9 @@
-﻿@{
+﻿
+@{
     Layout = "~/Views/Shared/User_Layout.cshtml";
-    ViewData["Title"] = "MyTranscript";
+    ViewData["Title"] = "MyTimetable";
 }
+@using System.Globalization
 <div class="contain1">
     <div class="title-top">
         <p>Home / Account</p>
@@ -13,12 +15,12 @@
             <strong>@Context.Session.GetString("Username")</strong>
         </div>
 
-      
+
         <ul>
             <li>
                 <div class="menu">
-                    <i class="fa-solid fa-user" style="color: #167ce9;"></i>
-                    <a href="/MyTranscript/MyTranscript" style="color: #167ce9;" class="li1">My Transcript</a>
+                    <i class="fa-solid fa-user"></i>
+                    <a href="/MyTranscript/MyTranscript">My Transcript</a>
                 </div>
             </li>
 
@@ -31,89 +33,50 @@
 
             <li>
                 <div class="menu">
-                    <i class="fas fa-calendar"></i>
-                    <a href="/MyTranscript/ViewClassesStudent">My Timetable</a>
+                    <i class="fas fa-calendar" style="color: #167ce9;"></i>
+                    <a href="/MyTranscript/ViewClassesStudent" style="color: #167ce9;" class="li1">My Timetable</a>
                 </div>
             </li>
+
 
         </ul>
     </div>
     <div class="content">
         <div class="content-top">
             <div class="content-top-title">
-                <p style="color: black">My Transcript </p>
+                <p style="color: black">My Class</p>
             </div>
-            
         </div>
 
+        <div class="content-main">
 
-        <table class="table table-borderless">
-            <thead>
-                <tr>
-                    <th style="width:2%">No</th>
-                    <th style="width:3%">TermNo</th>
-                    <th style="width:10%">Subject Code</th>
-                    <th style="width:20%">Subject Name</th>
-                    <th style="width:10%">Year</th>
-                    <th style="width:15%px">Grade</th>
-                    <th style="width:10%px">Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>7023-LBEP</td>
-                    <td>Logic Building and Elementary Programming</td>
-                    <td>Year2022</td>
-                    <td>
-                        <b>Written (max 10)</b>: <em>3.5</em><br>
-                        <b>Assignment (max 10)</b>: <em>9</em><br>
-                        <b>Practical (max 15)</b>: <em>12.5</em><br>
-                        <b>Written Resit (max 10)</b>: <em>5</em><br>
-                    </td>
-                    <td><span class="label label-success">Passed</span></td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>1</td>
-                    <td>7023-AJS</td>
-                    <td>AngularJS</td>
-                    <td>Year2022</td>
-                    <td>
-                        <b>Written (max 10)</b>: <em>4</em><br>
-                        <b>Assignment (max 10)</b>: <em>7</em><br>
-                        <b>Practical (max 15)</b>: <em>11.5</em><br>
-                    </td>
-                    <td><span class="label label-success">Passed</span></td>
-                </tr>
-                <tr>
-                    <td>3</td>
-                    <td>1</td>
-                    <td>7023-ePRJ1</td>
-                    <td>eProject</td>
-                    <td>Year2023</td>
-                    <td><b>Project(max100)</b>: <em>74</em><br></td>
-                    <td><span class="label label-success">Passed</span></td>
-                </tr>
-                <tr>
-                    <td>4</td>
-                    <td>1</td>
-                    <td>7023-DDD</td>
-                    <td>Database Design & Development (NCC Module)</td>
-                    <td>Year2022</td>
-                    <td>
-                        <b>Written (max 10)</b>: <em>4</em><br>
-                        <b>Assignment (max 10)</b>: <em>7</em><br>
-                        <b>Practical (max 15)</b>: <em>11.5</em><br>
-                    </td>
-                    <td><span class="label label-success">Passed</span></td>
-                </tr>
-            </tbody>
-        </table>
-        <div>
+            <table class="table-bordered">
+                @if (ViewBag.Classes != null && ViewBag.Classes.Count > 0)
+                {
+                    @foreach (var classItem in ViewBag.Classes)
+                    {
+                        <tr>
+                            <td>@classItem.Item2</td> <!-- Accessing the second item of the tuple -->
+                            <td style="width: 70px;">
+                                <div class="button-group">
+                                    <a style="background-color: #167CE9; width: 70px;" class="btn btn-primary1" href="@Url.Action("MyTimetable", "MyTranscript", new { classesId = classItem.Item1 })">
+                                        <span class="icon" style="color: #FFFFFF;"><i class="oi oi-eye"></i></span>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="2" style="text-align: center; color: black;">
+                            No classes available.
+                        </td>
+                    </tr>
+                }
+            </table>
         </div>
-
     </div>
 
 
