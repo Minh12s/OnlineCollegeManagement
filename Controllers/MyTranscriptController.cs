@@ -33,11 +33,65 @@ namespace OnlineCollegeManagement.Controllers
             _configuration = configuration;
             _env = env;
         }
-        public async Task<IActionResult> MyTranscript()
+
+        public async Task<IActionResult> ViewCoures()
         {
-            return View();
+            // Lấy UserId từ phiên đăng nhập
+            var userIdString = HttpContext.Session.GetString("UsersId");
+
+            if (string.IsNullOrEmpty(userIdString))
+            {
+                return BadRequest("User is not logged in or session has expired.");
+            }
+
+            if (!int.TryParse(userIdString, out int userId))
+            {
+                return BadRequest("Invalid user ID in session.");
+            }
+            // Tìm OfficialStudentId dựa trên UserId
+            var officialStudent = await _context.OfficialStudents
+                .FirstOrDefaultAsync(os => os.UsersId == userId);
+
+            if (officialStudent == null)
+            {
+                return NotFound("Official student not found.");
+            }
+
+            // Lấy danh sách ExamScores tương ứng với OfficialStudentId và bao gồm cả CoursesName
+            var examScores = await _context.ExamScores
+                .Include(es => es.Subject)
+                .Include(es => es.Course) // Bao gồm Courses
+                .Where(es => es.OfficialStudentId == officialStudent.OfficialStudentId)
+                .ToListAsync();
+
+            // Truyền dữ liệu này tới view để hiển thị
+            return View(examScores);
         }
-      
+
+        public async Task<IActionResult> MyTranscript(int officialStudentId, int courseId)
+        {
+            // Tìm OfficialStudent dựa trên OfficialStudentId
+            var officialStudent = await _context.OfficialStudents
+                .FirstOrDefaultAsync(os => os.OfficialStudentId == officialStudentId);
+
+            if (officialStudent == null)
+            {
+                return NotFound("Official student not found.");
+            }
+
+            // Lấy danh sách ExamScores tương ứng với OfficialStudentId và CoursesId
+            var examScores = await _context.ExamScores
+                .Include(es => es.Subject)
+                .Include(es => es.Course)
+                .Where(es => es.OfficialStudentId == officialStudentId && es.CoursesId == courseId)
+                .ToListAsync();
+
+            // Truyền dữ liệu này tới view để hiển thị
+            return View(examScores);
+        }
+
+
+
         public async Task<IActionResult> ChangePassword()
         {
            

@@ -442,50 +442,31 @@ namespace OnlineCollegeManagement.Data
                 context.SaveChanges();
 
 
-                // Seed data for ExamScores
+             // Seed data for ExamScores
                 var officialStudent = context.OfficialStudents.ToList();
-                var course3 = context.Courses.ToList();
-                var classes3 = context.Classes.ToList();
+                var subjects2 = context.Subjects.ToList();
+                var courses5 = context.Courses.ToList();  // Sử dụng context.Courses để lấy danh sách courses
+
 
 
                 var examScores = new ExamScores[]
                 {
-                  new ExamScores {
-                      OfficialStudentId = officialStudent[random.Next(officialStudent.Count)].OfficialStudentId,
-                      CoursesId = course3[random.Next(course3.Count)].CoursesId,
-                      ClassesId = classes3[random.Next(classes3.Count)].ClassesId,
-                   
-                      SubjectName = "IT",
-                      Score = 90
-                  },
-                    new ExamScores {
-                      OfficialStudentId = officialStudent[random.Next(officialStudent.Count)].OfficialStudentId,
-                      CoursesId = course3[random.Next(course3.Count)].CoursesId,
-                      ClassesId = classes3[random.Next(classes3.Count)].ClassesId,
-                     
-                      SubjectName = "IT",
-                      Score = 50
-                  },
-                      new ExamScores {
-                      OfficialStudentId = officialStudent[random.Next(officialStudent.Count)].OfficialStudentId,
-                      CoursesId = course3[random.Next(course3.Count)].CoursesId,
-                      ClassesId = classes3[random.Next(classes3.Count)].ClassesId,
-                      
-                      SubjectName = "IT",
-                      Score = 80
-                  }
-
+    new ExamScores { OfficialStudentId = officialStudent[random.Next(officialStudent.Count)].OfficialStudentId, SubjectsId = subjects2[random.Next(subjects2.Count)].SubjectsId, Score = 80 },
+    new ExamScores { OfficialStudentId = officialStudent[random.Next(officialStudent.Count)].OfficialStudentId, SubjectsId = subjects2[random.Next(subjects2.Count)].SubjectsId, Score = 85 },
+    new ExamScores { OfficialStudentId = officialStudent[random.Next(officialStudent.Count)].OfficialStudentId, SubjectsId = subjects2[random.Next(subjects2.Count)].SubjectsId, Score = 75 }
                 };
 
                 // Cập nhật Status dựa trên Score
                 foreach (var score in examScores)
                 {
                     score.Status = score.Score >= 40 ? "Passed" : "Not Passed";
+                    score.CoursesId = courses5[random.Next(courses5.Count)].CoursesId; // Randomly assign a CoursesId
+
                     context.ExamScores.Add(score);
                 }
 
                 context.SaveChanges(); // Lưu các thay đổi vào cơ sở dữ liệu
-
+              
 
                 // Seed data for Registrations
                 var students = context.StudentsInformation.ToList();

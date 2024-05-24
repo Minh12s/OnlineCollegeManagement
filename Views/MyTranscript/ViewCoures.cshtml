@@ -48,43 +48,46 @@
 
         @{
             int serialNumber = 1; // Khởi tạo biến đếm
+            var displayedCourses = new HashSet<int>(); // Tạo một HashSet để lưu trữ các CoursesId đã hiển thị
         }
+
+        <style>
+            .center-content {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+        </style>
+
         <table class="table table-bordered">
             <thead>
                 <tr>
                     <th style="width:2%">No</th>
-                    <th style="width:10%">Subject Code</th>
-                    <th style="width:20%">Subject Name</th>
-                    <th style="width:15%">Grade</th>
-                    <th style="width:10%">Status</th>
+                    <th>Courses Name</th>
+                    <th width="70px"></th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var score in Model)
                 {
-                    // Kiểm tra nếu tên khóa học thay đổi, thêm một hàng trống
-                   
+                    // Kiểm tra nếu CoursesId đã hiển thị, nếu chưa thì hiển thị
+                    if (!displayedCourses.Contains(score.CoursesId))
+                    {
+                        <tr>
+                            <td>@serialNumber</td> <!-- Hiển thị số thứ tự -->
+                            <td>@score.Course.CourseName</td>
+                            <td class="center-content">
+                                <div class="button-group">
+                                    <a style="background-color: #167CE9; width: 70px;" class="btn btn-primary1" href="@Url.Action("MyTranscript", "MyTranscript", new { officialStudentId = score.OfficialStudentId, courseId = score.CoursesId })">
+                                        <span class="icon" style="color: #FFFFFF;"><i class="oi oi-eye"></i></span>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
 
-                    <tr>
-                        <td>@serialNumber</td> <!-- Hiển thị số thứ tự -->
-                        <td>@score.Subject.SubjectCode</td>
-                        <td>@score.Subject.SubjectName</td>
-                        <td>@score.Score</td>
-                        @if (score.Status == "Passed")
-                        {
-                            <td style="color: green">@score.Status</td>
-                        }
-                        @if (score.Status == "Not Passed")
-                        {
-                            <td style="color: red">@score.Status</td>
-                        }
-                        @if (score.Status == "Not started")
-                        {
-                            <td>@score.Status</td>
-                        }
-                    </tr>
-
-                    serialNumber++; // Tăng biến đếm sau mỗi lần lặp
+                        serialNumber++; // Tăng biến đếm sau mỗi lần lặp
+                        displayedCourses.Add(score.CoursesId); // Thêm CoursesId vào HashSet
+                    }
                 }
             </tbody>
         </table>

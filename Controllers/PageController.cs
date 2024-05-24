@@ -411,6 +411,24 @@ namespace OnlineCollegeManagement.Controllers
             try
             {
                 _context.StudentCourses.Add(mergedStudentData);
+                // Add exam scores for the student
+                var subjects = await _context.CoursesSubjects
+                    .Where(cs => cs.CoursesId == courseId)
+                    .Select(cs => cs.SubjectsId)
+                    .ToListAsync();
+
+                foreach (var subjectId in subjects)
+                {
+                    var examScore = new ExamScores
+                    {
+                        OfficialStudentId = officialStudent.OfficialStudentId,
+                        SubjectsId = subjectId,
+                        CoursesId = courseId,
+                        Score = null, // Default score
+                        Status = "Not started"
+                    };
+                    _context.ExamScores.Add(examScore);
+                }
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "You have successfully enrolled in the course!";
                 return RedirectToAction("Courses");
