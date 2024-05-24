@@ -200,13 +200,13 @@
                     {
                         <tr>
                             <td width="10">
-                                <input type="checkbox" name="selectedStudents" value="@student.OfficialStudentId-@student.CoursesId">
+                                <input type="checkbox" name="selectedStudents" value="@student.StudentCoursesId">
                             </td>
-                            <td>@student.OfficialStudent.OfficialStudentId</td>
+                            <td>@student.OfficialStudentId</td>
                             <td>@student.OfficialStudent.StudentCode</td>
                             <td>@student.Telephone</td>
-                            <td>@student.EnrollmentStartDate</td>
-                            <td>@student.EnrollmentEndDate</td>
+                            <td>@student.EnrollmentStartDate.ToString("yyyy-MM-dd")</td>
+                            <td>@student.EnrollmentEndDate.ToString("yyyy-MM-dd")</td>
                             <td>@student.StudyDays</td>
                             <td>@student.StudySession</td>
                             <td>@student.Course.CourseName</td>

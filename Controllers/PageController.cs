@@ -248,7 +248,7 @@ namespace OnlineCollegeManagement.Controllers
                 int totalCourses = await coursesQuery.CountAsync();
 
                 // Kiểm tra xem sinh viên đã đăng ký cả hai nhóm ngày học hay chưa
-                var studyDaysGroups = await _context.MergedStudentData
+                var studyDaysGroups = await _context.StudentCourses
                                                     .Where(msd => msd.OfficialStudentId == officialStudent.OfficialStudentId)
                                                     .Select(msd => msd.StudyDays)
                                                     .Distinct()
@@ -314,7 +314,7 @@ namespace OnlineCollegeManagement.Controllers
             int userId = Convert.ToInt32(userIdString);
 
             // Kiểm tra xem sinh viên đã đăng ký khóa học này chưa
-            var existingEnrollment = await _context.MergedStudentData
+            var existingEnrollment = await _context.StudentCourses
                                                    .FirstOrDefaultAsync(osc => osc.OfficialStudent.UsersId == userId && osc.CoursesId == courseId);
             if (existingEnrollment != null)
             {
@@ -351,7 +351,7 @@ namespace OnlineCollegeManagement.Controllers
                 return RedirectToAction("Error");
             }
 
-            var existingEnrollment = await _context.MergedStudentData
+            var existingEnrollment = await _context.StudentCourses
                                                    .FirstOrDefaultAsync(osc => osc.OfficialStudentId == officialStudent.OfficialStudentId && osc.CoursesId == courseId);
             if (existingEnrollment != null)
             {
@@ -360,7 +360,7 @@ namespace OnlineCollegeManagement.Controllers
                 return View(course);
             }
 
-            var conflictingEnrollment = await _context.MergedStudentData
+            var conflictingEnrollment = await _context.StudentCourses
       .Where(osc => osc.OfficialStudentId == officialStudent.OfficialStudentId && osc.StudyDays == studyDays)
       .ToListAsync();
 
@@ -375,7 +375,7 @@ namespace OnlineCollegeManagement.Controllers
             }
 
 
-            var mergedStudentData = new MergedStudentData
+            var mergedStudentData = new StudentCourses
             {
                 OfficialStudentId = officialStudent.OfficialStudentId,
                 CoursesId = courseId,
@@ -410,7 +410,7 @@ namespace OnlineCollegeManagement.Controllers
 
             try
             {
-                _context.MergedStudentData.Add(mergedStudentData);
+                _context.StudentCourses.Add(mergedStudentData);
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "You have successfully enrolled in the course!";
                 return RedirectToAction("Courses");

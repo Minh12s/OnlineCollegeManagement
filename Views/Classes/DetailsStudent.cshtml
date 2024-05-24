@@ -1,55 +1,9 @@
-﻿@model OnlineCollegeManagement.Models.MergedStudentData
+﻿@model OnlineCollegeManagement.Models.StudentCourseClassViewModel
 
 @{
     ViewData["Title"] = "AdmissionsDetail";
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
-
-<style>
-    .row {
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex;
-        -ms-flex-wrap: wrap;
-        flex-wrap: wrap;
-        margin-right: 15px;
-        margin-left: 15px;
-    }
-
-    .col-lg-4 {
-        -webkit-box-flex: 0;
-        -ms-flex: 0 0 33.3333333333%;
-        flex: 0 0 33.3333333333%;
-        max-width: 33.3333333333%;
-</style>
-<style>
-    .btn-primary {
-        color: rgb(245 157 57);
-        background-color: rgb(251 226 197);
-        border-color: none;
-        /* border-top-left-radius: 10px !important; */
-        /* border-bottom-right-radius: 10px !important; */
-        border-radius: .357rem;
-        border: none;
-        font-weight: 600;
-        padding: 5px 20px; /* Điều chỉnh kích thước theo ý muốn */
-    }
-
-    .page-link {
-        padding: 5px 10px; /* Có thể điều chỉnh kích thước của nút */
-        border: 1px solid #ccc; /* Thêm đường viền */
-        border-radius: 3px; /* Bo tròn góc */
-        margin-right: 5px; /* Khoảng cách giữa các nút */
-        text-decoration: none; /* Loại bỏ gạch chân mặc định */
-        color: #333; /* Màu chữ */
-    }
-
-        .page-link:hover {
-            background-color: #f0f0f0; /* Màu nền khi hover */
-        }
-</style>
-
-
 
 <section class="section main-section">
     <div class="container">
@@ -62,7 +16,6 @@
                         <table class="table">
                             <thead>
                                 <tr>
-
                                     <th style="width:200px;" scope="col">Student Name</th>
                                     <th style="width:200px;" scope="col">Date of Birth</th>
                                     <th style="width:200px;" scope="col">Gender</th>
@@ -70,20 +23,17 @@
                                     <th style="width:200px;" scope="col">Email</th>
                                     <th style="width:200px;" scope="col">Student Code</th>
                                     <th style="width:200px;" scope="col">Telephone</th>
-
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-
-                                    <td>@Model.OfficialStudent.StudentInformation.StudentName</td>
-                                    <td>@Model.OfficialStudent.StudentInformation.DateOfBirth.ToString("yyyy-MM-dd")</td>
-                                    <td>@Model.OfficialStudent.StudentInformation.Gender</td>
-                                    <td>@Model.OfficialStudent.StudentInformation.CurrentAddress</td>
-                                    <td>@Model.OfficialStudent.User.Email</td>
-                                    <td>@Model.OfficialStudent.StudentCode</td>
-                                    <td>@Model.Telephone</td>
-
+                                    <td>@Model.StudentCourse.OfficialStudent.StudentInformation.StudentName</td>
+                                    <td>@Model.StudentCourse.OfficialStudent.StudentInformation.DateOfBirth.ToString("yyyy-MM-dd")</td>
+                                    <td>@Model.StudentCourse.OfficialStudent.StudentInformation.Gender</td>
+                                    <td>@Model.StudentCourse.OfficialStudent.StudentInformation.CurrentAddress</td>
+                                    <td>@Model.StudentCourse.OfficialStudent.User.Email</td>
+                                    <td>@Model.StudentCourse.OfficialStudent.StudentCode</td>
+                                    <td>@Model.StudentCourse.Telephone</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -103,12 +53,12 @@
     <input type="hidden" id="returnUrl" name="returnUrl" value="@Url.Action("ViewStudents", "Classes", new { classesId = ViewBag.ClassesId })" />
 
     <!-- Thêm các input hidden để chứa giá trị officialStudentId, courseId, và classesId -->
-    <input type="hidden" id="officialStudentId" name="officialStudentId" value="@Model.OfficialStudentId" />
-    <input type="hidden" id="courseId" name="courseId" value="@Model.CoursesId" />
-    <input type="hidden" id="classesId" name="classesId" value="@ViewBag.ClassesId" />
+    <input type="hidden" id="officialStudentId" name="officialStudentId" value="@Model.StudentCourse.OfficialStudentId" />
+    <input type="hidden" id="courseId" name="courseId" value="@Model.StudentCourse.CoursesId" />
+    <input type="hidden" id="classesId" name="classesId" value="@Model.StudentClass.ClassesId" />
 
     <div style="float:right; margin-top: 10px; display: flex; gap: 10px;">
-        @if (Model.StudentStatus == "Studying")
+        @if (Model.StudentClass.StudentStatus == "Studying")
         {
             <!-- Hiển thị các nút "Complete", "Reserve", "Rest" -->
             <div>
@@ -117,9 +67,9 @@
 
                     <!-- Thêm các trường hidden vào form -->
                     <input type="hidden" name="returnUrl" value="@Url.Action("ViewStudents", "Classes", new { classesId = ViewBag.ClassesId })" />
-                    <input type="hidden" name="officialStudentId" value="@Model.OfficialStudentId" />
-                    <input type="hidden" name="courseId" value="@Model.CoursesId" />
-                    <input type="hidden" name="classesId" value="@Model.ClassesId" />
+                    <input type="hidden" name="officialStudentId" value="@Model.StudentCourse.OfficialStudentId" />
+                    <input type="hidden" name="courseId" value="@Model.StudentCourse.CoursesId" />
+                    <input type="hidden" name="classesId" value="@Model.StudentClass.ClassesId" />
 
                     <!-- Nút "Complete" -->
                     <button onclick="return confirm('Surely you want to update the status to:  Complete')" type="submit" name="studentStatus" value="Complete" class="btn btn-success"

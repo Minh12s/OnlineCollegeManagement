@@ -2,8 +2,8 @@
 using System.ComponentModel.DataAnnotations;
 namespace OnlineCollegeManagement.Models
 {
-	public class StudentClasses
-	{
+    public class StudentClasses
+    {
         [Key]
         public int StudentCoursesId { get; set; }
         [Key]
@@ -13,8 +13,7 @@ namespace OnlineCollegeManagement.Models
         public string? StudentStatus { get; set; }
         public int? DeleteStatus { get; set; }
 
-        public OfficialStudent OfficialStudent { get; set; }
-        public Courses Course { get; set; }
+        public StudentCourses StudentCourses { get; set; }
         public Classes Classes { get; set; }
     }
 }

@@ -3,6 +3,7 @@
     ViewData["Title"] = "Facilities";
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
+
 <style>
     .btn-primary {
         color: rgb(245 157 57);
@@ -47,6 +48,7 @@
     .status-admitted {
         color: green;
     }
+
     .edit-button {
         margin-top: 10px; /* Điều chỉnh giá trị margin-top theo ý muốn */
     }
@@ -234,16 +236,12 @@
                                        asp-route-StudentsInformationId="@student.StudentsInformationId">
                                         <span class="icon"><i class="mdi mdi-information"></i></span>
                                     </a>
-                                    <a style="background-color:#F59D39; color: white;" class="btn btn-primary"
-                                       asp-controller="Student" asp-action="ViewClassStudent"
-                                       asp-route-officialStudentId="@student.OfficialStudentId">
-                                        <span class="icon"><i class="mdi mdi-eye"></i></span>
-                                        </a>
+
                                 </div>
-                                
+
 
                             </td>
-                      
+
                         </tr>
                     }
 

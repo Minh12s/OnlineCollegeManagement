@@ -1,4 +1,4 @@
-﻿@model List<OnlineCollegeManagement.Models.MergedStudentData>
+﻿@model List<OnlineCollegeManagement.Models.StudentCourseClassViewModel>
 
 @{
     ViewData["Title"] = "List Student";
@@ -10,20 +10,16 @@
             <li style="margin-left:-50px;">Admin</li>
             <li>List Student</li>
         </ul>
-
     </div>
-
 </section>
 <section class="is-hero-bar">
     <div class="flex flex-col md:flex-row items-center justify-start">
-
         <div class="col-sm-2" style="margin-right: 5px;">
             <a class="btn btn-add" asp-controller="Classes" asp-action="AddStudentToClass" asp-route-classesId="@ViewBag.ClassesId" title="Thêm">
                 <i class="fas fa-plus"></i>
                 Add Student
             </a>
         </div>
-
         <!-- Phần này để chứa nút "Print PDF" -->
         <div class="col-sm-2" style="margin-right: 5px;">
             <button onclick="myApp.printTable()" class="btn btn-add">
@@ -31,7 +27,6 @@
                 Print PDF
             </button>
         </div>
-
         <!-- Phần này để chứa nút "Export Excel" -->
         <div class="col-sm-2" style="margin-right: 5px;">
             <button onclick="exportBlogToExcel()" class="btn btn-add">
@@ -39,7 +34,6 @@
                 Export Excel
             </button>
         </div>
-
         <!-- Phần này để chứa nút "Excel Filtered" -->
         <div class="col-sm-2">
             <button onclick="exportExcel()" class="btn btn-add">
@@ -54,17 +48,11 @@
     <div class="card has-table">
         <header class="card-header">
             <p class="card-header-title">
-                @*<span class="icon"><i class="mdi mdi-shopping"></i></span>*@
                 List Student
             </p>
-
-
         </header>
-
         <div class="card-content">
-
-
-            @if (Model.Count(osc => osc.DeleteStatus == 0) == 0)
+            @if (Model.Count(osc => osc.StudentClass.DeleteStatus == 0) == 0)
             {
                 <div class="alert alert-warning" role="alert">
                     No Student found.
@@ -76,7 +64,7 @@
                     <thead>
                         <tr>
                             <th width="10"><input type="checkbox" id="all"></th>
-                            <th>Classes Id </th>
+                            <th>Classes Id</th>
                             <th>Student Id</th>
                             <th>Student Code</th>
                             <th>Student Name</th>
@@ -88,139 +76,114 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var officialStudentClass in Model.Where(osc => osc.DeleteStatus == 0))
+                        @foreach (var officialStudentClass in Model.Where(osc => osc.StudentClass.DeleteStatus == 0))
                         {
                             <tr>
                                 <td width="10"><input type="checkbox" name="check1" value="1"></td>
+                                <td>@officialStudentClass.StudentClass.ClassesId</td>
+                                <td>@officialStudentClass.StudentCourse.OfficialStudentId</td>
+                                <td>@officialStudentClass.StudentCourse.OfficialStudent.StudentCode</td>
+                                <td>@officialStudentClass.StudentCourse.OfficialStudent.StudentInformation.StudentName</td>
+                                <td>@officialStudentClass.StudentCourse.OfficialStudent.User.Email</td>
                                 <td>
-                                    @officialStudentClass.Classes.ClassesId
+                                    @(officialStudentClass.StudentClass.ClassStartDate.HasValue ? officialStudentClass.StudentClass.ClassStartDate.Value.ToString("yyyy-MM-dd") : "")
                                 </td>
                                 <td>
-                                    @officialStudentClass.OfficialStudent.OfficialStudentId
+                                    @(officialStudentClass.StudentClass.ClassEndDate.HasValue ? officialStudentClass.StudentClass.ClassEndDate.Value.ToString("yyyy-MM-dd") : "")
                                 </td>
                                 <td>
-                                    @officialStudentClass.OfficialStudent.StudentCode
-                                </td>
-                                <td>
-                                    @officialStudentClass.OfficialStudent.StudentInformation.StudentName
-                                </td>
-                                <td>
-                                    @officialStudentClass.OfficialStudent.User.Email
-                                </td>
-
-                                <td>
-                                    @(officialStudentClass.ClassStartDate.HasValue ? officialStudentClass.ClassStartDate.Value.ToString("yyyy-MM-dd") : "")
-                                </td>
-                                <td>
-                                    @(officialStudentClass.ClassEndDate.HasValue ? officialStudentClass.ClassEndDate.Value.ToString("yyyy-MM-dd") : "")
-                                </td>
-                                <td>
-                                    @if (officialStudentClass.StudentStatus == "Studying")
+                                    @if (officialStudentClass.StudentClass.StudentStatus == "Studying")
                                     {
-                                        <span class="badge bg-warning text-studying">@officialStudentClass.StudentStatus</span>
+                                        <span class="badge bg-warning text-studying">@officialStudentClass.StudentClass.StudentStatus</span>
                                     }
-                                    else if (officialStudentClass.StudentStatus == "Complete")
+                                    else if (officialStudentClass.StudentClass.StudentStatus == "Complete")
                                     {
-                                        <span class="badge bg-primary text-complete">@officialStudentClass.StudentStatus</span>
+                                        <span class="badge bg-primary text-complete">@officialStudentClass.StudentClass.StudentStatus</span>
                                     }
-                                    else if (officialStudentClass.StudentStatus == "Reserve")
+                                    else if (officialStudentClass.StudentClass.StudentStatus == "Reserve")
                                     {
-                                        <span class="badge bg-info text-reserve">@officialStudentClass.StudentStatus</span>
+                                        <span class="badge bg-info text-reserve">@officialStudentClass.StudentClass.StudentStatus</span>
                                     }
-                                    else if (officialStudentClass.StudentStatus == "Rest")
+                                    else if (officialStudentClass.StudentClass.StudentStatus == "Rest")
                                     {
-                                        <span class="badge bg-info text-rest">@officialStudentClass.StudentStatus</span>
+                                        <span class="badge bg-info text-rest">@officialStudentClass.StudentClass.StudentStatus</span>
                                     }
-
                                 </td>
                                 <td>
                                     <div class="button-group">
-
-
                                         <form asp-action="RemoveStudentFromClass" asp-controller="Classes" method="post" onsubmit="return confirm('Do you want to remove this student from the class?')">
                                             <input type="hidden" name="classesId" value="@ViewBag.ClassesId" />
-                                            <input type="hidden" name="officialStudentId" value="@officialStudentClass.OfficialStudentId" />
+                                            <input type="hidden" name="officialStudentId" value="@officialStudentClass.StudentCourse.OfficialStudentId" />
                                             <button class="btn btn-danger">
                                                 <span class="icon"><i class="mdi mdi-delete"></i></span>
                                             </button>
                                         </form>
-                                        <a style="background-color:green; color:white;" class="btn btn-primary" href="@Url.Action("DetailsStudent", "Classes", new { officialStudentId = officialStudentClass.OfficialStudentId, courseId = officialStudentClass.CoursesId, classesId = ViewBag.ClassesId })">
+                                        <a style="background-color:green; color:white;" class="btn btn-primary" href="@Url.Action("DetailsStudent", "Classes", new { officialStudentId = officialStudentClass.StudentCourse.OfficialStudentId, courseId = officialStudentClass.StudentCourse.CoursesId, classesId = ViewBag.ClassesId })">
                                             <span class="icon"><i class="mdi mdi-eye"></i></span>
                                         </a>
-
-
                                     </div>
-
                                 </td>
                             </tr>
                         }
-
                     </tbody>
                 </table>
             }
-
         </div>
     </div>
-
 </section>
 <style>
     .text-studying {
-        color: orange; /* Màu chữ cho trạng thái "pending" */
+        color: orange;
     }
 
     .text-complete {
-        color: green; /* Màu chữ cho trạng thái "confirmed" */
+        color: green;
     }
 
     .text-rest {
-        color: red; /* Màu chữ cho trạng thái "shipping" */
+        color: red;
     }
+
     .text-reserve {
-        color: orange; /* Màu chữ cho trạng thái "shipping" */
+        color: orange;
     }
+
     .alert {
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100%; /* Đảm bảo nội dung được căn giữa theo chiều dọc */
-        padding : 20px 15px;
+        height: 100%;
+        padding: 20px 15px;
     }
 
     .btn-primary {
         color: rgb(245 157 57);
         background-color: rgb(251 226 197);
         border-color: none;
-        /* border-top-left-radius: 10px !important; */
-        /* border-bottom-right-radius: 10px !important; */
         border-radius: .357rem;
         border: none;
         font-weight: 600;
-        padding: 5px 20px; /* Điều chỉnh kích thước theo ý muốn */
+        padding: 5px 20px;
     }
 
     .edit-button {
-        margin-top: 10px; /* Điều chỉnh giá trị margin-top theo ý muốn */
+        margin-top: 10px;
     }
 
     .btn-add {
         color: white;
         background-color: black;
         border-color: none;
-        /* border-top-left-radius: 10px !important; */
-        /* border-bottom-right-radius: 10px !important; */
         border-radius: .357rem;
         border: none;
         font-weight: 600;
-        padding: 10px 20px; /* Điều chỉnh kích thước theo ý muốn */
+        padding: 10px 20px;
     }
 
     .btn-danger {
         color: #FFF;
         background-color: #dc3545;
         border-color: #dc3545;
-        border-color: none;
-        /* border-top-left-radius: 10px !important; */
-        /* border-bottom-right-radius: 10px !important; */
         border-radius: .357rem;
         border: none;
         font-weight: 600;
@@ -234,7 +197,6 @@
         }
 
         .btn-danger:focus, .btn-danger.focus {
-            -webkit-box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.5);
             box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.5);
         }
 
@@ -249,11 +211,10 @@
     }
 
         .button-group > * {
-            margin-right: 10px; /* Khoảng cách giữa các nút */
+            margin-right: 10px;
         }
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.2/xlsx.full.min.js"></script>
 <script>function exportBlogToExcel() {
         $.ajax({
@@ -285,25 +246,18 @@
         return buf;
     }</script>
 <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
-
 <script>this.exportExcel = function () {
-        // Lấy bảng cần xuất
         var tab = document.getElementById('sampleTable');
-        // Tạo một đối tượng Excel
         var excel = new ExcelJS.Workbook();
-        // Thêm một trang tính mới
         var sheet = excel.addWorksheet('Sheet 1');
-        // Lặp qua các hàng và cột của bảng để đổ dữ liệu vào trang tính Excel
         for (var i = 0; i < tab.rows.length; i++) {
             var row = sheet.getRow(i + 1);
             for (var j = 0; j < tab.rows[i].cells.length; j++) {
                 row.getCell(j + 1).value = tab.rows[i].cells[j].innerText;
             }
         }
-        // Tạo một blob từ file Excel
         excel.xlsx.writeBuffer().then(function (buffer) {
             var blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-            // Tạo một URL từ blob và mở cửa sổ mới để tải xuống file Excel
             var url = window.URL.createObjectURL(blob);
             var a = document.createElement("a");
             document.body.appendChild(a);
@@ -314,6 +268,3 @@
             window.URL.revokeObjectURL(url);
         });
     }</script>
-
-
-

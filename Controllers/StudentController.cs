@@ -41,7 +41,8 @@ namespace OnlineCollegeManagement.Controllers
                 .Include(s => s.StudentInformation)
                     .ThenInclude(si => si.Major)
                 .Include(s => s.User)
-              
+
+
                 .AsQueryable();
 
             // Fetch the list of courses and majors
@@ -61,12 +62,12 @@ namespace OnlineCollegeManagement.Controllers
             {
                 officialStudents = officialStudents.Where(s => s.StudentInformation.MajorsId == majorsId.Value);
             }
-          
+
             if (!string.IsNullOrEmpty(email))
             {
                 officialStudents = officialStudents.Where(s => s.User.Email.Contains(email));
             }
-          
+
             // Pagination
             var paginatedStudents = await officialStudents
                 .OrderBy(s => s.StudentCode)
@@ -86,19 +87,27 @@ namespace OnlineCollegeManagement.Controllers
             ViewBag.MajorsId = majorsId;
             ViewBag.CourseId = courseId;
             ViewBag.Email = email;
-          
+
 
             return View(paginatedStudents);
         }
-        public async Task<IActionResult> ViewClassStudent(int officialStudentId)
+        public async Task<IActionResult> ViewClassStudent(int studentCoursesId)
         {
             // Lấy dữ liệu từ cơ sở dữ liệu
-            var studentDataList = await _context.MergedStudentData
-                .Where(s => s.OfficialStudentId == officialStudentId)
-                .ToListAsync();
+            var studentData = await _context.StudentClasses
+                .Where(sc => sc.StudentCoursesId == studentCoursesId)
+                .Include(sc => sc.StudentCourses)
+                .ThenInclude(sc => sc.Course) 
+                .Include(sc => sc.Classes) 
+                .FirstOrDefaultAsync();
 
-            // Trả về view với danh sách view model
-            return View(studentDataList);
+            if (studentData == null)
+            {
+                return NotFound();
+            }
+
+            // Trả về view với dữ liệu của StudentCourses và StudentClasses
+            return View(studentData);
         }
 
 
@@ -133,4 +142,3 @@ namespace OnlineCollegeManagement.Controllers
 
     }
 }
-

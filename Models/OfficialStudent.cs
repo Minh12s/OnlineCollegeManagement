@@ -12,6 +12,8 @@ namespace OnlineCollegeManagement.Models
 
         public StudentsInformation StudentInformation { get; set; }
         public Users User { get; set; }
+     
+
 
     }
 }

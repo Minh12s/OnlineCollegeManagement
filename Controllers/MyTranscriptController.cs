@@ -99,16 +99,27 @@ namespace OnlineCollegeManagement.Controllers
                 return NotFound("Official student not found.");
             }
 
-            // Lấy ClassesId từ bảng MergedStudentData dựa trên OfficialStudentId
-            var mergedStudentData = await _context.MergedStudentData
-                .FirstOrDefaultAsync(msd => msd.OfficialStudentId == officialStudent.OfficialStudentId);
+            // Lấy StudentCoursesId từ bảng StudentCourses dựa trên OfficialStudentId
+            var studentCourses = await _context.StudentCourses
+                .FirstOrDefaultAsync(sc => sc.OfficialStudentId == officialStudent.OfficialStudentId);
 
-            if (mergedStudentData == null || !mergedStudentData.ClassesId.HasValue)
+            if (studentCourses == null)
+            {
+                return NotFound("Student courses not found for the official student.");
+            }
+
+            var studentCoursesId = studentCourses.StudentCoursesId;
+
+            // Lấy ClassesId từ bảng StudentClasses dựa trên StudentCoursesId
+            var studentClasses = await _context.StudentClasses
+                .FirstOrDefaultAsync(sc => sc.StudentCoursesId == studentCoursesId);
+
+            if (studentClasses == null || !studentClasses.ClassesId.HasValue)
             {
                 return NotFound("Class not found for the official student.");
             }
 
-            var classesId = mergedStudentData.ClassesId.Value;
+            var classesId = studentClasses.ClassesId.Value;
 
             // Lấy dữ liệu lịch học từ bảng ClassSchedules dựa trên ClassesId
             var classSchedulesQuery = _context.ClassSchedules
@@ -130,6 +141,7 @@ namespace OnlineCollegeManagement.Controllers
 
             return View(paginatedClassSchedules);
         }
+
 
 
     }
