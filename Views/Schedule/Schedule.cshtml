@@ -26,12 +26,11 @@
 
         <!-- Phần này để chứa nút "Export Excel" -->
         <div class="col-sm-2" style="margin-right: 5px;">
-            <button onclick="exportBlogToExcel()" class="btn btn-add">
+            <button onclick="exportSchedulesToExcel()" class="btn btn-add">
                 <i class="fas fa-file-excel"></i>
                 Export Excel
             </button>
         </div>
-
         <!-- Phần này để chứa nút "Excel Filtered" -->
         <div class="col-sm-2">
             <button onclick="exportExcel()" class="btn btn-add">
@@ -219,9 +218,10 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.2/xlsx.full.min.js"></script>
-<script>function exportBlogToExcel() {
+<script>
+    function exportSchedulesToExcel() {
         $.ajax({
-            url: '/Excel/ExportBlogToExcel',
+            url: '/Excel/ExportSchedulesToExcel',
             type: 'GET',
             success: function (data) {
                 var wb = XLSX.utils.book_new();
@@ -231,7 +231,7 @@
                 var blob = new Blob([s2ab(wbout)], { type: 'application/octet-stream' });
                 var link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
-                link.download = 'blogs.xlsx';
+                link.download = 'schedules.xlsx';
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
@@ -250,7 +250,8 @@
     }</script>
 <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
 
-<script>this.exportExcel = function () {
+<script>
+    this.exportExcel = function () {
         // Lấy bảng cần xuất
         var tab = document.getElementById('sampleTable');
         // Tạo một đối tượng Excel
@@ -273,11 +274,12 @@
             document.body.appendChild(a);
             a.style = "display: none";
             a.href = url;
-            a.download = "blogfiltered.xlsx";
+            a.download = "schedulefiltered.xlsx";
             a.click();
             window.URL.revokeObjectURL(url);
         });
     }</script>
+
 
 
 

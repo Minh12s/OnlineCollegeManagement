@@ -390,7 +390,11 @@ namespace OnlineCollegeManagement.Controllers
             {
                 if (int.TryParse(match.Groups[1].Value, out int courseDurationInMonths))
                 {
-                    mergedStudentData.EnrollmentEndDate = mergedStudentData.EnrollmentStartDate.Value.AddMonths(courseDurationInMonths);
+                    // Tạo một đối tượng TimeSpan từ số tháng
+                    var courseDuration = TimeSpan.FromDays(courseDurationInMonths * 30); // Giả sử mỗi tháng có 30 ngày
+
+                    // Thực hiện phép cộng để tính toán EnrollmentEndDate
+                    mergedStudentData.EnrollmentEndDate = mergedStudentData.EnrollmentStartDate.Value.Add(courseDuration);
                 }
                 else
                 {
@@ -431,6 +435,7 @@ namespace OnlineCollegeManagement.Controllers
                 }
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "You have successfully enrolled in the course!";
+                await SendEnrollmentConfirmationEmail("", course.CourseName);
                 return RedirectToAction("Courses");
             }
             catch (DbUpdateException ex)
