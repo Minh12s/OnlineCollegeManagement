@@ -180,38 +180,49 @@ namespace OnlineCollegeManagement.Controllers
         {
             return _context.Departments.Any(e => e.DepartmentsId == id);
         }
-        //[HttpPost]
-        //public async Task<IActionResult> DeleteClasses(int id)
-        //{
-        //    // Tìm lớp cần xóa bằng ID
-        //    var classes = await _context.Classes.FindAsync(id);
-        //    if (classes == null)
-        //    {
-        //        return NotFound();
-        //    }
+        [HttpPost]
+        public async Task<IActionResult> DeleteClasses(int id)
+        {
+            // Tìm lớp cần xóa bằng ID
+            var classes = await _context.Classes.FindAsync(id);
+            if (classes == null)
+            {
+                return NotFound();
+            }
 
-        //    try
-        //    {
-        //        // Xóa tất cả các bản ghi OfficialStudentClasses có ClassesId tương ứng
-        //        var studentClasses = _context.MergedStudentData.Where(osc => osc.ClassesId == id);
-        //        _context.MergedStudentData.RemoveRange(studentClasses);
+            // Kiểm tra nếu có học sinh nào trong lớp có DeleteStatus là 0
+            var studentInClass = await _context.StudentClasses
+                .AnyAsync(sc => sc.ClassesId == id && sc.DeleteStatus == 0);
+            if (studentInClass)
+            {
+                // Nếu có học sinh, trả về thông báo lỗi
+                TempData["ErrorMessage"] = "Cannot delete this class because there are active students in it.";
+                return RedirectToAction("Classes");
+            }
 
-        //        // Xóa lớp khỏi cơ sở dữ liệu
-        //        _context.Classes.Remove(classes);
+            try
+            {
+                // Xóa tất cả các bản ghi StudentClasses có ClassesId tương ứng
+                var studentClasses = _context.StudentClasses.Where(sc => sc.ClassesId == id);
+                _context.StudentClasses.RemoveRange(studentClasses);
 
-        //        // Lưu thay đổi vào cơ sở dữ liệu
-        //        await _context.SaveChangesAsync();
+                // Xóa lớp khỏi cơ sở dữ liệu
+                _context.Classes.Remove(classes);
 
-        //        // Chuyển hướng đến action "Classes" sau khi xóa thành công
-        //        return RedirectToAction(nameof(Classes));
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Xử lý ngoại lệ nếu có bất kỳ lỗi nào xảy ra
-        //        // Trong trường hợp này, bạn có thể muốn ghi log, hiển thị thông báo lỗi, vv.
-        //        return StatusCode(500); // Hoặc trả về một view với thông báo lỗi
-        //    }
-        //}
+                // Lưu thay đổi vào cơ sở dữ liệu
+                await _context.SaveChangesAsync();
+
+                // Chuyển hướng đến action "Classes" sau khi xóa thành công
+                return RedirectToAction(nameof(Classes));
+            }
+            catch (Exception ex)
+            {
+                // Xử lý ngoại lệ nếu có bất kỳ lỗi nào xảy ra
+                // Trong trường hợp này, bạn có thể muốn ghi log, hiển thị thông báo lỗi, vv.
+                return StatusCode(500); // Hoặc trả về một view với thông báo lỗi
+            }
+        }
+
 
         public async Task<IActionResult> ViewStudents(int classesId)
         {
@@ -377,27 +388,44 @@ namespace OnlineCollegeManagement.Controllers
         }
 
 
-        //[HttpPost]
-        //public async Task<IActionResult> RemoveStudentFromClass(int classesId, int officialStudentId)
-        //{
-        //    // Tìm OfficialStudentClasses dựa trên ClassesId và OfficialStudentId
-        //    var officialStudentClass = await _context.MergedStudentData
-        //        .FirstOrDefaultAsync(osc => osc.ClassesId == classesId && osc.OfficialStudentId == officialStudentId);
+        [HttpPost]
+        public async Task<IActionResult> RemoveStudentFromClass(int coursesId, int classesId, int officialStudentId)
+        {
+            // Kiểm tra xem tất cả các bản ghi của học sinh trong bảng ExamScores có Score là null không
+            var examScores = await _context.ExamScores
+                .Where(e => e.CoursesId == coursesId && e.OfficialStudentId == officialStudentId)
+                .ToListAsync();
 
-        //    if (officialStudentClass == null)
-        //    {
-        //        return NotFound(); // Trả về NotFound nếu không tìm thấy
-        //    }
+            if (examScores.All(e => e.Score == null))
+            {
+                // Nếu tất cả các bản ghi đều có Score là null, xoá học sinh khỏi bảng StudentClasses và ExamScores
+                var studentClass = await _context.StudentClasses
+                    .FirstOrDefaultAsync(sc => sc.StudentCourses.CoursesId == coursesId && sc.StudentCourses.OfficialStudentId == officialStudentId && sc.ClassesId == classesId);
 
-        //    // Thay đổi thuộc tính DeleteStatus thành 1 thay vì xóa khỏi cơ sở dữ liệu
-        //    officialStudentClass.DeleteStatus = 1;
+                if (studentClass != null)
+                {
+                    _context.StudentClasses.Remove(studentClass);
+                   
+                    await _context.SaveChangesAsync();
+                }
+            }
+            else
+            {
+                // Nếu có bản ghi nào không phải là null, cập nhật DeleteStatus thành 1
+                var studentClass = await _context.StudentClasses
+                    .FirstOrDefaultAsync(sc => sc.StudentCourses.CoursesId == coursesId && sc.StudentCourses.OfficialStudentId == officialStudentId && sc.ClassesId == classesId);
 
-        //    // Lưu thay đổi
-        //    await _context.SaveChangesAsync();
+                if (studentClass != null)
+                {
+                    studentClass.DeleteStatus = 1;
+                    await _context.SaveChangesAsync();
+                }
+            }
 
-        //    // Chuyển hướng đến action hiển thị danh sách học sinh trong lớp học
-        //    return RedirectToAction(nameof(ViewStudents), new { classesId = classesId });
-        //}
+            // Chuyển hướng đến action hiển thị danh sách học sinh trong lớp học
+            return RedirectToAction(nameof(ViewStudents), new { classesId = classesId });
+        }
+
 
         public async Task<IActionResult> DetailsStudent(int? officialStudentId, int? courseId, int? classesId)
         {

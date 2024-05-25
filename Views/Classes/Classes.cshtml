@@ -63,7 +63,12 @@
         </button>
     </div>
 </form>
-
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
 <section class="section main-section">
     <div class="card has-table">
         <header class="card-header">
@@ -165,6 +170,15 @@
 
 </section>
 <style>
+    .alert {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%; /* Đảm bảo nội dung được căn giữa theo chiều dọc */
+        padding: 20px 15px;
+        color: red;
+    }
+
 
     .btn-primary {
         color: rgb(245 157 57);
@@ -235,8 +249,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.2/xlsx.full.min.js"></script>
-<script>
-    function exportClassesToExcel() {
+<script>function exportClassesToExcel() {
         $.ajax({
             url: '/Excel/ExportClassesToExcel',
             type: 'GET',
@@ -265,8 +278,7 @@
         var view = new Uint8Array(buf);
         for (var i = 0; i != s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
         return buf;
-    }
-</script>
+    }</script>
 
 <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
 

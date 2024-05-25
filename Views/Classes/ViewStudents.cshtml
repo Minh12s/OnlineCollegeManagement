@@ -113,6 +113,7 @@
                                     <div class="button-group">
                                         <form asp-action="RemoveStudentFromClass" asp-controller="Classes" method="post" onsubmit="return confirm('Do you want to remove this student from the class?')">
                                             <input type="hidden" name="classesId" value="@ViewBag.ClassesId" />
+                                            <input type="hidden" name="coursesId" value="@officialStudentClass.StudentCourse.CoursesId" />
                                             <input type="hidden" name="officialStudentId" value="@officialStudentClass.StudentCourse.OfficialStudentId" />
                                             <button class="btn btn-danger">
                                                 <span class="icon"><i class="mdi mdi-delete"></i></span>

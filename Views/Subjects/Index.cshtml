@@ -5,8 +5,8 @@
 <section class="is-title-bar">
     <div class="flex flex-col md:flex-row items-center justify-between space-y-6 md:space-y-0">
         <ul>
-            <li>Admin</li>
-            <li>Tables</li>
+            <li style="margin-left:-50px;">Admin</li>
+            <li>Subject list</li>
         </ul>
         <a href="https://justboil.me/" onclick="alert('Coming soon'); return false" target="_blank" class="button blue">
             <span class="icon"><i class="mdi mdi-credit-card-outline"></i></span>
@@ -52,7 +52,7 @@
 </section>
 
 <form style="display: flex; align-items: center; border-radius: 5px; margin-top: 10px; flex-wrap: wrap;" asp-action="Index" asp-controller="Subjects" method="get">
-    <div class="input-group input-group-sm" style="margin-right: 5px; margin-bottom: 10px;">
+    <div class="input-group input-group-sm" style="margin-left: 10px; margin-bottom: 10px;">
         <input value="@ViewBag.SearchString" class="form-control" type="text" name="searchString" placeholder="Search " style="height: 45px; font-size: 0.765625rem; padding: 4px 8px; background-color: #F1F1F1; border-radius: 5px; width: 200px; margin-left: 10px;" />
     </div>
      <div class="input-group input-group-sm" style="margin-bottom: 10px; margin-left: -5px;">
@@ -109,10 +109,10 @@
             <table>
                 <thead>
                     <tr>
-                        <th>SubjectsId</th>
-                        <th>SubjectCode</th>
-                        <th>SubjectName</th>
-                        <th>NumberOfSessions</th>
+                        <th>Id</th>
+                        <th>Subject Code</th>
+                        <th>Subject Name</th>
+                        <th>Number Of Sessions</th>
 
                         <th></th>
                     </tr>
