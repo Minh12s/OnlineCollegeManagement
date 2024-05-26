@@ -43,6 +43,12 @@
         </div>
     </div>
 </section>
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
 
 <section class="section main-section">
     <div class="card has-table">
@@ -133,6 +139,14 @@
     </div>
 </section>
 <style>
+    .alert {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%; /* Đảm bảo nội dung được căn giữa theo chiều dọc */
+        padding: 20px 15px;
+        color: red;
+    }
     .text-studying {
         color: orange;
     }

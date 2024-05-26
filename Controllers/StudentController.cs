@@ -91,24 +91,35 @@ namespace OnlineCollegeManagement.Controllers
 
             return View(paginatedStudents);
         }
-        public async Task<IActionResult> ViewClassStudent(int studentCoursesId)
+        public async Task<IActionResult> ViewClassStudent(int officialStudentId)
         {
-            // Lấy dữ liệu từ cơ sở dữ liệu
-            var studentData = await _context.StudentClasses
-                .Where(sc => sc.StudentCoursesId == studentCoursesId)
-                .Include(sc => sc.StudentCourses)
-                .ThenInclude(sc => sc.Course) 
-                .Include(sc => sc.Classes) 
-                .FirstOrDefaultAsync();
+            // Lấy tất cả các khóa học mà học sinh đang tham gia dựa vào OfficialStudentId
+            var studentCourses = await _context.StudentCourses
+                .Include(sc => sc.Course)
+                .Include(sc => sc.OfficialStudent)
+                .ThenInclude(os => os.StudentInformation)
+                .Where(sc => sc.OfficialStudentId == officialStudentId)
+                .ToListAsync();
 
-            if (studentData == null)
+            // Lấy tên của sinh viên từ thông tin học sinh và đặt vào ViewBag
+            ViewBag.StudentName = studentCourses.FirstOrDefault()?.OfficialStudent?.StudentInformation?.StudentName;
+
+            // Lấy tất cả các lớp học mà học sinh đang tham gia dựa vào StudentCoursesId
+            var studentClasses = await _context.StudentClasses
+                .Include(sc => sc.Classes)
+                .Where(sc => studentCourses.Select(s => s.StudentCoursesId).Contains(sc.StudentCoursesId))
+                .ToListAsync();
+
+            // Tạo ViewModel để truyền dữ liệu vào view
+            var viewModel = new StudentClassViewModel
             {
-                return NotFound();
-            }
+                StudentCourses = studentCourses,
+                StudentClasses = studentClasses
+            };
 
-            // Trả về view với dữ liệu của StudentCourses và StudentClasses
-            return View(studentData);
+            return View(viewModel);
         }
+
 
 
         public async Task<IActionResult> DetailsStudent(int? StudentsInformationId)

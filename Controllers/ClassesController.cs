@@ -129,7 +129,7 @@ namespace OnlineCollegeManagement.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditClasses(int id, [Bind("ClassesId,ClassName,StartDate,EndDate")] Classes classes)
+        public async Task<IActionResult> EditClasses(int id, [Bind("ClassesId,ClassName,ClassStartDate,ClassEndDate")] Classes classes)
         {
             // Kiểm tra xem ID của phòng ban được chỉnh sửa có khớp với ID được truyền vào không
             if (id != classes.ClassesId)
@@ -190,6 +190,13 @@ namespace OnlineCollegeManagement.Controllers
                 return NotFound();
             }
 
+            // Kiểm tra nếu lớp đã kết thúc
+            if (classes.ClassEndDate <= DateTime.Now)
+            {
+                TempData["ErrorMessage"] = "Cannot delete this class because it has already ended.";
+                return RedirectToAction("Classes");
+            }
+
             // Kiểm tra nếu có học sinh nào trong lớp có DeleteStatus là 0
             var studentInClass = await _context.StudentClasses
                 .AnyAsync(sc => sc.ClassesId == id && sc.DeleteStatus == 0);
@@ -222,6 +229,7 @@ namespace OnlineCollegeManagement.Controllers
                 return StatusCode(500); // Hoặc trả về một view với thông báo lỗi
             }
         }
+
 
 
         public async Task<IActionResult> ViewStudents(int classesId)
@@ -291,7 +299,7 @@ namespace OnlineCollegeManagement.Controllers
             return View(students);
         }
         [HttpPost]
-        public async Task<IActionResult> AddStudentToClass(int classesId, int officialStudentId, int coursesId, List<string> selectedStudents, int page = 1, int pageSize = 10)
+        public async Task<IActionResult> AddStudentToClass(int classesId, List<string> selectedStudents, int page = 1, int pageSize = 10)
         {
             var classes = await _context.Classes.FindAsync(classesId);
 
@@ -303,6 +311,13 @@ namespace OnlineCollegeManagement.Controllers
             ViewBag.ClassesId = classesId;
             ViewBag.ClassesStartDate = classes.ClassStartDate;
             ViewBag.ClassesEndDate = classes.ClassEndDate;
+
+            // Kiểm tra xem lớp học đã kết thúc hay chưa
+            if (classes.ClassEndDate <= DateTime.Now)
+            {
+                TempData["ErrorMessage"] = "The class has ended, students cannot be added to the class.";
+                return RedirectToAction(nameof(AddStudentToClass), new { classesId = classesId });
+            }
 
             if (selectedStudents != null && selectedStudents.Any())
             {
@@ -375,6 +390,7 @@ namespace OnlineCollegeManagement.Controllers
         }
 
 
+
         // Helper method to retrieve paginated student list
         private async Task<List<StudentCourses>> GetStudentsPagedList(int page, int pageSize)
         {
@@ -391,6 +407,25 @@ namespace OnlineCollegeManagement.Controllers
         [HttpPost]
         public async Task<IActionResult> RemoveStudentFromClass(int coursesId, int classesId, int officialStudentId)
         {
+            // Lấy thông tin lớp học
+            var classInfo = await _context.Classes
+                .FirstOrDefaultAsync(c => c.ClassesId == classesId);
+
+            if (classInfo == null)
+            {
+                // Nếu không tìm thấy lớp học, trả về lỗi
+                TempData["ErrorMessage"] = "Class not found.";
+                return RedirectToAction(nameof(ViewStudents), new { classesId = classesId });
+            }
+
+            // Kiểm tra xem lớp học đã kết thúc hay chưa
+            if (classInfo.ClassEndDate <= DateTime.Now)
+            {
+                // Nếu lớp học đã kết thúc, trả về thông báo lỗi
+                TempData["ErrorMessage"] = "The class has ended, students cannot be removed from the class.";
+                return RedirectToAction(nameof(ViewStudents), new { classesId = classesId });
+            }
+
             // Kiểm tra xem tất cả các bản ghi của học sinh trong bảng ExamScores có Score là null không
             var examScores = await _context.ExamScores
                 .Where(e => e.CoursesId == coursesId && e.OfficialStudentId == officialStudentId)
@@ -405,7 +440,6 @@ namespace OnlineCollegeManagement.Controllers
                 if (studentClass != null)
                 {
                     _context.StudentClasses.Remove(studentClass);
-                   
                     await _context.SaveChangesAsync();
                 }
             }
@@ -425,6 +459,8 @@ namespace OnlineCollegeManagement.Controllers
             // Chuyển hướng đến action hiển thị danh sách học sinh trong lớp học
             return RedirectToAction(nameof(ViewStudents), new { classesId = classesId });
         }
+
+
 
 
         public async Task<IActionResult> DetailsStudent(int? officialStudentId, int? courseId, int? classesId)
@@ -455,7 +491,7 @@ namespace OnlineCollegeManagement.Controllers
                 StudentCourse = studentCourses,
                 StudentClass = studentClasses
             };
-
+            ViewBag.ClassesId = classesId;
             return View(viewModel);
         }
 
@@ -473,7 +509,7 @@ namespace OnlineCollegeManagement.Controllers
             // Lấy thông tin sinh viên từ bảng StudentClasses
             var studentClass = await _context.StudentClasses
                 .Include(sc => sc.StudentCourses) // Liên kết với bảng StudentCourses
-                .FirstOrDefaultAsync(sc => sc.StudentCourses.StudentCoursesId == officialStudentId && sc.ClassesId == classesId);
+                .FirstOrDefaultAsync(sc => sc.StudentCourses.OfficialStudentId == officialStudentId && sc.ClassesId == classesId);
 
             if (studentClass == null)
             {
@@ -488,6 +524,7 @@ namespace OnlineCollegeManagement.Controllers
             // Chuyển hướng đến action "ViewStudents" trong controller "Classes" với tham số "classesId"
             return RedirectToAction("ViewStudents", "Classes", new { classesId = classesId });
         }
+
 
 
 

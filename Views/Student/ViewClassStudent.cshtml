@@ -1,0 +1,168 @@
+﻿@model OnlineCollegeManagement.Models.StudentClassViewModel
+@{
+    ViewData["Title"] = "Facilities";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+<style>
+    .btn-primary {
+        color: rgb(245 157 57);
+        background-color: rgb(251 226 197);
+        border-color: none;
+        /* border-top-left-radius: 10px !important; */
+        /* border-bottom-right-radius: 10px !important; */
+        border-radius: .357rem;
+        border: none;
+        font-weight: 600;
+        padding: 5px 20px; /* Điều chỉnh kích thước theo ý muốn */
+    }
+
+    .btn-add {
+        color: white;
+        background-color: black;
+        border-color: none;
+        /* border-top-left-radius: 10px !important; */
+        /* border-bottom-right-radius: 10px !important; */
+        border-radius: .357rem;
+        border: none;
+        font-weight: 600;
+        padding: 10px 20px; /* Điều chỉnh kích thước theo ý muốn */
+    }
+
+    .button-group {
+        display: flex;
+    }
+
+        .button-group > * {
+            margin-right: 10px; /* Khoảng cách giữa các nút */
+        }
+
+    .status-pending {
+        color: orange;
+    }
+
+    .status-not-admitted {
+        color: red;
+    }
+
+    .status-admitted {
+        color: green;
+    }
+
+    .edit-button {
+        margin-top: 10px; /* Điều chỉnh giá trị margin-top theo ý muốn */
+    }
+
+    .btn-add {
+        color: white;
+        background-color: black;
+        border-color: none;
+        /* border-top-left-radius: 10px !important; */
+        /* border-bottom-right-radius: 10px !important; */
+        border-radius: .357rem;
+        border: none;
+        font-weight: 600;
+        padding: 10px 20px; /* Điều chỉnh kích thước theo ý muốn */
+    }
+
+    .btn-danger {
+        color: #FFF;
+        background-color: #dc3545;
+        border-color: #dc3545;
+        border-color: none;
+        /* border-top-left-radius: 10px !important; */
+        /* border-bottom-right-radius: 10px !important; */
+        border-radius: .357rem;
+        border: none;
+        font-weight: 600;
+        padding: 5px 20px;
+    }
+
+        .btn-danger:hover {
+            color: #FFF;
+            background-color: #c82333;
+            border-color: #bd2130;
+        }
+
+        .btn-danger:focus, .btn-danger.focus {
+            -webkit-box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.5);
+            box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.5);
+        }
+
+        .btn-danger.disabled, .btn-danger:disabled {
+            color: #FFF;
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+    .text-center {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    .button-group {
+        display: flex;
+    }
+
+        .button-group > * {
+            margin-right: 10px; /* Khoảng cách giữa các nút */
+        }
+</style>
+<section class="is-title-bar">
+    <div class="flex flex-col md:flex-row items-center justify-between space-y-6 md:space-y-0">
+        <ul>
+            <li style="margin-left:-50px;">Admin</li>
+            <li>Student</li>
+        </ul>
+
+    </div>
+
+</section>
+<section class="section main-section">
+    <div class="card has-table">
+        <header class="card-header">
+            <p class="card-header-title">
+                @*<span class="icon"><i class="mdi mdi-shopping"></i></span>*@
+                List Classes for Student @ViewBag.StudentName
+            </p>
+        </header>
+
+        <div class="card-content">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Course Name</th>
+                        <th>Class Name</th>
+                        <th>Class Start Date</th>
+                        <th>Class End Date</th>
+                        <th>Student Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.StudentClasses.Any())
+                    {
+                        <tr>
+                            <td class="text-center" colspan="5">No classes found for this student.</td>
+                        </tr>
+
+                    }
+                    else
+                    {
+                        @foreach (var studentClass in Model.StudentClasses)
+                        {
+                            <tr>
+                                <td>@studentClass.StudentCourses.Course.CourseName</td>
+                                <td>@studentClass.Classes.ClassName</td>
+                                <td>@studentClass.ClassStartDate?.ToString("yyyy-MM-dd")</td>
+                                <td>@studentClass.ClassEndDate?.ToString("yyyy-MM-dd")</td>
+                                <td>@studentClass.StudentStatus</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+
+
+

@@ -10,6 +10,7 @@
         align-items: center;
         height: 100%; /* Đảm bảo nội dung được căn giữa theo chiều dọc */
         padding: 20px 15px;
+        color: red;
     }
 
     .text-error {
@@ -146,7 +147,13 @@
         </div>
     </div>
 </section>
-<form id="addStudentsForm" method="post" asp-controller="Classes" asp-action="AddStudentToClass" asp-route-classesId="@ViewBag.ClassesId" >
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+<form id="addStudentsForm" method="post" asp-controller="Classes" asp-action="AddStudentToClass" asp-route-classesId="@ViewBag.ClassesId">
     <section class="section main-section">
         <div class="card has-table">
             <header class="card-header">
@@ -181,40 +188,40 @@
                         </div>
                     }
 
-            <table class="table table-hover table-bordered js-copytextarea" cellpadding="0" cellspacing="0" border="0" id="sampleTable">
-                <thead>
-                    <tr>
-                        <th width="10"><input type="checkbox" id="selectAll"></th>
-                        <th>Student ID</th>
-                        <th>Student Code</th>
-                        <th>Telephone</th>
-                        <th>Start Date</th>
-                        <th>End Date</th>
-                        <th>Study Days</th>
-                        <th>Study Session</th>
-                        <th>Course Name</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var student in Model)
-                    {
-                        <tr>
-                            <td width="10">
-                                <input type="checkbox" name="selectedStudents" value="@student.StudentCoursesId">
-                            </td>
-                            <td>@student.OfficialStudentId</td>
-                            <td>@student.OfficialStudent.StudentCode</td>
-                            <td>@student.Telephone</td>
-                            <td>@student.EnrollmentStartDate.ToString("yyyy-MM")</td>
-                            <td>@student.EnrollmentEndDate.ToString("yyyy-MM")</td>
-                            <td>@student.StudyDays</td>
-                            <td>@student.StudySession</td>
-                            <td>@student.Course.CourseName</td>
-                        </tr>
-                    }
-                </tbody>
+                    <table class="table table-hover table-bordered js-copytextarea" cellpadding="0" cellspacing="0" border="0" id="sampleTable">
+                        <thead>
+                            <tr>
+                                <th width="10"><input type="checkbox" id="selectAll"></th>
+                                <th>Student ID</th>
+                                <th>Student Code</th>
+                                <th>Telephone</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Study Days</th>
+                                <th>Study Session</th>
+                                <th>Course Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var student in Model)
+                            {
+                                <tr>
+                                    <td width="10">
+                                        <input type="checkbox" name="selectedStudents" value="@student.StudentCoursesId">
+                                    </td>
+                                    <td>@student.OfficialStudentId</td>
+                                    <td>@student.OfficialStudent.StudentCode</td>
+                                    <td>@student.Telephone</td>
+                                    <td>@student.EnrollmentStartDate.ToString("yyyy-MM")</td>
+                                    <td>@student.EnrollmentEndDate.ToString("yyyy-MM")</td>
+                                    <td>@student.StudyDays</td>
+                                    <td>@student.StudySession</td>
+                                    <td>@student.Course.CourseName</td>
+                                </tr>
+                            }
+                        </tbody>
 
-            </table>
+                    </table>
 
                     <div class="table-pagination">
                         <div class="flex items-center justify-between">
@@ -251,8 +258,7 @@
 
 
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
+<script>document.addEventListener("DOMContentLoaded", function () {
         var selectedStudents = [];
 
         var storedStudents = localStorage.getItem("selectedStudents");
@@ -290,6 +296,4 @@
         form.addEventListener('submit', function () {
             localStorage.removeItem('selectedStudents');
         });
-    });
-
-   </script>
+    });</script>

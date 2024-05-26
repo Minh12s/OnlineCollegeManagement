@@ -72,19 +72,19 @@
                     <input type="hidden" name="classesId" value="@Model.StudentClass.ClassesId" />
 
                     <!-- Nút "Complete" -->
-                    <button onclick="return confirm('Surely you want to update the status to:  Complete')" type="submit" name="studentStatus" value="Complete" class="btn btn-success"
+                    <button onclick="return confirm('Surely you want to update the status to: Complete')" type="submit" name="studentStatus" value="Complete" class="btn btn-success"
                             style="padding: 5px 10px; border-radius: 5px; margin-right: 10px; background-color: green; color: white;">
                         Complete
                     </button>
 
                     <!-- Nút "Reserve" -->
-                    <button onclick="return confirm('Surely you want to update the status to:  Reserve')" type="submit" name="studentStatus" value="Reserve" class="btn btn-primary"
+                    <button onclick="return confirm('Surely you want to update the status to: Reserve')" type="submit" name="studentStatus" value="Reserve" class="btn btn-primary"
                             style="padding: 5px 10px; border-radius: 5px; margin-right: 10px; background-color: orange; color: white;">
                         Reserve
                     </button>
 
                     <!-- Nút "Rest" -->
-                    <button onclick="return confirm('Surely you want to update the status to:  Rest')" type="submit" name="studentStatus" value="Rest" class="btn btn-warning"
+                    <button onclick="return confirm('Surely you want to update the status to: Rest')" type="submit" name="studentStatus" value="Rest" class="btn btn-warning"
                             style="padding: 5px 10px; border-radius: 5px; margin-right: 10px; background-color: red; color: white;">
                         Rest
                     </button>
@@ -95,8 +95,9 @@
         {
             <!-- Hiển thị nút "Back" -->
             <div style="float:right; margin-top: 10px;">
-                <a style="padding: 5px 10px; border-radius: 5px; margin-right: 10px; background-color: black; color: white; " href="@Url.Action("ViewStudents", "Classes", new { classesId = ViewBag.ClassesId })" class="btn btn-warning">Back</a>
+                <a style="padding: 5px 10px; border-radius: 5px; margin-right: 10px; background-color: black; color: white;" href="@Url.Action("ViewStudents", "Classes", new { classesId = ViewBag.ClassesId })" class="btn btn-warning">Back</a>
             </div>
         }
     </div>
 </div>
+
