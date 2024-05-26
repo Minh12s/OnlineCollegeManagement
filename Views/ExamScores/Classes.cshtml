@@ -51,7 +51,7 @@
                 Classes
             </p>
 
-            <form class="card-header-icon" asp-controller="Classes" asp-action="Classes" method="get" onchange="this.submit()">
+            <form class="card-header-icon" asp-controller="ExamScores" asp-action="Classes" method="get" onchange="this.submit()">
 
                 <select style="margin-left:-10px; padding: 5px 10px;border:1px solid #F1F1F1 " name="PageSize">
                     <option value="10"
@@ -106,7 +106,7 @@
                             <td>
                                 <div class="button-group">
 
-                                    <a style="background-color:green; color:white;" class="btn btn-primary" href="@Url.Action("ViewStudents", "ExamScores", new { classesId = classes.ClassesId })">
+                                    <a style="background-color:green; color:white;" class="btn btn-primary" href="@Url.Action("ViewSubject", "ExamScores", new { classesId = classes.ClassesId })">
                                         <span class="icon"><i class="mdi mdi-eye"></i></span>
                                     </a>
                                 </div>
@@ -122,7 +122,7 @@
                     <div class="buttons">
                         @for (int i = 1; i <= ViewBag.TotalPages; i++)
                         {
-                            <button type="button" class="button @(ViewBag.CurrentPage == i ? "active" : "")" onclick="location.href='@Url.Action("Classes", "Classes", new { page = i, pageSize = ViewBag.PageSize })'">@i</button>
+                            <button type="button" class="button @(ViewBag.CurrentPage == i ? "active" : "")" onclick="location.href='@Url.Action("Classes", "ExamScores", new { page = i, pageSize = ViewBag.PageSize })'">@i</button>
                         }
                     </div>
                     <small>Page @ViewBag.CurrentPage of @ViewBag.TotalPages</small>

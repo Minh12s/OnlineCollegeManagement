@@ -30,68 +30,103 @@
         <div class="card-content">
 
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>Id</th>
-                        <th>Subject Code </th>
+            <form id="examScoresForm" asp-route-classesId="@ViewBag.ClassesId" asp-route-coursesId="@ViewBag.CoursesId" asp-route-subjectsId="@ViewBag.SubjectsId" asp-controller="ExamScores" asp-action="ExamScores" method="post" enctype="multipart/form-data">
 
-                        <th>Subject Name</th>
-                        <th>Score</th>
-                        <th>Status</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var score in Model)
-                    {
+                <table>
+                    <thead>
                         <tr>
-                            <td>@score.ExamScoresId</td>
-                            <td>@score.Subject.SubjectCode</td>
-
-                            <td>@score.Subject.SubjectName</td>
-                            <td>@score.Score</td>
-
-                            <td class="@(score.Status == "Passed" ? "passed" : score.Status == "Not Passed" ? "not-passed" : "not-started")">@score.Status</td>
-                            <td>
-                                <div class="button-group">
-                                    <a class="btn btn-primary" asp-controller="ExamScores" asp-action="EditScores" asp-route-CoursesId="@ViewBag.CoursesId" asp-route-id="@score.ExamScoresId">
-                                        <span class="icon"><i class="mdi mdi-pencil"></i></span>
-                                    </a>
-
-
-
-
-                                </div>
-
-                            </td>
+                            <th>Id</th>
+                            <th>Student Name</th>
+                            <th>Score</th>
+                            <th>Status</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
-
-
-            <div class="table-pagination">
-                <div class="flex items-center justify-between">
-                    <div class="buttons">
-                        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                    </thead>
+                    <tbody>
+                        @foreach (var score in Model)
                         {
-                            <button type="button" class="button @(ViewBag.CurrentPage == i ? "active" : "")" onclick="location.href='@Url.Action("examScores", "examScores", new {OfficialStudentId = ViewBag.OfficialStudentId, page = i, pageSize = ViewBag.PageSize })'">@i</button>
-                        }
-                    </div>
-                    <small>Page @ViewBag.CurrentPage of @ViewBag.TotalPages</small>
+                            <tr>
+                                <td>@score.ExamScoresId</td>
+                                <td>@score.OfficialStudent.StudentInformation.StudentName</td>
 
-                </div>
-            </div>
+                                <td>
+                                    @{
+                                        var scoreValue = score.Score.HasValue ? score.Score.ToString() : "";
+                                        var inputType = score.Score.HasValue ? "text" : "number";
+                                    }
+                                    <input type="@inputType" name="Scores[@score.ExamScoresId]" value="@scoreValue" />
+                                </td>
+
+
+
+
+                                <td class="@(score.Status == "Passed" ? "passed" : score.Status == "Not Passed" ? "not-passed" : "not-started")">@score.Status</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <section class="is-title-bar">
+                    <div style="float:right; margin-top:50px" class="flex flex-col md:flex-row items-center justify-between space-y-6 md:space-y-0">
+                        <button class="btn btn-save" type="submit">Save</button>
+
+
+                    </div>
+
+                </section>
+
+            </form>
 
 
         </div>
     </div>
 
 </section>
-<style>
-   
+<script>
+    document.getElementById("saveBtn").addEventListener("click", function () {
+        var form = document.getElementById("examScoresForm");
+        var formData = new FormData(form);
 
+        fetch(form.action, {
+            method: "POST",
+            body: formData
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Handle success response here if needed
+                console.log(data);
+            })
+            .catch(error => {
+                // Handle error here
+                console.error("There was a problem with the fetch operation:", error);
+            });
+    });
+</script>
+
+<style>
+    .passed {
+        color: green;
+    }
+
+    .not-passed {
+        color: red;
+    }
+
+    .btn-save {
+        background-color: rgb(166 236 171);
+        color: rgb(1 123 10);
+        /* width: 100px; */
+        font-weight: 600;
+        letter-spacing: 1px;
+        border-color: none;
+        border-radius: .357rem;
+        border: none;
+        padding: 5px 20px;
+        margin-top: 10px;
+    }
     .not-started {
         color: black;
     }

@@ -57,20 +57,17 @@ namespace OnlineCollegeManagement.Controllers
             return View(paginatedClasses);
         }
 
-        public async Task<IActionResult> ViewStudents(int classesId)
+        public async Task<IActionResult> ViewSubject(int classesId)
         {
-            // Lưu classesId vào ViewBag để sử dụng trong view
             ViewBag.ClassesId = classesId;
 
-            // Lấy danh sách sinh viên dựa trên classesId từ bảng StudentClasses
             var studentCoursesWithClasses = await _context.StudentCourses
                 .Include(sc => sc.OfficialStudent)
                     .ThenInclude(os => os.StudentInformation)
                 .Include(sc => sc.OfficialStudent)
-                    .ThenInclude(os => os.User) // Bao gồm thông tin từ bảng User
+                    .ThenInclude(os => os.User)
                 .Join(
                     _context.StudentClasses,
-
                     studentCourse => studentCourse.StudentCoursesId,
                     studentClass => studentClass.StudentCoursesId,
                     (studentCourse, studentClass) => new StudentCourseClassViewModel
@@ -81,143 +78,103 @@ namespace OnlineCollegeManagement.Controllers
                 .Where(sc => sc.StudentClass.ClassesId == classesId && sc.StudentClass.DeleteStatus == 0)
                 .ToListAsync();
 
+            var courseId = studentCoursesWithClasses.FirstOrDefault()?.StudentCourse.CoursesId;
+            if (courseId.HasValue)
+            {
+                ViewBag.CourseId = courseId.Value;
+
+                var officialStudentIds = await _context.StudentCourses
+                    .Where(sc => sc.CoursesId == courseId.Value)
+                    .Select(sc => sc.OfficialStudentId)
+                    .ToListAsync();
+                ViewBag.OfficialStudentIds = officialStudentIds;
+
+                var subjects = await _context.CoursesSubjects
+                    .Include(cs => cs.Subject)
+                    .Where(cs => cs.CoursesId == courseId.Value)
+                    .Select(cs => cs.Subject)
+                    .ToListAsync();
+
+                ViewBag.Subjects = subjects;
+
+            }
+            else
+            {
+                ViewBag.Subjects = new List<Subjects>();
+                ViewBag.CourseId = null;
+                ViewBag.OfficialStudentIds = new List<int>();
+            }
+
+            // Truyền studentCoursesWithClasses vào ViewBag.StudentInfo
+
             return View(studentCoursesWithClasses);
         }
 
 
 
 
-        public async Task<IActionResult> ExamScores(int? page, int OfficialStudentId, int CourseId, int pageSize = 10)
+        public async Task<IActionResult> ExamScores(int classesId, int coursesId, int subjectsId)
         {
-            int pageNumber = page ?? 1;
-
-            // Truy vấn cơ sở dữ liệu để lấy các bản ghi ExamScores tương ứng với OfficialStudentId và CoursesId
-            var examScores = _context.ExamScores
-                .Include(e => e.OfficialStudent)
-                .Include(e => e.Subject)
-                .Where(e => e.OfficialStudentId == OfficialStudentId && e.CoursesId == CourseId)
-                .AsQueryable();
-
-            // Pagination
-            var paginatedExamScores = await examScores
-                .OrderBy(s => s.ExamScoresId)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
+            var examScores = await _context.ExamScores
+                .Include(es => es.Subject)
+                .Include(es => es.Course)
+                .Include(es => es.OfficialStudent)
+                    .ThenInclude(os => os.StudentInformation)
+                .Where(es => es.CoursesId == coursesId && es.SubjectsId == subjectsId)
+                .Join(
+                    _context.StudentClasses.Where(sc => sc.ClassesId == classesId && sc.DeleteStatus == 0),
+                    examScore => examScore.OfficialStudentId,
+                    studentClass => studentClass.StudentCourses.OfficialStudentId,
+                    (examScore, studentClass) => examScore
+                )
                 .ToListAsync();
 
-            int totalExamScores = await examScores.CountAsync();
+            // Lưu các tham số vào ViewBag để sử dụng trong view
+            ViewBag.ClassesId = classesId;
+            ViewBag.CoursesId = coursesId;
+            ViewBag.SubjectsId = subjectsId;
 
-            // Pass pagination info to ViewBag
-            ViewBag.CurrentPage = pageNumber;
-            ViewBag.TotalPages = (int)Math.Ceiling((double)totalExamScores / pageSize);
-            ViewBag.TotalExamScores = totalExamScores;
-            ViewBag.PageSize = pageSize;
-            ViewBag.OfficialStudentId = OfficialStudentId;
-            ViewBag.CoursesId = CourseId;
-
-            // Truyền dữ liệu vào view
-            return View(paginatedExamScores);
-        }
-
-    
-
-
-        public async Task<IActionResult> EditScores(int id)
-        {
-            // Lấy thông tin của bản ghi ExamScores có id tương ứng
-            var examScore = await _context.ExamScores
-                .Include(e => e.Subject)
-                .Include(e => e.OfficialStudent)
-                .FirstOrDefaultAsync(e => e.ExamScoresId == id);
-
-            if (examScore == null)
-            {
-                return NotFound();
-            }
-
-            // Lấy danh sách các môn thuộc khóa học của examScore
-            var subjectsForCourse = await _context.CoursesSubjects
-                .Where(cs => cs.CoursesId == examScore.CoursesId)
-                .Select(cs => cs.Subject)
-                .OrderBy(s => s.SubjectName)
-                .ToListAsync();
-
-            // Truyền danh sách các môn học thuộc khóa học đó vào ViewBag
-            ViewBag.Subjects = subjectsForCourse;
-            ViewBag.OfficialStudentId = examScore.OfficialStudentId;
-            @ViewBag.CoursesId = examScore.CoursesId;
-            return View(examScore);
+            return View(examScores);
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditScores(int id, decimal score)
-        {
-            var examScoreInDb = await _context.ExamScores.FindAsync(id);
-
-            if (examScoreInDb == null)
-            {
-                return NotFound();
-            }
-
-            examScoreInDb.Score = score;
-            examScoreInDb.Status = score >= 40 ? "Passed" : "Not Passed";
-
-            await _context.SaveChangesAsync();
-
-            var subjectName = (await _context.Subjects.FindAsync(examScoreInDb.SubjectsId))?.SubjectName;
-
-            // Gửi email xác nhận với tên môn học
-            await SendEditExamScoresEmail("longtqth2209038@fpt.edu.vn", subjectName);
-
-            return RedirectToAction("ExamScores", "ExamScores", new { OfficialStudentId = examScoreInDb.OfficialStudentId, CourseId = examScoreInDb.CoursesId });
-        }
-
-
-
-
-        private async Task SendAddExamScoresEmail(string recipientEmail, string SubjectName)
+        public async Task<IActionResult> ExamScores(Dictionary<int, decimal?> scores, int classesId, int coursesId, int subjectsId)
         {
             try
             {
-                // Đường dẫn tới mẫu email
-                string emailTemplatePath = Path.Combine(_env.ContentRootPath, "Views", "Email", "AddExamScores.cshtml");
-
-                // Đọc nội dung mẫu email từ file
-                string emailContent = await System.IO.File.ReadAllTextAsync(emailTemplatePath);
-
-                // Thay thế các thẻ placeholder trong mẫu email bằng thông tin thích hợp
-                emailContent = emailContent.Replace("{SubjectName}", SubjectName);
-
-                // Tạo đối tượng MailMessage
-                var message = new MailMessage();
-                message.To.Add(new MailAddress(recipientEmail)); // Địa chỉ email của sinh viên
-                message.From = new MailAddress(_configuration["EmailSettings:Username"]);
-                message.Subject = "Confirm successful registration!";
-                message.Body = emailContent;
-                message.IsBodyHtml = true;
-
-                // Tạo đối tượng SmtpClient để gửi email
-                using (var smtp = new SmtpClient(_configuration["EmailSettings:SmtpServer"], int.Parse(_configuration["EmailSettings:Port"])))
+                foreach (var kvp in scores)
                 {
-                    var credentials = new NetworkCredential
+                    var examScore = await _context.ExamScores.FindAsync(kvp.Key);
+                    if (examScore != null)
                     {
-                        UserName = _configuration["EmailSettings:Username"],
-                        Password = _configuration["EmailSettings:Password"]
-                    };
-                    smtp.Credentials = credentials;
-                    smtp.EnableSsl = true;
-
-                    // Gửi email
-                    await smtp.SendMailAsync(message);
+                        examScore.Score = kvp.Value;
+                        examScore.Status = kvp.Value >= 40 ? "Passed" : "Not Passed";
+                        _context.Entry(examScore).State = EntityState.Modified;
+                    }
                 }
+
+                await _context.SaveChangesAsync();
+                var subject = await _context.Subjects.FindAsync(subjectsId);
+                await SendEditExamScoresEmail("longtqth2209038@fpt.edu.vn", subject.SubjectName);
+
+                // Redirect or return success response
+                return RedirectToAction(nameof(ExamScores), new { classesId = classesId, coursesId = coursesId, subjectsId = subjectsId });
             }
             catch (Exception ex)
             {
-                // Xử lý nếu có lỗi xảy ra khi gửi email
-                // Log lỗi ex.Message
+                // Handle error
+                return StatusCode(500, new { message = "An error occurred while updating scores", error = ex.Message });
             }
         }
 
+
+
+
+
+       
+
+
+       
 
         private async Task SendEditExamScoresEmail(string recipientEmail, string SubjectName)
         {
