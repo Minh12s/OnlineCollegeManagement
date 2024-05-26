@@ -155,7 +155,7 @@ namespace OnlineCollegeManagement.Controllers
 
                 await _context.SaveChangesAsync();
                 var subject = await _context.Subjects.FindAsync(subjectsId);
-                await SendEditExamScoresEmail("longtqth2209038@fpt.edu.vn", subject.SubjectName);
+                await SendEditExamScoresEmail("dungprohn1409@gmail.com", subject.SubjectName);
 
                 // Redirect or return success response
                 return RedirectToAction(nameof(ExamScores), new { classesId = classesId, coursesId = coursesId, subjectsId = subjectsId });
@@ -193,7 +193,7 @@ namespace OnlineCollegeManagement.Controllers
                 var message = new MailMessage();
                 message.To.Add(new MailAddress(recipientEmail)); // Địa chỉ email của sinh viên
                 message.From = new MailAddress(_configuration["EmailSettings:Username"]);
-                message.Subject = "Confirm successful registration!";
+                message.Subject = $"Notification: Exam Scores for {SubjectName}";
                 message.Body = emailContent;
                 message.IsBodyHtml = true;
 
