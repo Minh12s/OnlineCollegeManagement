@@ -260,10 +260,10 @@ namespace OnlineCollegeManagement.Controllers
         }
 
 
+        // Phương thức GET để hiển thị trang thêm sinh viên vào lớp với phân trang
         [HttpGet]
         public async Task<IActionResult> AddStudentToClass(int classesId, int page = 1, int pageSize = 10)
         {
-            // Lấy thông tin lớp học từ ID
             var classes = await _context.Classes.FindAsync(classesId);
 
             if (classes == null)
@@ -271,33 +271,18 @@ namespace OnlineCollegeManagement.Controllers
                 return NotFound();
             }
 
-            // Retrieve all students from the StudentCourses table
-            var students = await _context.StudentCourses
-                .Include(sc => sc.OfficialStudent)
-                    .ThenInclude(os => os.StudentInformation)
-                .Include(sc => sc.Course)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-
-
-
-
-            // Tính toán số trang
-            int totalStudents = await _context.OfficialStudents.CountAsync();
-            int totalPages = (int)Math.Ceiling(totalStudents / (double)pageSize);
-
-            // Truy vấn lại thông tin lớp học và gán cho ViewBag
+            var studentsPagedList = await GetStudentsPagedList(page, pageSize);
 
             ViewBag.ClassesId = classesId;
             ViewBag.ClassesStartDate = classes.ClassStartDate;
             ViewBag.ClassesEndDate = classes.ClassEndDate;
-            // Pass paging info through ViewBag
             ViewBag.PageNumber = page;
-            ViewBag.TotalPages = totalPages;
+            ViewBag.TotalPages = studentsPagedList.TotalPages;
 
-            return View(students);
+            return View(studentsPagedList.Students);
         }
+
+        // Phương thức POST để xử lý thêm sinh viên vào lớp và cũng phân trang
         [HttpPost]
         public async Task<IActionResult> AddStudentToClass(int classesId, List<string> selectedStudents, int page = 1, int pageSize = 10)
         {
@@ -316,7 +301,7 @@ namespace OnlineCollegeManagement.Controllers
             if (classes.ClassEndDate <= DateTime.Now)
             {
                 TempData["ErrorMessage"] = "The class has ended, students cannot be added to the class.";
-                return RedirectToAction(nameof(AddStudentToClass), new { classesId = classesId });
+                return RedirectToAction(nameof(AddStudentToClass), new { classesId = classesId, page, pageSize });
             }
 
             if (selectedStudents != null && selectedStudents.Any())
@@ -325,9 +310,9 @@ namespace OnlineCollegeManagement.Controllers
 
                 foreach (var studentCoursesId in selectedStudents)
                 {
+                    // Xử lý studentCoursesId không hợp lệ
                     if (!int.TryParse(studentCoursesId, out int courseId))
                     {
-                        // Handle invalid studentCoursesId here
                         ModelState.AddModelError("", $"Invalid studentCoursesId: {studentCoursesId}");
                         continue;
                     }
@@ -340,33 +325,43 @@ namespace OnlineCollegeManagement.Controllers
                         continue;
                     }
 
-                    // Kiểm tra xem học sinh đã đăng ký một khóa học khác trong cùng lớp hay chưa
-                    var existingRecord = await _context.StudentClasses
+                    // Kiểm tra xem sinh viên đã tồn tại trong bất kỳ lớp nào với khóa học cụ thể chưa
+                    var existingRecordInAnyClass = await _context.StudentClasses
                         .Include(sc => sc.StudentCourses)
-                        .ThenInclude(sc => sc.Course) // Bổ sung để lấy thông tin về khóa học
-                        .FirstOrDefaultAsync(sc => sc.StudentCourses.OfficialStudentId == studentCourse.OfficialStudentId && sc.ClassesId == classesId);
+                        .ThenInclude(sc => sc.Course)
+                        .FirstOrDefaultAsync(sc => sc.StudentCourses.OfficialStudentId == studentCourse.OfficialStudentId
+                            && sc.StudentCourses.CoursesId == studentCourse.CoursesId);
 
-                    if (existingRecord != null && existingRecord.StudentCourses != null && existingRecord.StudentCourses.Course != null)
+                    if (existingRecordInAnyClass != null)
                     {
-                        errors.Add($"Student with ID {studentCourse.OfficialStudentId} is already enrolled in class {classes.ClassName} with course {existingRecord.StudentCourses.Course.CourseName}.");
+                        var existingClass = await _context.Classes.FindAsync(existingRecordInAnyClass.ClassesId);
+                        errors.Add($"Student with ID {studentCourse.OfficialStudentId} is already enrolled in course {studentCourse.Course.CourseName} in class {existingClass.ClassName}.");
+                        continue;
                     }
-                    else if (existingRecord != null && existingRecord.Classes != null)
+
+                    // Kiểm tra xem sinh viên có hai khóa học trong cùng một lớp hay không
+                    var existingRecordInSameClass = await _context.StudentClasses
+                        .Include(sc => sc.StudentCourses)
+                        .ThenInclude(sc => sc.Course)
+                        .FirstOrDefaultAsync(sc => sc.StudentCourses.OfficialStudentId == studentCourse.OfficialStudentId
+                            && sc.ClassesId == classesId);
+
+                    if (existingRecordInSameClass != null)
                     {
-                        errors.Add($"Student with ID {studentCourse.OfficialStudentId} is already enrolled in class {classes.ClassName}.");
+                        errors.Add($"Student with ID {studentCourse.OfficialStudentId} is already enrolled in another course in class {classes.ClassName}.");
+                        continue;
                     }
-                    else
+
+                    var studentClass = new StudentClasses
                     {
-                        var studentClass = new StudentClasses
-                        {
-                            StudentCoursesId = courseId,
-                            ClassesId = classesId,
-                            ClassStartDate = classes.ClassStartDate,
-                            ClassEndDate = classes.ClassEndDate,
-                            StudentStatus = "Studying",
-                            DeleteStatus = 0
-                        };
-                        _context.StudentClasses.Add(studentClass);
-                    }
+                        StudentCoursesId = courseId,
+                        ClassesId = classesId,
+                        ClassStartDate = classes.ClassStartDate,
+                        ClassEndDate = classes.ClassEndDate,
+                        StudentStatus = "Studying",
+                        DeleteStatus = 0
+                    };
+                    _context.StudentClasses.Add(studentClass);
                 }
 
                 if (errors.Any())
@@ -375,7 +370,12 @@ namespace OnlineCollegeManagement.Controllers
                     {
                         ModelState.AddModelError(string.Empty, error);
                     }
-                    return View(await GetStudentsPagedList(page, pageSize));
+
+                    var studentsPagedList = await GetStudentsPagedList(page, pageSize);
+                    ViewBag.PageNumber = page;
+                    ViewBag.TotalPages = studentsPagedList.TotalPages;
+
+                    return View(studentsPagedList.Students);
                 }
                 else
                 {
@@ -385,23 +385,33 @@ namespace OnlineCollegeManagement.Controllers
             }
             else
             {
-                return View(await GetStudentsPagedList(page, pageSize));
+                var studentsPagedList = await GetStudentsPagedList(page, pageSize);
+                ViewBag.PageNumber = page;
+                ViewBag.TotalPages = studentsPagedList.TotalPages;
+
+                return View(studentsPagedList.Students);
             }
         }
 
-
-
-        // Helper method to retrieve paginated student list
-        private async Task<List<StudentCourses>> GetStudentsPagedList(int page, int pageSize)
+        // Phương thức để lấy danh sách sinh viên phân trang
+        private async Task<(List<StudentCourses> Students, int TotalPages)> GetStudentsPagedList(int page, int pageSize)
         {
-            return await _context.StudentCourses
-                  .Include(sc => sc.OfficialStudent)
+            var studentsQuery = _context.StudentCourses
+                .Include(sc => sc.OfficialStudent)
                     .ThenInclude(os => os.StudentInformation)
-                .Include(sc => sc.Course)
+                .Include(sc => sc.Course);
+
+            int totalStudents = await studentsQuery.CountAsync();
+            int totalPages = (int)Math.Ceiling(totalStudents / (double)pageSize);
+
+            var students = await studentsQuery
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
+
+            return (students, totalPages);
         }
+
 
 
         [HttpPost]

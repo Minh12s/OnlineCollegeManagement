@@ -155,7 +155,7 @@ namespace OnlineCollegeManagement.Controllers
 
                 await _context.SaveChangesAsync();
                 var subject = await _context.Subjects.FindAsync(subjectsId);
-                await SendEditExamScoresEmail("dungprohn1409@gmail.com", subject.SubjectName);
+                await SendEditExamScoresEmail("", subject.SubjectName);
 
                 // Redirect or return success response
                 return RedirectToAction(nameof(ExamScores), new { classesId = classesId, coursesId = coursesId, subjectsId = subjectsId });

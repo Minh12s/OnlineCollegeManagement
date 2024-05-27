@@ -258,7 +258,9 @@
 
 
 
-<script>document.addEventListener("DOMContentLoaded", function () {
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
         var selectedStudents = [];
 
         var storedStudents = localStorage.getItem("selectedStudents");
@@ -292,8 +294,10 @@
             });
         });
 
-        var form = document.querySelector('.edit-product-form');
+        var form = document.querySelector('#addStudentsForm');
         form.addEventListener('submit', function () {
             localStorage.removeItem('selectedStudents');
         });
-    });</script>
+    });
+
+</script>

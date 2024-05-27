@@ -93,36 +93,8 @@ namespace OnlineCollegeManagement.Controllers
         [HttpPost]
         public async Task<IActionResult> AddSchedule(ClassSchedules model, int classesId)
         {
-            // Kiểm tra khóa ngoại CoursesId có tồn tại hay không
-            var course = await _context.Courses.FindAsync(model.CoursesId);
-            if (course == null)
-            {
-                // Xử lý khi khóa ngoại CoursesId không tồn tại
-                var courses = await _context.Courses.ToListAsync();
-                ViewBag.Courses = new SelectList(courses, "CoursesId", "CourseName");
-                ViewBag.ClassesId = model.ClassesId;
-                TempData["ErrorMessage"] = "Selected course does not exist.";
-                ViewBag.ClassesId = classesId;
-                return RedirectToAction("AddSchedule", "Schedule", new { classesId = classesId });
-            }
-            // Kiểm tra xem lớp học đã có lịch học hay chưa
-            var existingSchedules = await _context.ClassSchedules
-                .AnyAsync(schedule => schedule.ClassesId == classesId);
-
-            if (existingSchedules)
-            {
-                // Lớp học đã có lịch học, trả về thông báo lỗi
-                TempData["ErrorMessage"] = "This class already has schedules.";
-                // Load danh sách khóa học cho dropdown
-                var courses = await _context.Courses.ToListAsync();
-                ViewBag.Courses = new SelectList(courses, "CoursesId", "CourseName");
-                ViewBag.ClassesId = classesId;
-
-                // Trả về view với thông báo lỗi và model
-                return RedirectToAction("AddSchedule", "Schedule", new { classesId = classesId });
-            }
             // Kiểm tra khóa ngoại ClassesId có tồn tại hay không
-            var classEntity = await _context.Classes.FindAsync(model.ClassesId);
+            var classEntity = await _context.Classes.FindAsync(classesId);
             if (classEntity == null)
             {
                 // Xử lý khi khóa ngoại ClassesId không tồn tại
@@ -132,6 +104,41 @@ namespace OnlineCollegeManagement.Controllers
                 TempData["ErrorMessage"] = "Selected class does not exist.";
                 return RedirectToAction("AddSchedule", "Schedule", new { classesId = classesId });
             }
+
+            // Kiểm tra xem lớp học đã kết thúc hay chưa
+            if (classEntity.ClassEndDate <= DateTime.Today)
+            {
+                TempData["ErrorMessage"] = "This class has ended, schedules cannot be added.";
+                var courses = await _context.Courses.ToListAsync();
+                ViewBag.Courses = new SelectList(courses, "CoursesId", "CourseName");
+                ViewBag.ClassesId = classesId;
+                return RedirectToAction("AddSchedule", "Schedule", new { classesId = classesId });
+            }
+
+            // Kiểm tra khóa ngoại CoursesId có tồn tại hay không
+            var course = await _context.Courses.FindAsync(model.CoursesId);
+            if (course == null)
+            {
+                // Xử lý khi khóa ngoại CoursesId không tồn tại
+                var courses = await _context.Courses.ToListAsync();
+                ViewBag.Courses = new SelectList(courses, "CoursesId", "CourseName");
+                ViewBag.ClassesId = model.ClassesId;
+                TempData["ErrorMessage"] = "Selected course does not exist.";
+                return RedirectToAction("AddSchedule", "Schedule", new { classesId = classesId });
+            }
+
+            // Kiểm tra xem lớp học đã có lịch học hay chưa
+            var existingSchedules = await _context.ClassSchedules.AnyAsync(schedule => schedule.ClassesId == classesId);
+            if (existingSchedules)
+            {
+                TempData["ErrorMessage"] = "This class already has schedules.";
+                var courses = await _context.Courses.ToListAsync();
+                ViewBag.Courses = new SelectList(courses, "CoursesId", "CourseName");
+                ViewBag.ClassesId = classesId;
+                return RedirectToAction("AddSchedule", "Schedule", new { classesId = classesId });
+            }
+
+            // Tiếp tục thêm lịch học nếu lớp học chưa kết thúc và chưa có lịch học
 
             var courseSubjects = await _context.CoursesSubjects
                 .Where(cs => cs.CoursesId == model.CoursesId)
@@ -183,7 +190,6 @@ namespace OnlineCollegeManagement.Controllers
                     StudySession = model.StudySession,
                     SchedulesDate = startDate
                 };
-
                 _context.ClassSchedules.Add(testSchedule);
 
                 // Tính ngày học tiếp theo sau ngày thi
@@ -197,7 +203,8 @@ namespace OnlineCollegeManagement.Controllers
 
             return RedirectToAction("ViewSchedule", "Schedule", new { classesId = classesId });
         }
-        private async Task SendScheduleConfirmationEmail(string recipientEmail, string className, string studyDays, string studySession, DateTime ClassStartDate)
+
+            private async Task SendScheduleConfirmationEmail(string recipientEmail, string className, string studyDays, string studySession, DateTime ClassStartDate)
         {
             try
             {
