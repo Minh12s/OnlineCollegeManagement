@@ -78,6 +78,14 @@
         </button>
     </div>
 </form>
+@{
+    if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+}
 <section class="section main-section">
     <div class="card has-table">
         <header class="card-header">
@@ -115,6 +123,7 @@
         </header>
 
         <div class="card-content">
+
             <table class="table table-hover table-bordered js-copytextarea" cellpadding="0" cellspacing="0" border="0" id="sampleTable">
                 <thead>
                     <tr>
@@ -140,7 +149,7 @@
                             <td><img src="@courses.CoursesImageUrl" alt="Thumbnail" width="100" height="100"></td>
                             <td>@Html.Raw(courses.Description)</td>
                             <td>@courses.CourseTime</td>
-                            <td>@courses.Major.MajorName</td> 
+                            <td>@courses.Major.MajorName</td>
                             <td>@courses.Teacher.TeacherName</td>
 
                             <td>
@@ -184,33 +193,48 @@
 
 </section>
 <style>
+    .alert {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        / Đảm bảo nội dung được căn giữa theo chiều dọc / padding: 20px 15px;
+        color: red;
+    }
+
+    .text-error {
+        color: red;
+    }
 
     .btn-primary {
         color: rgb(245 157 57);
         background-color: rgb(251 226 197);
         border-color: none;
-        /* border-top-left-radius: 10px !important; */
-        /* border-bottom-right-radius: 10px !important; */
-        border-radius: .357rem;
+        / border-top-left-radius: 10px !important;
+        / / border-bottom-right-radius: 10px !important;
+        / border-radius: .357rem;
         border: none;
         font-weight: 600;
-        padding: 5px 20px; /* Điều chỉnh kích thước theo ý muốn */
+        padding: 5px 20px;
+        / Điều chỉnh kích thước theo ý muốn /
     }
 
     .edit-button {
-        margin-top: 10px; /* Điều chỉnh giá trị margin-top theo ý muốn */
+        margin-top: 10px;
+        / Điều chỉnh giá trị margin-top theo ý muốn /
     }
 
     .btn-add {
         color: white;
         background-color: black;
         border-color: none;
-        /* border-top-left-radius: 10px !important; */
-        /* border-bottom-right-radius: 10px !important; */
-        border-radius: .357rem;
+        / border-top-left-radius: 10px !important;
+        / / border-bottom-right-radius: 10px !important;
+        / border-radius: .357rem;
         border: none;
         font-weight: 600;
-        padding: 10px 20px; /* Điều chỉnh kích thước theo ý muốn */
+        padding: 10px 20px;
+        / Điều chỉnh kích thước theo ý muốn /
     }
 
     .btn-danger {
@@ -218,9 +242,9 @@
         background-color: #dc3545;
         border-color: #dc3545;
         border-color: none;
-        /* border-top-left-radius: 10px !important; */
-        /* border-bottom-right-radius: 10px !important; */
-        border-radius: .357rem;
+        / border-top-left-radius: 10px !important;
+        / / border-bottom-right-radius: 10px !important;
+        / border-radius: .357rem;
         border: none;
         font-weight: 600;
         padding: 5px 20px;
@@ -248,14 +272,14 @@
     }
 
         .button-group > * {
-            margin-right: 10px; /* Khoảng cách giữa các nút */
+            margin-right: 10px;
+            / Khoảng cách giữa các nút /
         }
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.2/xlsx.full.min.js"></script>
-<script>
-    function exportCoursesToExcel() {
+<script>function exportCoursesToExcel() {
         $.ajax({
             url: '/Excel/ExportCoursesToExcel',
             type: 'GET',
@@ -268,9 +292,11 @@
                 var link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
                 link.download = 'courses.xlsx';
-                document.body.appendChild(link);
+                document.body.appendChild(link)
+                    ;
                 link.click();
-                document.body.removeChild(link);
+                document.body.removeChild(link)
+                    ;
             },
             error: function (error) {
                 console.log(error);
@@ -286,8 +312,7 @@
     }</script>
 <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
 
-<script>
-    this.exportExcel = function () {
+<script>this.exportExcel = function () {
         // Lấy bảng cần xuất
         var tab = document.getElementById('sampleTable');
         // Tạo một đối tượng Excel
@@ -315,6 +340,3 @@
             window.URL.revokeObjectURL(url);
         });
     }</script>
-
-
-

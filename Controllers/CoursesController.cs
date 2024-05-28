@@ -408,27 +408,36 @@ namespace OnlineCollegeManagement.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteCourses(int id)
         {
-            var courses = await _context.Courses.FindAsync(id);
+            var course = await _context.Courses.FindAsync(id)
+;
 
-            if (courses == null)
+            if (course == null)
             {
                 return NotFound();
             }
 
-            // Xóa ảnh đại diện của blog khỏi thư mục
-            if (!string.IsNullOrEmpty(courses.CoursesImageUrl))
+            // Kiểm tra xem khóa học có sinh viên đã đăng ký hay chưa
+            bool hasRegistrations = await _context.StudentCourses.AnyAsync(sc => sc.CoursesId == id);
+            if (hasRegistrations)
             {
-                var imagePath = Path.Combine("wwwroot", courses.CoursesImageUrl.TrimStart('/'));
+                TempData["ErrorMessage"] = "Cannot delete the course because students have already registered for it.";
+                return RedirectToAction("Courses", "Courses");
+            }
+
+            // Xóa ảnh đại diện của khóa học khỏi thư mục
+            if (!string.IsNullOrEmpty(course.CoursesImageUrl))
+            {
+                var imagePath = Path.Combine("wwwroot", course.CoursesImageUrl.TrimStart('/'));
                 if (System.IO.File.Exists(imagePath))
                 {
                     System.IO.File.Delete(imagePath);
                 }
             }
 
-            _context.Courses.Remove(courses);
+            _context.Courses.Remove(course);
             await _context.SaveChangesAsync();
 
-            // Chuyển hướng về trang BlogManagement/Blog
+            // Chuyển hướng về trang Courses
             return RedirectToAction("Courses", "Courses");
         }
     }
