@@ -20,27 +20,7 @@
                 Add Student
             </a>
         </div>
-        <!-- Phần này để chứa nút "Print PDF" -->
-        <div class="col-sm-2" style="margin-right: 5px;">
-            <button onclick="myApp.printTable()" class="btn btn-add">
-                <i class="fas fa-file-pdf"></i>
-                Print PDF
-            </button>
-        </div>
-        <!-- Phần này để chứa nút "Export Excel" -->
-        <div class="col-sm-2" style="margin-right: 5px;">
-            <button onclick="exportBlogToExcel()" class="btn btn-add">
-                <i class="fas fa-file-excel"></i>
-                Export Excel
-            </button>
-        </div>
-        <!-- Phần này để chứa nút "Excel Filtered" -->
-        <div class="col-sm-2">
-            <button onclick="exportExcel()" class="btn btn-add">
-                <i class="fas fa-file-excel"></i>
-                Excel Filtered
-            </button>
-        </div>
+       
     </div>
 </section>
 @if (TempData["ErrorMessage"] != null)

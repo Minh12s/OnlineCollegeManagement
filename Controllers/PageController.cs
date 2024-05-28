@@ -107,16 +107,17 @@ namespace OnlineCollegeManagement.Controllers
 
         public async Task<IActionResult> Search(string searchTerm)
         {
-            // Thực hiện tìm kiếm dựa trên UniqueCode
+            // Thực hiện tìm kiếm dựa trên UniqueCode chính xác
             var registrations = await _context.Registrations
                 .Include(r => r.StudentInformation)
                     .ThenInclude(si => si.Major)
-                .Where(r => r.UniqueCode.Contains(searchTerm))
+                .Where(r => r.UniqueCode == searchTerm)
                 .ToListAsync();
 
             // Trả về kết quả tìm kiếm
             return View(registrations);
         }
+
         public async Task<IActionResult> DetailsSearch(int? id)
         {
             if (id == null)
